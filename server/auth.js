@@ -100,6 +100,22 @@ app.post("/register", async (req, res) => {
   }
 });
 
+// to login to the application
+app.post('/login', async(req,res)=>{
+  const {email, admission_number, password} = req.body;
+
+  await getCurrentUser(email, admission_number, res);
+
+  const hashedPassword = currentUser.password;
+  const isValid = await bcrypt.compare(password, hashedPassword);
+  if (isValid) {
+    res.status(200).json({ message: "Successful login"})
+    console.log("Password matches !"); // return errors to display to end user
+  } else {
+    res.status(400).json({ message: "Email, admission number and password confirmation do not match"})
+
+  }
+})
 app.listen(port, () => {
   console.log(`Server started on ${port}`);
 });
