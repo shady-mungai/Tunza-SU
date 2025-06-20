@@ -104,6 +104,10 @@ app.post("/register", async (req, res) => {
 app.post('/login', async(req,res)=>{
   const {email, admission_number, password} = req.body;
 
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
+
   await getCurrentUser(email, admission_number, res);
 
   const hashedPassword = currentUser.password;
