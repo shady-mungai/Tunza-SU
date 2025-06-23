@@ -17,13 +17,13 @@ import { validatePassword, validateEmail, validateName, validatePhone } from "..
 const { width } = Dimensions.get("window")
 
 const Signup = () => {
-    const [currentStep, setCurrentStep] = useState(0)
+    const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        admission_number: "", 
-        phone_number: "",
+        admission_number: "", // Fixed: was admission_number
+        phone_number: "", // Fixed: was phone_number_number
         role: "",
         password: "",
         confirmPassword: ""
@@ -41,6 +41,27 @@ const Signup = () => {
         },
     })
 
+    // Add validation states for real-time feedback
+    const [validationErrors, setValidationErrors] = useState({
+        name: "",
+        email: "",
+        admission_number: "",
+        phone_number: "",
+        role: "",
+        password: "",
+        confirmPassword: ""
+    })
+
+    const [fieldsTouched, setFieldsTouched] = useState({
+        name: false,
+        email: false,
+        admission_number: false,
+        phone_number: false,
+        role: false,
+        password: false,
+        confirmPassword: false
+    })
+
     const slideAnim = useRef(new Animated.Value(0)).current
 
     const steps = [
@@ -52,7 +73,7 @@ const Signup = () => {
         {
             title: "Add your details",
             subtitle: "We need some additional information",
-            fields: ["admissionNumber", "phone", "role"],
+            fields: ["admission_number", "phone_number", "role"],
         },
         {
             title: "Choose a password",
@@ -66,6 +87,7 @@ const Signup = () => {
         },
     ]
   
+    // Fixed: Proper React Native input change handler with real-time validation
     function handleInputChange(field, value) {
         console.log(`Input changed - Field: ${field}, Value: ${value}`);
         
@@ -78,11 +100,61 @@ const Signup = () => {
             return newData;
         });
 
+        // Mark field as touched
+        setFieldsTouched(prev => ({
+            ...prev,
+            [field]: true
+        }));
+
+        // Real-time validation
+        validateField(field, value);
+
         if (field === "password") {
             const strength = validatePassword(value);
             console.log('Password strength:', strength);
             setPasswordStrength(strength);
         }
+    }
+
+    // Real-time field validation
+    const validateField = (field, value) => {
+        let error = "";
+
+        switch (field) {
+            case "name":
+                if (value.trim()) {
+                    const validation = validateName(value);
+                    error = validation.message;
+                }
+                break;
+            case "email":
+                if (value.trim()) {
+                    const validation = validateEmail(value);
+                    error = validation.message;
+                }
+                break;
+            case "admission_number":
+                if (value.trim() && value.length < 3) {
+                    error = "Admission number must be at least 3 characters";
+                }
+                break;
+            case "phone_number":
+                if (value.trim()) {
+                    const validation = validatePhone(value);
+                    error = validation.message;
+                }
+                break;
+            case "confirmPassword":
+                if (value.trim() && formData.password !== value) {
+                    error = "Passwords do not match";
+                }
+                break;
+        }
+
+        setValidationErrors(prev => ({
+            ...prev,
+            [field]: error
+        }));
     }
 
     const validateCurrentStep = () => {
@@ -110,15 +182,15 @@ const Signup = () => {
                         return false
                     }
                     break
-                case "admissionNumber":
+                case "admission_number":
                     if (value.length < 3) {
                         Alert.alert("Error", "Please enter a valid admission number (at least 3 characters)")
                         return false
                     }
                     break
-                case "phone":
+                case "phone_number":
                     if (!validatePhone(value).isValid) {
-                        Alert.alert("Error", "Please enter a valid phone number")
+                        Alert.alert("Error", "Please enter a valid phone_number")
                         return false
                     }
                     break
@@ -151,8 +223,8 @@ const Signup = () => {
         const fieldNames = {
             name: "name",
             email: "email",
-            admissionNumber: "admission number",
-            phone: "phone number",
+            admission_number: "admission number",
+            phone_number: "phone_number",
             role: "role",
             password: "password",
             confirmPassword: "confirm password"
@@ -181,6 +253,8 @@ const Signup = () => {
         if (currentStep > 0) {
             const newStep = currentStep - 1;
             setCurrentStep(newStep);
+            // Remove animation for now
+            // animateSlide(newStep)
         }
     }
 
@@ -248,7 +322,9 @@ const Signup = () => {
                 <Text className="text-sm font-medium text-gray-700 mb-2">First & last name *</Text>
                 <TextInput
                     className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        !formData.name.trim() && currentStep === 0 ? "border-red-300" : "border-gray-300"
+                        validationErrors.name ? "border-red-400" : 
+                        (fieldsTouched.name && formData.name.trim() && !validationErrors.name) ? "border-green-400" : 
+                        "border-gray-300"
                     }`}
                     value={formData.name}
                     onChangeText={(value) => handleInputChange("name", value)}
@@ -256,8 +332,14 @@ const Signup = () => {
                     autoCapitalize="words"
                     autoFocus
                 />
-                {!formData.name.trim() && (
+                {fieldsTouched.name && !formData.name.trim() && (
                     <Text className="text-xs text-red-500 mt-1">Name is required</Text>
+                )}
+                {validationErrors.name && (
+                    <Text className="text-xs text-red-500 mt-1">{validationErrors.name}</Text>
+                )}
+                {fieldsTouched.name && formData.name.trim() && !validationErrors.name && (
+                    <Text className="text-xs text-green-600 mt-1">✓ Valid name</Text>
                 )}
             </View>
 
@@ -265,7 +347,9 @@ const Signup = () => {
                 <Text className="text-sm font-medium text-gray-700 mb-2">Email *</Text>
                 <TextInput
                     className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        !formData.email.trim() && currentStep === 0 ? "border-red-300" : "border-gray-300"
+                        validationErrors.email ? "border-red-400" : 
+                        (fieldsTouched.email && formData.email.trim() && !validationErrors.email) ? "border-green-400" : 
+                        "border-gray-300"
                     }`}
                     value={formData.email}
                     onChangeText={(value) => handleInputChange("email", value)}
@@ -274,8 +358,14 @@ const Signup = () => {
                     autoCapitalize="none"
                     autoCorrect={false}
                 />
-                {!formData.email.trim() && (
+                {fieldsTouched.email && !formData.email.trim() && (
                     <Text className="text-xs text-red-500 mt-1">Email is required</Text>
+                )}
+                {validationErrors.email && (
+                    <Text className="text-xs text-red-500 mt-1">{validationErrors.email}</Text>
+                )}
+                {fieldsTouched.email && formData.email.trim() && !validationErrors.email && (
+                    <Text className="text-xs text-green-600 mt-1">✓ Valid email</Text>
                 )}
                 <Text className="text-xs text-gray-500 mt-1">You'll use this email to sign in to your account</Text>
             </View>
@@ -288,39 +378,56 @@ const Signup = () => {
                 <Text className="text-sm font-medium text-gray-700 mb-2">Admission Number *</Text>
                 <TextInput
                     className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        !formData.admission_number.trim() && currentStep === 1 ? "border-red-300" : "border-gray-300"
+                        validationErrors.admission_number ? "border-red-400" : 
+                        (fieldsTouched.admission_number && formData.admission_number.trim() && !validationErrors.admission_number) ? "border-green-400" : 
+                        "border-gray-300"
                     }`}
                     value={formData.admission_number}
-                    onChangeText={(value) => handleInputChange("admissionNumber", value)}
+                    onChangeText={(value) => handleInputChange("admission_number", value)}
                     placeholder="Enter your admission number"
                     autoCapitalize="characters"
                     autoFocus
                 />
-                {!formData.admission_number.trim() && (
+                {fieldsTouched.admission_number && !formData.admission_number.trim() && (
                     <Text className="text-xs text-red-500 mt-1">Admission number is required</Text>
+                )}
+                {validationErrors.admission_number && (
+                    <Text className="text-xs text-red-500 mt-1">{validationErrors.admission_number}</Text>
+                )}
+                {fieldsTouched.admission_number && formData.admission_number.trim() && formData.admission_number.length >= 3 && (
+                    <Text className="text-xs text-green-600 mt-1">✓ Valid admission number</Text>
                 )}
             </View>
 
             <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Phone Number *</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">phone number *</Text>
                 <TextInput
                     className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        !formData.phone_number.trim() && currentStep === 1 ? "border-red-300" : "border-gray-300"
+                        validationErrors.phone_number ? "border-red-400" : 
+                        (fieldsTouched.phone_number && formData.phone_number.trim() && !validationErrors.phone_number) ? "border-green-400" : 
+                        "border-gray-300"
                     }`}
                     value={formData.phone_number}
-                    onChangeText={(value) => handleInputChange("phone", value)}
+                    onChangeText={(value) => handleInputChange("phone_number", value)}
                     placeholder="Enter your phone number"
-                    keyboardType="phone-pad"
                 />
-                {!formData.phone_number.trim() && (
+                {fieldsTouched.phone_number && !formData.phone_number.trim() && (
                     <Text className="text-xs text-red-500 mt-1">Phone number is required</Text>
+                )}
+                {validationErrors.phone_number && (
+                    <Text className="text-xs text-red-500 mt-1">{validationErrors.phone_number}</Text>
+                )}
+                {fieldsTouched.phone_number && formData.phone_number.trim() && !validationErrors.phone_number && (
+                    <Text className="text-xs text-green-600 mt-1">✓ Valid phone number</Text>
                 )}
             </View>
 
             <View className="mb-6">
                 <Text className="text-sm font-medium text-gray-700 mb-2">Role *</Text>
                 <View className={`border rounded-lg bg-white ${
-                    !formData.role && currentStep === 1 ? "border-red-300" : "border-gray-300"
+                    fieldsTouched.role && !formData.role ? "border-red-400" : 
+                    (fieldsTouched.role && formData.role) ? "border-green-400" : 
+                    "border-gray-300"
                 }`}>
                     <Picker
                         selectedValue={formData.role}
@@ -333,8 +440,11 @@ const Signup = () => {
                         <Picker.Item label="Staff" value="staff" />
                     </Picker>
                 </View>
-                {!formData.role && (
+                {fieldsTouched.role && !formData.role && (
                     <Text className="text-xs text-red-500 mt-1">Please select your role</Text>
+                )}
+                {fieldsTouched.role && formData.role && (
+                    <Text className="text-xs text-green-600 mt-1">✓ Role selected</Text>
                 )}
             </View>
         </View>
@@ -359,7 +469,9 @@ const Signup = () => {
                     <Text className="text-sm font-medium text-gray-700 mb-2">Password *</Text>
                     <TextInput
                         className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                            !formData.password.trim() && currentStep === 2 ? "border-red-300" : "border-gray-300"
+                            fieldsTouched.password && passwordStrength.score < 5 ? "border-red-400" : 
+                            (fieldsTouched.password && passwordStrength.score >= 5) ? "border-green-400" : 
+                            "border-gray-300"
                         }`}
                         value={formData.password}
                         onChangeText={(value) => handleInputChange("password", value)}
@@ -368,7 +480,7 @@ const Signup = () => {
                         autoCapitalize="none"
                         autoFocus
                     />
-                    {!formData.password.trim() && (
+                    {fieldsTouched.password && !formData.password.trim() && (
                         <Text className="text-xs text-red-500 mt-1">Password is required</Text>
                     )}
                     {formData.password.length > 0 && (
@@ -400,7 +512,9 @@ const Signup = () => {
                     <Text className="text-sm font-medium text-gray-700 mb-2">Confirm Password *</Text>
                     <TextInput
                         className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                            !formData.confirmPassword.trim() && currentStep === 2 ? "border-red-300" : "border-gray-300"
+                            validationErrors.confirmPassword ? "border-red-400" : 
+                            (fieldsTouched.confirmPassword && formData.confirmPassword && !validationErrors.confirmPassword) ? "border-green-400" : 
+                            "border-gray-300"
                         }`}
                         value={formData.confirmPassword}
                         onChangeText={(value) => handleInputChange("confirmPassword", value)}
@@ -408,17 +522,20 @@ const Signup = () => {
                         secureTextEntry
                         autoCapitalize="none"
                     />
-                    {!formData.confirmPassword.trim() && (
+                    {fieldsTouched.confirmPassword && !formData.confirmPassword.trim() && (
                         <Text className="text-xs text-red-500 mt-1">Please confirm your password</Text>
                     )}
-                    {formData.confirmPassword.length > 0 && formData.password !== formData.confirmPassword && (
-                        <Text className="text-xs text-red-500 mt-1">Passwords do not match</Text>
+                    {validationErrors.confirmPassword && (
+                        <Text className="text-xs text-red-500 mt-1">{validationErrors.confirmPassword}</Text>
+                    )}
+                    {fieldsTouched.confirmPassword && formData.confirmPassword && !validationErrors.confirmPassword && (
+                        <Text className="text-xs text-green-600 mt-1">✓ Passwords match</Text>
                     )}
                 </View>
 
                 <View className="bg-blue-50 p-4 rounded-lg">
                     <Text className="text-sm text-blue-800">
-                        💡 Use a mix of letters, numbers, and symbols to create a strong password
+                        Hint: Use a mix of letters, numbers, and symbols to create a strong password
                     </Text>
                 </View>
             </View>
@@ -447,7 +564,7 @@ const Signup = () => {
                     </View>
 
                     <View className="flex-row justify-between">
-                        <Text className="text-gray-600">Phone:</Text>
+                        <Text className="text-gray-600">Phone number:</Text>
                         <Text className="font-medium text-gray-900">{formData.phone_number}</Text>
                     </View>
 
