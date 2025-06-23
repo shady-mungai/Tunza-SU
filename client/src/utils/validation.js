@@ -2,7 +2,7 @@ export const validateEmail = (email) => {
   const emailRegex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
   return {
-    isValid: emailRegex.test(email) && email.length <= 254,
+    isValid: emailRegex.test(email),
     message: emailRegex.test(email) ? "" : "Please enter a valid email address",
   }
 }
