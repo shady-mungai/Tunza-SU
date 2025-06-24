@@ -11,6 +11,9 @@ import {
   Animated,
   Dimensions,
 } from "react-native"
+import axios from 'axios'
+import Toast from 'react-native-toast-message'
+
 import { Picker } from '@react-native-picker/picker' // Make sure to install this package
 import { useState, useRef } from 'react'
 import { validatePassword, validateEmail, validateName, validatePhone } from "../src/utils/validation"
@@ -258,16 +261,15 @@ const Signup = () => {
         }
     }
 
-    // Keep animation function but don't use it for now
-    const animateSlide = (step) => {
-        Animated.timing(slideAnim, {
-            toValue: step * -width,
-            duration: 300,
-            useNativeDriver: true,
-        }).start()
-    }
 
     const handleSignup = async () => {
+        console.log("I GOT PRESSED !!!!!!!!!!!!!")
+        console.log(currentStep);
+        console.log("-------------------------------");
+        
+        console.log(steps.length);
+        
+        
         setIsLoading(true)
         try {
             // Add final validation before signup
@@ -279,22 +281,35 @@ const Signup = () => {
                 setIsLoading(false)
                 return
             }
-
-            const success = await signup({
+            const success =  await axios.post("http://localhost:4000/register",{
                 name: formData.name,
                 email: formData.email,
                 admission_number: formData.admission_number,
                 phone_number: formData.phone_number,
                 role: formData.role,
                 password: formData.password,
+            },{
+                headers: {
+                    'Content-Type':'application/json'
+                }
             })
+            //const success = true;
 
             if (success) {
-                Alert.alert("Success", "Account created successfully!", [
-                    { text: "OK", onPress: () => navigation.replace("Dashboard") },
-                ])
+                console.log("Account created!");
+                Toast.show({
+                    type: 'success',
+                    text1: 'Success!',
+                    text2: 'Account created successfully',
+                    visibilityTime: 3000,
+                });
+                setTimeout(() => navigation.navigate("StudentDash"), 2000);
             } else {
-                Alert.alert("Error", "Failed to create account. Please try again.")
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Failed to create account. Please try again.',
+                });
             }
         } catch (error) {
             console.error("Signup error:", error)
@@ -635,7 +650,7 @@ const Signup = () => {
 
                         <TouchableOpacity
                             className={`px-8 py-3 rounded-lg ${isLoading ? "bg-gray-400" : "bg-blue-600"}`}
-                            onPress={nextStep}
+                            onPress={currentStep === steps.length - 1 ? handleSignup : nextStep}                            
                             disabled={isLoading}
                         >
                             <Text className="text-white font-semibold">
