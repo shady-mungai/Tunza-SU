@@ -51,7 +51,7 @@ function generateSecret() {
 }
 
 app.post("/register", async (req, res) => {
-  const { email, admission_number, name, password, phone_number, role } = req.body;
+  const { name, email, admission_number, password, phone_number, role } = req.body;
 
   await getCurrentUser(email, admission_number);
 
