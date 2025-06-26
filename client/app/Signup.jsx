@@ -17,9 +17,13 @@ import Toast from 'react-native-toast-message'
 import { Picker } from '@react-native-picker/picker' // Make sure to install this package
 import { useState, useRef } from 'react'
 import { validatePassword, validateEmail, validateName, validatePhone } from "../src/utils/validation"
+import { useAuth } from '../src/contexts/AuthContexts'
+import { useNavigation } from '@react-navigation/native'
 const { width } = Dimensions.get("window")
 
 const Signup = () => {
+    const { register } = useAuth();
+    const navigation = useNavigation();
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -263,59 +267,30 @@ const Signup = () => {
 
 
     const handleSignup = async () => {
-        console.log("I GOT PRESSED !!!!!!!!!!!!!")
-        console.log(currentStep);
-        console.log("-------------------------------");
-        
-        console.log(steps.length);
-        
-        
         setIsLoading(true)
-        try {
-            // Add final validation before signup
-            const requiredFields = ['name', 'email', 'admission_number', 'phone_number', 'role', 'password']
-            const emptyFields = requiredFields.filter(field => !formData[field] || !formData[field].trim())
-            
-            if (emptyFields.length > 0) {
-                Alert.alert("Error", "Please fill in all required fields")
-                setIsLoading(false)
-                return
-            }
-            const success =  await axios.post("http://localhost:4000/register",{
-                name: formData.name,
-                email: formData.email,
-                admission_number: formData.admission_number,
-                phone_number: formData.phone_number,
-                role: formData.role,
-                password: formData.password,
-            },{
-                headers: {
-                    'Content-Type':'application/json'
-                }
-            })
-            //const success = true;
-
-            if (success) {
-                console.log("Account created!");
-                Toast.show({
-                    type: 'success',
-                    text1: 'Success!',
-                    text2: 'Account created successfully',
-                    visibilityTime: 3000,
-                });
-                setTimeout(() => navigation.navigate("StudentDash"), 2000);
-            } else {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'Failed to create account. Please try again.',
-                });
-            }
-        } catch (error) {
-            console.error("Signup error:", error)
-            Alert.alert("Error", "Registration failed. Please try again.")
-        } finally {
-            setIsLoading(false)
+        const success = await register({
+            name: formData.name,
+            email: formData.email,
+            admission_number: formData.admission_number,
+            phone_number: formData.phone_number,
+            role: formData.role,
+            password: formData.password,
+        });
+        setIsLoading(false)
+        if (success) {
+            Toast.show({
+                type: 'success',
+                text1: 'Success!',
+                text2: 'Account created successfully',
+                visibilityTime: 3000,
+            });
+            setTimeout(() => navigation.navigate("StudentDash"), 2000);
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to create account. Please try again.',
+            });
         }
     }
 

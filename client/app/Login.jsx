@@ -9,12 +9,27 @@ import {
   ScrollView,
 } from "react-native";
 import { useState } from 'react'
+import { useAuth } from '../src/contexts/AuthContexts'
+import { useNavigation } from '@react-navigation/native'
 
 const Login = () => {
-
+    const { login, user, loading } = useAuth();
+    const navigation = useNavigation();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false);
+
+    const handleLogin = async () => {
+      setIsLoading(true);
+      const success = await login(email, password);
+      setIsLoading(false);
+      if (success) {
+        navigation.navigate("StudentDash");
+      } else {
+        Alert.alert("Login failed", "Invalid credentials");
+      }
+    };
+
   return (
   <KeyboardAvoidingView className="flex-1 bg-gray-50" behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
@@ -56,7 +71,7 @@ const Login = () => {
 
             <TouchableOpacity
               className={`py-3 rounded-lg ${isLoading ? "bg-gray-400" : "bg-blue-600"}`}
-             // onPress={handleLogin}
+              onPress={handleLogin}
               disabled={isLoading}
             >
               <Text className="text-white text-center font-semibold text-base">
