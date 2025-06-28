@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
-
-// Placeholder components (replace with actual implementations)
-const HeaderBar = () => <View style={styles.header}><></></View>;
-const SidebarNavigation = () => <View style={styles.sidebar}><></></View>;
-const StatCardList = () => <View style={styles.statCardList}><></></View>;
-const QuickActions = () => <View style={styles.quickActions}><></></View>;
-const RecentReportsList = () => <View style={styles.recentReports}><></></View>;
+import HeaderBar from './HeaderBar';
+import StatCardList from './StatCardList';
+import QuickActions from './QuickActions';
+import RecentReportsList from './RecentReportsList';
+import SidebarNavigation from './SidebarNavigation';
 
 const StudentDashboard = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(Dimensions.get('window').width >= 768);

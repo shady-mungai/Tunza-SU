@@ -1,14 +1,74 @@
-import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { StyleSheet, Text, View, Platform } from 'react-native'
+import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import Login from './Login'
+import Signup from './Signup'
+import StudentDashboard from '../src/components/StudentDashboard'
+import MyReports from '../src/components/MyReports' // Placeholder, create this component
+//import MapScreen from '../src/screens/MapScreen'
+import ProfileScreen from '../src/components/ProfileScreen' // Placeholder, create this component
+//import HelpScreen from '../src/screens/HelpScreen'
 import "../global.css"
+import { AuthProvider, useAuth } from '../src/contexts/AuthContexts'
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
+        tabBarLabelStyle: { fontSize: 12 },
+      }}
+    >
+      <Tab.Screen name="Student Dash" component={StudentDashboard} options={{ tabBarIcon: () => <Text>⚙️</Text> }} />
+      <Tab.Screen name="My Reports" component={MyReports} options={{ tabBarIcon: () => <Text>⚠️</Text> }} />
+      {/* <Tab.Screen name="Map View" component={MapScreen} options={{ tabBarIcon: () => <Text>📍</Text> }} /> */}
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: () => <Text>👤</Text> }} />
+      {/* <Tab.Screen name="Help" component={HelpScreen} options={{ tabBarIcon: () => <Text>❓</Text> }} /> */}
+    </Tab.Navigator>
+  )
+}
+
+function RootNavigator() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <Text className="text-xl font-bold text-blue-500">Loading...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {user ? (
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+      ) : (
+        <>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Signup" component={Signup} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
 
 const Home = () => {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-bold text-blue-500">
-        Welcome to Nativewind!
-      </Text>
-    </View>
+    <AuthProvider>
+      <NavigationIndependentTree>
+
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+      </NavigationIndependentTree>
+    </AuthProvider>
   )
 }
 
@@ -17,3 +77,4 @@ export default Home
 const styles = StyleSheet.create({
 
 })
+

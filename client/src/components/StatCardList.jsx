@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
 const stats = [
   { label: 'Total Reports', value: 2, icon: '⚠️', color: 'text-blue-500', bg: 'bg-blue-50' },
