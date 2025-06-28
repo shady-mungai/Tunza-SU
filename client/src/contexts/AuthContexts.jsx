@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
         return true
       }
       // API call for regular users
-      const response = await fetch("YOUR_API_ENDPOINT/auth/login", {
+      const response = await fetch("http://localhost:4000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,6 +52,7 @@ export function AuthProvider({ children }) {
       if (response.ok) {
         const userData = await response.json()
         setUser(userData.user)
+        console.log(`The user logged in is: ${user}`);
         await AsyncStorage.setItem("user", JSON.stringify(userData.user))
         return true
       }
@@ -64,7 +65,7 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      const response = await fetch("YOUR_API_ENDPOINT/auth/register", {
+      const response = await fetch("http://localhost:4000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
