@@ -113,8 +113,12 @@ app.post('/login', async(req,res)=>{
   const hashedPassword = currentUser.password;
   const isValid = await bcrypt.compare(password, hashedPassword);
   if (isValid) {
-    res.status(200).json({ message: "Successful login"})
     console.log("Password matches !"); // return errors to display to end user
+    return res.status(200).json({ 
+      success: true,
+      message: "Login successful",
+      user: currentUser // This is what your frontend expects
+    });
   } else {
     res.status(400).json({ message: "Email, admission number and password confirmation do not match"})
 
