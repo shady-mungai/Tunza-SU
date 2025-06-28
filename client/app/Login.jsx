@@ -23,77 +23,179 @@ const Login = () => {
       setIsLoading(true);
       const success = await login(email, password);
       setIsLoading(false);
-      if (success) {
-        navigation.navigate("StudentDash");
-      } else {
+      if (!success) {
         Alert.alert("Login failed", "Invalid credentials");
       }
     };
 
   return (
-  <KeyboardAvoidingView className="flex-1 bg-gray-50" behavior={Platform.OS === "ios" ? "padding" : "height"}>
-      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 justify-center px-6">
+    <KeyboardAvoidingView 
+      style={{ flex: 1, backgroundColor: '#f9fafb' }} 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView 
+        style={{ flex: 1 }} 
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ maxWidth: 400, alignSelf: 'center', width: '100%' }}>
           {/* Header */}
-          <View className="items-center mb-12">
-            <Text className="text-4xl font-bold text-blue-600 mb-2">TunzaSU</Text>
-            <Text className="text-gray-600 text-center">Facility Maintenance Reporting System</Text>
+          <View style={{ alignItems: 'center', marginBottom: 32 }}>
+            <Text style={{ 
+              fontSize: 36, 
+              fontWeight: 'bold', 
+              color: '#2563eb', 
+              marginBottom: 8 
+            }}>
+              TunzaSU
+            </Text>
+            <Text style={{ 
+              color: '#6b7280', 
+              fontSize: 14, 
+              textAlign: 'center' 
+            }}>
+              Facility Maintenance Reporting System
+            </Text>
           </View>
 
           {/* Login Form */}
-          <View className="bg-white rounded-2xl p-6 shadow-sm mb-6">
-            <Text className="text-2xl font-bold text-gray-900 mb-2">Welcome back</Text>
-            <Text className="text-gray-600 mb-8">Sign in to your account</Text>
+          <View style={{ 
+            backgroundColor: 'white', 
+            borderRadius: 16, 
+            padding: 32,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 12,
+            elevation: 8
+          }}>
+            <View style={{ marginBottom: 24 }}>
+              <Text style={{ 
+                fontSize: 24, 
+                fontWeight: 'bold', 
+                color: '#111827', 
+                marginBottom: 4 
+              }}>
+                Welcome back
+              </Text>
+              <Text style={{ color: '#6b7280', fontSize: 14 }}>
+                Sign in to your account
+              </Text>
+            </View>
 
-            <View className="mb-6">
-              <Text className="text-sm font-medium text-gray-700 mb-2">Email or Admission Number</Text>
+            {/* Email/Admission Number Field */}
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ 
+                fontSize: 14, 
+                fontWeight: '500', 
+                color: '#374151', 
+                marginBottom: 8 
+              }}>
+                Email or Admission Number
+              </Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Enter your email or admission number"
+                placeholderTextColor="#9ca3af"
+                style={{
+                  width: '100%',
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  borderWidth: 1,
+                  borderColor: '#d1d5db',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  backgroundColor: 'white',
+                  color: '#111827'
+                }}
                 autoCapitalize="none"
                 autoCorrect={false}
+                keyboardType="email-address"
               />
             </View>
 
-            <View className="mb-6">
-              <Text className="text-sm font-medium text-gray-700 mb-2">Password</Text>
+            {/* Password Field */}
+            <View style={{ marginBottom: 24 }}>
+              <Text style={{ 
+                fontSize: 14, 
+                fontWeight: '500', 
+                color: '#374151', 
+                marginBottom: 8 
+              }}>
+                Password
+              </Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Enter your password"
+                placeholderTextColor="#9ca3af"
                 secureTextEntry
+                style={{
+                  width: '100%',
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  borderWidth: 1,
+                  borderColor: '#d1d5db',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  backgroundColor: 'white',
+                  color: '#111827'
+                }}
                 autoCapitalize="none"
               />
             </View>
 
+            {/* Sign In Button */}
             <TouchableOpacity
-              className={`py-3 rounded-lg ${isLoading ? "bg-gray-400" : "bg-blue-600"}`}
               onPress={handleLogin}
               disabled={isLoading}
+              style={{
+                width: '100%',
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                borderRadius: 8,
+                backgroundColor: isLoading ? '#9ca3af' : '#2563eb',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 3
+              }}
+              activeOpacity={0.8}
             >
-              <Text className="text-white text-center font-semibold text-base">
-                {isLoading ? "Signing in..." : "Sign In"}
+              <Text style={{
+                color: 'white',
+                textAlign: 'center',
+                fontSize: 16,
+                fontWeight: '500'
+              }}>
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Text>
             </TouchableOpacity>
-          </View>
 
-          {/* Footer */}
-          <View className="items-center">
-            <Text className="text-gray-600">
-              Don't have an account?{" "}
-              <Text className="text-blue-600 font-medium" onPress={() => navigation.navigate("Signup")}>
-                Create account
-              </Text>
-            </Text>
+            {/* Footer */}
+            <View style={{ alignItems: 'center', marginTop: 24 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, color: '#6b7280' }}>
+                  Don't have an account?{' '}
+                </Text>
+                <TouchableOpacity onPress={()=>navigation.navigate("Signup")} activeOpacity={0.7}>
+                  <Text style={{ 
+                    fontSize: 14, 
+                    color: '#2563eb', 
+                    fontWeight: '500' 
+                  }}>
+                    Create account
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  
   );
-};
+}
 
 export default Login;

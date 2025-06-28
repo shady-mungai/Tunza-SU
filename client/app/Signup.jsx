@@ -284,7 +284,6 @@ const Signup = () => {
                 text2: 'Account created successfully',
                 visibilityTime: 3000,
             });
-            setTimeout(() => navigation.navigate("StudentDash"), 2000);
         } else {
             Toast.show({
                 type: 'error',
@@ -295,134 +294,213 @@ const Signup = () => {
     }
 
     const renderProgressBar = () => (
-        <View className="flex-row justify-center mb-8">
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 32 }}>
             {steps.map((_, index) => (
                 <View
                     key={index}
-                    className={`h-1 mx-1 rounded-full ${index <= currentStep ? "bg-blue-600" : "bg-gray-300"}`}
-                    style={{ width: width / steps.length - 16 }}
+                    style={{
+                        height: 4,
+                        marginHorizontal: 2,
+                        borderRadius: 2,
+                        backgroundColor: index <= currentStep ? "#2563eb" : "#d1d5db",
+                        width: (width - 64) / steps.length - 8
+                    }}
                 />
             ))}
         </View>
     )
 
     const renderStep1 = () => (
-        <View className="flex-1">
-            <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">First & last name *</Text>
+        <View style={{ flex: 1 }}>
+            <View style={{ marginBottom: 24 }}>
+                <Text style={{ 
+                    fontSize: 14, 
+                    fontWeight: '500', 
+                    color: '#374151', 
+                    marginBottom: 8 
+                }}>
+                    First & last name *
+                </Text>
                 <TextInput
-                    className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        validationErrors.name ? "border-red-400" : 
-                        (fieldsTouched.name && formData.name.trim() && !validationErrors.name) ? "border-green-400" : 
-                        "border-gray-300"
-                    }`}
+                    style={{
+                        width: '100%',
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        borderWidth: 1,
+                        borderColor: validationErrors.name ? "#f87171" : 
+                            (fieldsTouched.name && formData.name.trim() && !validationErrors.name) ? "#34d399" : 
+                            "#d1d5db",
+                        borderRadius: 8,
+                        fontSize: 14,
+                        backgroundColor: 'white',
+                        color: '#111827'
+                    }}
                     value={formData.name}
                     onChangeText={(value) => handleInputChange("name", value)}
                     placeholder="Enter your full name"
+                    placeholderTextColor="#9ca3af"
                     autoCapitalize="words"
                     autoFocus
                 />
                 {fieldsTouched.name && !formData.name.trim() && (
-                    <Text className="text-xs text-red-500 mt-1">Name is required</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Name is required</Text>
                 )}
                 {validationErrors.name && (
-                    <Text className="text-xs text-red-500 mt-1">{validationErrors.name}</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>{validationErrors.name}</Text>
                 )}
                 {fieldsTouched.name && formData.name.trim() && !validationErrors.name && (
-                    <Text className="text-xs text-green-600 mt-1">✓ Valid name</Text>
+                    <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4 }}>✓ Valid name</Text>
                 )}
             </View>
 
-            <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Email *</Text>
+            <View style={{ marginBottom: 24 }}>
+                <Text style={{ 
+                    fontSize: 14, 
+                    fontWeight: '500', 
+                    color: '#374151', 
+                    marginBottom: 8 
+                }}>
+                    Email *
+                </Text>
                 <TextInput
-                    className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        validationErrors.email ? "border-red-400" : 
-                        (fieldsTouched.email && formData.email.trim() && !validationErrors.email) ? "border-green-400" : 
-                        "border-gray-300"
-                    }`}
+                    style={{
+                        width: '100%',
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        borderWidth: 1,
+                        borderColor: validationErrors.email ? "#f87171" : 
+                            (fieldsTouched.email && formData.email.trim() && !validationErrors.email) ? "#34d399" : 
+                            "#d1d5db",
+                        borderRadius: 8,
+                        fontSize: 14,
+                        backgroundColor: 'white',
+                        color: '#111827'
+                    }}
                     value={formData.email}
                     onChangeText={(value) => handleInputChange("email", value)}
                     placeholder="Enter your email address"
+                    placeholderTextColor="#9ca3af"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
                 />
                 {fieldsTouched.email && !formData.email.trim() && (
-                    <Text className="text-xs text-red-500 mt-1">Email is required</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Email is required</Text>
                 )}
                 {validationErrors.email && (
-                    <Text className="text-xs text-red-500 mt-1">{validationErrors.email}</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>{validationErrors.email}</Text>
                 )}
                 {fieldsTouched.email && formData.email.trim() && !validationErrors.email && (
-                    <Text className="text-xs text-green-600 mt-1">✓ Valid email</Text>
+                    <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4 }}>✓ Valid email</Text>
                 )}
-                <Text className="text-xs text-gray-500 mt-1">You'll use this email to sign in to your account</Text>
+                <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>You'll use this email to sign in to your account</Text>
             </View>
         </View>
     )
 
     const renderStep2 = () => (
-        <View className="flex-1">
-            <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Admission Number *</Text>
+        <View style={{ flex: 1 }}>
+            <View style={{ marginBottom: 24 }}>
+                <Text style={{ 
+                    fontSize: 14, 
+                    fontWeight: '500', 
+                    color: '#374151', 
+                    marginBottom: 8 
+                }}>
+                    Admission Number *
+                </Text>
                 <TextInput
-                    className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        validationErrors.admission_number ? "border-red-400" : 
-                        (fieldsTouched.admission_number && formData.admission_number.trim() && !validationErrors.admission_number) ? "border-green-400" : 
-                        "border-gray-300"
-                    }`}
+                    style={{
+                        width: '100%',
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        borderWidth: 1,
+                        borderColor: validationErrors.admission_number ? "#f87171" : 
+                            (fieldsTouched.admission_number && formData.admission_number.trim() && !validationErrors.admission_number) ? "#34d399" : 
+                            "#d1d5db",
+                        borderRadius: 8,
+                        fontSize: 14,
+                        backgroundColor: 'white',
+                        color: '#111827'
+                    }}
                     value={formData.admission_number}
                     onChangeText={(value) => handleInputChange("admission_number", value)}
                     placeholder="Enter your admission number"
+                    placeholderTextColor="#9ca3af"
                     autoCapitalize="characters"
                     autoFocus
                 />
                 {fieldsTouched.admission_number && !formData.admission_number.trim() && (
-                    <Text className="text-xs text-red-500 mt-1">Admission number is required</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Admission number is required</Text>
                 )}
                 {validationErrors.admission_number && (
-                    <Text className="text-xs text-red-500 mt-1">{validationErrors.admission_number}</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>{validationErrors.admission_number}</Text>
                 )}
                 {fieldsTouched.admission_number && formData.admission_number.trim() && formData.admission_number.length >= 3 && (
-                    <Text className="text-xs text-green-600 mt-1">✓ Valid admission number</Text>
+                    <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4 }}>✓ Valid admission number</Text>
                 )}
             </View>
 
-            <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">phone number *</Text>
+            <View style={{ marginBottom: 24 }}>
+                <Text style={{ 
+                    fontSize: 14, 
+                    fontWeight: '500', 
+                    color: '#374151', 
+                    marginBottom: 8 
+                }}>
+                    Phone number *
+                </Text>
                 <TextInput
-                    className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                        validationErrors.phone_number ? "border-red-400" : 
-                        (fieldsTouched.phone_number && formData.phone_number.trim() && !validationErrors.phone_number) ? "border-green-400" : 
-                        "border-gray-300"
-                    }`}
+                    style={{
+                        width: '100%',
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        borderWidth: 1,
+                        borderColor: validationErrors.phone_number ? "#f87171" : 
+                            (fieldsTouched.phone_number && formData.phone_number.trim() && !validationErrors.phone_number) ? "#34d399" : 
+                            "#d1d5db",
+                        borderRadius: 8,
+                        fontSize: 14,
+                        backgroundColor: 'white',
+                        color: '#111827'
+                    }}
                     value={formData.phone_number}
                     onChangeText={(value) => handleInputChange("phone_number", value)}
                     placeholder="Enter your phone number"
+                    placeholderTextColor="#9ca3af"
                 />
                 {fieldsTouched.phone_number && !formData.phone_number.trim() && (
-                    <Text className="text-xs text-red-500 mt-1">Phone number is required</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Phone number is required</Text>
                 )}
                 {validationErrors.phone_number && (
-                    <Text className="text-xs text-red-500 mt-1">{validationErrors.phone_number}</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>{validationErrors.phone_number}</Text>
                 )}
                 {fieldsTouched.phone_number && formData.phone_number.trim() && !validationErrors.phone_number && (
-                    <Text className="text-xs text-green-600 mt-1">✓ Valid phone number</Text>
+                    <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4 }}>✓ Valid phone number</Text>
                 )}
             </View>
 
-            <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Role *</Text>
-                <View className={`border rounded-lg bg-white ${
-                    fieldsTouched.role && !formData.role ? "border-red-400" : 
-                    (fieldsTouched.role && formData.role) ? "border-green-400" : 
-                    "border-gray-300"
-                }`}>
+            <View style={{ marginBottom: 24 }}>
+                <Text style={{ 
+                    fontSize: 14, 
+                    fontWeight: '500', 
+                    color: '#374151', 
+                    marginBottom: 8 
+                }}>
+                    Role *
+                </Text>
+                <View style={{
+                    borderWidth: 1,
+                    borderColor: fieldsTouched.role && !formData.role ? "#f87171" : 
+                        (fieldsTouched.role && formData.role) ? "#34d399" : 
+                        "#d1d5db",
+                    borderRadius: 8,
+                    backgroundColor: 'white'
+                }}>
                     <Picker
                         selectedValue={formData.role}
                         onValueChange={(value) => handleInputChange("role", value)}
-                        style={{ height: 50 }}
+                        style={{ height: 48, fontSize: 14 }}
                     >
                         <Picker.Item label="Select your role" value="" />
                         <Picker.Item label="Student" value="student" />
@@ -431,10 +509,10 @@ const Signup = () => {
                     </Picker>
                 </View>
                 {fieldsTouched.role && !formData.role && (
-                    <Text className="text-xs text-red-500 mt-1">Please select your role</Text>
+                    <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Please select your role</Text>
                 )}
                 {fieldsTouched.role && formData.role && (
-                    <Text className="text-xs text-green-600 mt-1">✓ Role selected</Text>
+                    <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4 }}>✓ Role selected</Text>
                 )}
             </View>
         </View>
@@ -454,42 +532,67 @@ const Signup = () => {
         }
 
         return (
-            <View className="flex-1">
-                <View className="mb-6">
-                    <Text className="text-sm font-medium text-gray-700 mb-2">Password *</Text>
+            <View style={{ flex: 1 }}>
+                <View style={{ marginBottom: 24 }}>
+                    <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: '500', 
+                        color: '#374151', 
+                        marginBottom: 8 
+                    }}>
+                        Password *
+                    </Text>
                     <TextInput
-                        className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                            fieldsTouched.password && passwordStrength.score < 5 ? "border-red-400" : 
-                            (fieldsTouched.password && passwordStrength.score >= 5) ? "border-green-400" : 
-                            "border-gray-300"
-                        }`}
+                        style={{
+                            width: '100%',
+                            paddingHorizontal: 16,
+                            paddingVertical: 12,
+                            borderWidth: 1,
+                            borderColor: fieldsTouched.password && passwordStrength.score < 5 ? "#f87171" : 
+                                (fieldsTouched.password && passwordStrength.score >= 5) ? "#34d399" : 
+                                "#d1d5db",
+                            borderRadius: 8,
+                            fontSize: 14,
+                            backgroundColor: 'white',
+                            color: '#111827'
+                        }}
                         value={formData.password}
                         onChangeText={(value) => handleInputChange("password", value)}
                         placeholder="Create a password"
+                        placeholderTextColor="#9ca3af"
                         secureTextEntry
                         autoCapitalize="none"
                         autoFocus
                     />
                     {fieldsTouched.password && !formData.password.trim() && (
-                        <Text className="text-xs text-red-500 mt-1">Password is required</Text>
+                        <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Password is required</Text>
                     )}
                     {formData.password.length > 0 && (
-                        <View className="mt-3">
-                            <View className="h-1 bg-gray-200 rounded-full mb-2">
+                        <View style={{ marginTop: 16 }}>
+                            <View style={{ height: 8, backgroundColor: '#e5e7eb', borderRadius: 4, marginBottom: 12 }}>
                                 <View
-                                    className="h-1 rounded-full transition-all duration-300"
                                     style={{
+                                        height: 8,
+                                        borderRadius: 4,
                                         width: `${(passwordStrength.score / 5) * 100}%`,
                                         backgroundColor: getPasswordStrengthColor(),
                                     }}
                                 />
                             </View>
-                            <Text className="text-xs font-medium mb-2" style={{ color: getPasswordStrengthColor() }}>
+                            <Text style={{ 
+                                fontSize: 12, 
+                                fontWeight: '500', 
+                                marginBottom: 12,
+                                color: getPasswordStrengthColor()
+                            }}>
                                 {getPasswordStrengthText()} password
                             </Text>
-                            <View className="space-y-1">
+                            <View style={{ gap: 4 }}>
                                 {Object.entries(passwordStrength.requirements).map(([key, met]) => (
-                                    <Text key={key} className={`text-xs ${met ? "text-green-600" : "text-red-500"}`}>
+                                    <Text key={key} style={{ 
+                                        fontSize: 12, 
+                                        color: met ? "#10b981" : "#ef4444" 
+                                    }}>
                                         {met ? "✓" : "✗"} {getRequirementText(key)}
                                     </Text>
                                 ))}
@@ -498,33 +601,53 @@ const Signup = () => {
                     )}
                 </View>
 
-                <View className="mb-6">
-                    <Text className="text-sm font-medium text-gray-700 mb-2">Confirm Password *</Text>
+                <View style={{ marginBottom: 24 }}>
+                    <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: '500', 
+                        color: '#374151', 
+                        marginBottom: 8 
+                    }}>
+                        Confirm Password *
+                    </Text>
                     <TextInput
-                        className={`border rounded-lg px-4 py-3 text-base bg-white ${
-                            validationErrors.confirmPassword ? "border-red-400" : 
-                            (fieldsTouched.confirmPassword && formData.confirmPassword && !validationErrors.confirmPassword) ? "border-green-400" : 
-                            "border-gray-300"
-                        }`}
+                        style={{
+                            width: '100%',
+                            paddingHorizontal: 16,
+                            paddingVertical: 12,
+                            borderWidth: 1,
+                            borderColor: validationErrors.confirmPassword ? "#f87171" : 
+                                (fieldsTouched.confirmPassword && formData.confirmPassword && !validationErrors.confirmPassword) ? "#34d399" : 
+                                "#d1d5db",
+                            borderRadius: 8,
+                            fontSize: 14,
+                            backgroundColor: 'white',
+                            color: '#111827'
+                        }}
                         value={formData.confirmPassword}
                         onChangeText={(value) => handleInputChange("confirmPassword", value)}
                         placeholder="Confirm your password"
+                        placeholderTextColor="#9ca3af"
                         secureTextEntry
                         autoCapitalize="none"
                     />
                     {fieldsTouched.confirmPassword && !formData.confirmPassword.trim() && (
-                        <Text className="text-xs text-red-500 mt-1">Please confirm your password</Text>
+                        <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>Please confirm your password</Text>
                     )}
                     {validationErrors.confirmPassword && (
-                        <Text className="text-xs text-red-500 mt-1">{validationErrors.confirmPassword}</Text>
+                        <Text style={{ fontSize: 12, color: '#ef4444', marginTop: 4 }}>{validationErrors.confirmPassword}</Text>
                     )}
                     {fieldsTouched.confirmPassword && formData.confirmPassword && !validationErrors.confirmPassword && (
-                        <Text className="text-xs text-green-600 mt-1">✓ Passwords match</Text>
+                        <Text style={{ fontSize: 12, color: '#10b981', marginTop: 4 }}>✓ Passwords match</Text>
                     )}
                 </View>
 
-                <View className="bg-blue-50 p-4 rounded-lg">
-                    <Text className="text-sm text-blue-800">
+                <View style={{ 
+                    backgroundColor: '#eff6ff', 
+                    padding: 24, 
+                    borderRadius: 8 
+                }}>
+                    <Text style={{ fontSize: 14, color: '#1e40af' }}>
                         Hint: Use a mix of letters, numbers, and symbols to create a strong password
                     </Text>
                 </View>
@@ -533,40 +656,56 @@ const Signup = () => {
     }
 
     const renderStep4 = () => (
-        <View className="flex-1">
-            <View className="bg-gray-50 rounded-lg p-4 mb-6">
-                <Text className="text-lg font-semibold text-gray-900 mb-4">Account Summary</Text>
+        <View style={{ flex: 1 }}>
+            <View style={{ 
+                backgroundColor: '#f9fafb', 
+                borderRadius: 8, 
+                padding: 24, 
+                marginBottom: 24 
+            }}>
+                <Text style={{ 
+                    fontSize: 20, 
+                    fontWeight: 'bold', 
+                    color: '#111827', 
+                    marginBottom: 16 
+                }}>
+                    Account Summary
+                </Text>
 
-                <View className="space-y-3">
-                    <View className="flex-row justify-between">
-                        <Text className="text-gray-600">Name:</Text>
-                        <Text className="font-medium text-gray-900">{formData.name}</Text>
+                <View style={{ gap: 12 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ color: '#6b7280', fontSize: 14 }}>Name:</Text>
+                        <Text style={{ fontWeight: '500', color: '#111827', fontSize: 14 }}>{formData.name}</Text>
                     </View>
 
-                    <View className="flex-row justify-between">
-                        <Text className="text-gray-600">Email:</Text>
-                        <Text className="font-medium text-gray-900">{formData.email}</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ color: '#6b7280', fontSize: 14 }}>Email:</Text>
+                        <Text style={{ fontWeight: '500', color: '#111827', fontSize: 14 }}>{formData.email}</Text>
                     </View>
 
-                    <View className="flex-row justify-between">
-                        <Text className="text-gray-600">Admission:</Text>
-                        <Text className="font-medium text-gray-900">{formData.admission_number}</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ color: '#6b7280', fontSize: 14 }}>Admission:</Text>
+                        <Text style={{ fontWeight: '500', color: '#111827', fontSize: 14 }}>{formData.admission_number}</Text>
                     </View>
 
-                    <View className="flex-row justify-between">
-                        <Text className="text-gray-600">Phone number:</Text>
-                        <Text className="font-medium text-gray-900">{formData.phone_number}</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ color: '#6b7280', fontSize: 14 }}>Phone number:</Text>
+                        <Text style={{ fontWeight: '500', color: '#111827', fontSize: 14 }}>{formData.phone_number}</Text>
                     </View>
 
-                    <View className="flex-row justify-between">
-                        <Text className="text-gray-600">Role:</Text>
-                        <Text className="font-medium text-gray-900 capitalize">{formData.role}</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ color: '#6b7280', fontSize: 14 }}>Role:</Text>
+                        <Text style={{ fontWeight: '500', color: '#111827', fontSize: 14, textTransform: 'capitalize' }}>{formData.role}</Text>
                     </View>
                 </View>
             </View>
 
-            <View className="bg-green-50 p-4 rounded-lg">
-                <Text className="text-sm text-green-800">
+            <View style={{ 
+                backgroundColor: '#f0fdf4', 
+                padding: 24, 
+                borderRadius: 8 
+            }}>
+                <Text style={{ fontSize: 14, color: '#166534' }}>
                     ✅ By creating an account, you agree to TunzaSU's Terms of Service and Privacy Policy
                 </Text>
             </View>
@@ -589,46 +728,111 @@ const Signup = () => {
     }
 
     return (
-        <KeyboardAvoidingView className="flex-1 bg-gray-50" behavior={Platform.OS === "ios" ? "padding" : "height"}>
-            <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-                <View className="flex-1 px-6 pt-12">
+        <KeyboardAvoidingView 
+            style={{ flex: 1, backgroundColor: '#f9fafb' }} 
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+            <ScrollView 
+                style={{ flex: 1 }} 
+                contentContainerStyle={{ flexGrow: 1, padding: 16 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={{ maxWidth: 400, alignSelf: 'center', width: '100%' }}>
                     {/* Header */}
-                    <View className="items-center mb-8">
-                        <Text className="text-3xl font-bold text-blue-600 mb-2">TunzaSU</Text>
-                        <Text className="text-sm text-gray-600 text-center">Facility Maintenance Reporting System</Text>
+                    <View style={{ alignItems: 'center', marginBottom: 32 }}>
+                        <Text style={{ 
+                            fontSize: 36, 
+                            fontWeight: 'bold', 
+                            color: '#2563eb', 
+                            marginBottom: 8 
+                        }}>
+                            TunzaSU
+                        </Text>
+                        <Text style={{ 
+                            color: '#6b7280', 
+                            fontSize: 14, 
+                            textAlign: 'center' 
+                        }}>
+                            Facility Maintenance Reporting System
+                        </Text>
                     </View>
 
                     {/* Progress Bar */}
                     {renderProgressBar()}
 
                     {/* Step Content */}
-                    <View className="bg-white rounded-2xl p-6 shadow-sm mb-6 flex-1">
-                        <View className="mb-6">
-                            <Text className="text-2xl font-bold text-gray-900 mb-2">{steps[currentStep].title}</Text>
-                            <Text className="text-gray-600">{steps[currentStep].subtitle}</Text>
+                    <View style={{ 
+                        backgroundColor: 'white', 
+                        borderRadius: 16, 
+                        padding: 32,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 12,
+                        elevation: 8,
+                        marginBottom: 32,
+                        flex: 1
+                    }}>
+                        <View style={{ marginBottom: 24 }}>
+                            <Text style={{ 
+                                fontSize: 24, 
+                                fontWeight: 'bold', 
+                                color: '#111827', 
+                                marginBottom: 4 
+                            }}>
+                                {steps[currentStep].title}
+                            </Text>
+                            <Text style={{ color: '#6b7280', fontSize: 14 }}>
+                                {steps[currentStep].subtitle}
+                            </Text>
                         </View>
 
                         {renderCurrentStep()}
                     </View>
 
                     {/* Navigation Buttons */}
-                    <View className="flex-row justify-between items-center pb-6">
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 32 }}>
                         {currentStep > 0 ? (
-                            <TouchableOpacity className="px-6 py-3 rounded-lg border border-gray-300" onPress={prevStep}>
-                                <Text className="text-gray-700 font-medium">Back</Text>
+                            <TouchableOpacity 
+                                style={{
+                                    paddingHorizontal: 32,
+                                    paddingVertical: 16,
+                                    borderRadius: 8,
+                                    borderWidth: 1,
+                                    borderColor: '#d1d5db'
+                                }} 
+                                onPress={prevStep}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={{ color: '#374151', fontWeight: '500', fontSize: 14 }}>Back</Text>
                             </TouchableOpacity>
                         ) : (
-                            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                                <Text className="text-blue-600 font-medium">Sign in instead</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("Login")} activeOpacity={0.7}>
+                                <Text style={{ color: '#2563eb', fontWeight: '500', fontSize: 14 }}>Sign in instead</Text>
                             </TouchableOpacity>
                         )}
 
                         <TouchableOpacity
-                            className={`px-8 py-3 rounded-lg ${isLoading ? "bg-gray-400" : "bg-blue-600"}`}
+                            style={{
+                                paddingHorizontal: 40,
+                                paddingVertical: 16,
+                                borderRadius: 8,
+                                backgroundColor: isLoading ? '#9ca3af' : '#2563eb',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 2 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 4,
+                                elevation: 3
+                            }}
                             onPress={currentStep === steps.length - 1 ? handleSignup : nextStep}                            
                             disabled={isLoading}
+                            activeOpacity={0.8}
                         >
-                            <Text className="text-white font-semibold">
+                            <Text style={{ 
+                                color: 'white', 
+                                fontWeight: '500', 
+                                fontSize: 16 
+                            }}>
                                 {isLoading ? "Creating..." : currentStep === steps.length - 1 ? "Create Account" : "Next"}
                             </Text>
                         </TouchableOpacity>
