@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 const reports = [
   {
@@ -34,7 +34,9 @@ const RecentReportsList = () => (
   <View className="bg-white rounded-2xl p-6 border border-gray-200">
     <View className="flex-row justify-between items-center mb-4">
       <Text className="font-bold text-lg text-gray-900">Recent Reports</Text>
-      <Text className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 text-sm">View All</Text>
+      <TouchableOpacity onPress={() => navigation.navigate( { screen: 'MyReports' })}>
+        <Text className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 text-sm">View All</Text>
+      </TouchableOpacity>
     </View>
     <View>
       {reports.map((report, idx) => (
