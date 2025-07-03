@@ -6,10 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Login from './Login'
 import Signup from './Signup'
 import StudentDashboard from '../src/components/StudentDashboard'
-import MyReports from '../src/components/MyReports' // Placeholder, create this component
-//import MapScreen from '../src/screens/MapScreen'
-import ProfileScreen from '../src/components/ProfileScreen' // Placeholder, create this component
-//import HelpScreen from '../src/screens/HelpScreen'
+import MyReports from '../src/components/MyReports'
 import "../global.css"
 import { AuthProvider, useAuth } from '../src/contexts/AuthContexts'
 
@@ -28,7 +25,7 @@ function MainTabs() {
       <Tab.Screen name="Student Dash" component={StudentDashboard} options={{ tabBarIcon: () => <Text>⚙️</Text> }} />
       <Tab.Screen name="My Reports" component={MyReports} options={{ tabBarIcon: () => <Text>⚠️</Text> }} />
       {/* <Tab.Screen name="Map View" component={MapScreen} options={{ tabBarIcon: () => <Text>📍</Text> }} /> */}
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: () => <Text>👤</Text> }} />
+      {/* <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: () => <Text>👤</Text> }} /> */}
       {/* <Tab.Screen name="Help" component={HelpScreen} options={{ tabBarIcon: () => <Text>❓</Text> }} /> */}
     </Tab.Navigator>
   )

@@ -1,17 +1,49 @@
 "use client"
 
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
 import { createContext, useContext, useState, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { WEB_CLIENT_ID, IOS_CLIENT_ID } from '@env'
 
 const AuthContext = createContext(undefined)
+WebBrowser.maybeCompleteAuthSession();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [token, setToken] = useState("");
 
+  // Google Auth Request setup
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: IOS_CLIENT_ID,
+    webClientId: WEB_CLIENT_ID,
+  });
+
+  // Handle Google sign-in response
   useEffect(() => {
-    checkAuthState()
-  }, [])
+    const handleGoogleResponse = async () => {
+      if (response?.type === "success") {
+        const accessToken = response.authentication.accessToken;
+        try {
+          const res = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const googleUser = await res.json();
+          await AsyncStorage.setItem("user", JSON.stringify(googleUser));
+          setUser(googleUser);
+        } catch (error) {
+          console.error("Google sign-in error:", error);
+        }
+      }
+    };
+    handleGoogleResponse();
+  }, [response]);
+
+  // Check auth state on mount
+  useEffect(() => {
+    checkAuthState();
+  }, []);
 
   const checkAuthState = async () => {
     try {
@@ -24,6 +56,10 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loginWithGoogle = async () => {
+    promptAsync();
   }
 
   const login = async (email, password) => {
@@ -81,18 +117,6 @@ export function AuthProvider({ children }) {
       return false
     } catch (error) {
       console.error("Registration error:", error)
-      return false
-    }
-  }
-
-  const loginWithGoogle = async () => {
-    try {
-      // Implement Google Sign-In logic here
-      // This is a placeholder - you'll need to configure Google Sign-In
-      console.log("Google Sign-In not implemented yet")
-      return false
-    } catch (error) {
-      console.error("Google login error:", error)
       return false
     }
   }
