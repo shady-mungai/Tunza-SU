@@ -23,15 +23,17 @@ const StudentDashboard = () => {
   const handleOpenReportModal = () => setReportModalVisible(true);
   const handleCloseReportModal = () => setReportModalVisible(false);
 
-  const handleSubmitReport = async (reportData) => {
+  const handleSubmitReport = async (reportData, isFormData = false) => {
     setSubmitting(true);
     try {
       const response = await fetch('http://localhost:4000/addReport', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...reportData, user_id: user?.id }),
+        ...(isFormData
+          ? { body: reportData }
+          : {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              body: JSON.stringify({ ...reportData, user_id: user?.id }),
+            }),
       });
       if (response.ok) {
         Alert.alert('Success', 'Report submitted successfully!');

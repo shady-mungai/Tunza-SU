@@ -4,6 +4,8 @@ import con from "./dbConnection.js";
 import bcrypt from "bcrypt";
 import axios from "axios";
 import speakeasy from "speakeasy";
+import multer from 'multer';
+import path from 'path';
 
 const app = express();
 const port = 4000;
@@ -15,6 +17,20 @@ app.use(
 );
 
 let currentUser = {}; // empty object to store the current user, attempting to login using credentials
+
+// Set up multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
+// Serve uploads directory statically
+app.use('/uploads', express.static('uploads'));
 
 async function getCurrentUser(email, admission_number, res) {
   try {
@@ -152,7 +168,12 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/addReport", async (req, res) => {
+app.post('/addReport', upload.single('image'), async (req, res) => {
+  console.log('=== DEBUG: addReport endpoint ===');
+  console.log('req.body:', req.body);
+  console.log('req.file:', req.file);
+  console.log('req.headers:', req.headers);
+  
   const {
     user_id,
     title,
@@ -160,8 +181,7 @@ app.post("/addReport", async (req, res) => {
     location,
     category,
     priority,
-    status = "Pending", // default status
-    image_url,
+    status = "in_progress",
     assigned_to = null,
     estimated_cost = null,
     actual_cost = null,
@@ -169,6 +189,15 @@ app.post("/addReport", async (req, res) => {
     actual_completion_date = null,
     completed_at = null,
   } = req.body;
+
+  // The uploaded file info is in req.file
+  const image_url = req.file ? req.file.path : null;
+  console.log('image_url being saved:', image_url);
+
+  // Validation: check required fields
+  if (!user_id || !title || !description || !location || !category || !priority) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
 
   try {
     const [result] = await con.promise().query(
@@ -199,6 +228,29 @@ app.post("/addReport", async (req, res) => {
     }
   } catch (err) {
     console.error("Error adding report:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+app.get('/userReports', async (req, res) => {
+  const { user_id } = req.query;
+
+  if (!user_id) {
+    return res.status(400).json({ success: false, message: "user_id is required" });
+  }
+
+  try {
+    const [reports] = await con.promise().query(
+      `SELECT * FROM reports2 WHERE user_id = ? ORDER BY created_at DESC`,
+      [user_id]
+    );
+    
+    res.status(200).json({ 
+      success: true, 
+      reports: reports 
+    });
+  } catch (err) {
+    console.error("Error fetching user reports:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
