@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContexts'
+import { useNavigation } from '@react-navigation/native'
 
 const statusBadge = (status) => {
   if (status === 'In Progress') return <Text style={styles.statusInProgress}>In Progress</Text>;
@@ -20,6 +21,7 @@ const MyReports = () => {
   const { user } = useAuth();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchReports = async () => {
