@@ -20,7 +20,6 @@ const HeaderBar = () => {
         </View>
       </View>
       <View className="flex-row items-center space-x-6">
-        <Text className="text-gray-400 text-xl">🔔</Text>
         <Text className="text-gray-400 text-xl">👤</Text>
         <View className="items-end">
           <Text className="font-semibold text-gray-900">{user?.name || 'User'}</Text>
