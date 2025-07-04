@@ -87,7 +87,7 @@ const AllReports = () => {
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("Dashboard")}
+            onPress={() => navigation.navigate("dashboard")}
           >
             <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Dashboard</Text>
@@ -100,32 +100,43 @@ const AllReports = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("AssignedReports")}
+            onPress={() => navigation.navigate("assigned_reports")}
           >
             <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Assigned Reports</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Analytics")}
-          >
-            <BarChart size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Analytics</Text>
-          </TouchableOpacity>
+              style={styles.navItem}
+              onPress={() => navigation.navigate("analytics")}
+            >
+              <BarChart size={20} color="#4B5563" style={styles.navIcon} />
+              <Text style={styles.navText}>Analytics</Text>
+            </TouchableOpacity>
           <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Profile")}
-          >
-            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
+              style={styles.navItem}
+              onPress={() => {
+                console.log("Profile button pressed");
+                navigation.navigate("profile");
+              }}
+              activeOpacity={0.7}
+              delayPressIn={0}
+            >
+              <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
+              <Text style={styles.navText}>Profile</Text>
+            </TouchableOpacity>
           <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Help")}
-          >
-            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Help</Text>
-          </TouchableOpacity>
+              style={styles.navItem}
+              onPress={() => {
+                console.log("help button pressed");
+                navigation.navigate("help");
+              }}
+              activeOpacity={0.7}
+              delayPressIn={0}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
+              <Text style={styles.navText}>Help</Text>
+            </TouchableOpacity>
         </View>
       </View>
       {/* Main Content */}
