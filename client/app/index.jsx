@@ -16,6 +16,8 @@ import { AuthProvider, useAuth } from "../src/contexts/AuthContexts";
 import Help from "./help";
 import AssignedReports from "./assigned_reports";
 import Profile from "./profile";
+import Analytics from "./analytics";
+import Dashboard from "./dashboard";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,9 +64,11 @@ function RootNavigator() {
       {user ? (
         <>
           <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="AllReports" component={AllReports} />
           <Stack.Screen name="AssignedReports" component={AssignedReports} />
           <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="Analytics" component={Analytics} />
           <Stack.Screen name="Help" component={Help} />
         </>
       ) : (
