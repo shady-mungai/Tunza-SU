@@ -226,7 +226,10 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.navItem}
-              onPress={handleHelpNavigation}
+              onPress={() => {
+                console.log("help button pressed");
+                navigation.navigate("help");
+              }}
               activeOpacity={0.7}
               delayPressIn={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
