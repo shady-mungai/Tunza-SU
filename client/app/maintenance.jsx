@@ -160,7 +160,7 @@ const App = () => {
               <View style={styles.userInfo}>
                 <User size={32} color="#4B5563" style={styles.userAvatar} />
                 <View>
-                  <Text style={styles.userName}>John Doe</Text>
+                  <Text style={styles.userName}>Richard Mungai</Text>
                   <Text style={styles.userId}>MNT/001</Text>
                 </View>
               </View>
