@@ -115,7 +115,10 @@ const AssignedReports = () => {
             <BarChart size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Analytics</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("Profile")}
+          >
             <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
