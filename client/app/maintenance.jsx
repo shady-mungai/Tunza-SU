@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Dimensions,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 // You might need to install lucide-react-native: `npx expo install lucide-react-native`
 import {
   Bell,
@@ -31,6 +32,7 @@ import {
 const { width } = Dimensions.get("window");
 
 const App = () => {
+  const navigation = useNavigation();
   // Placeholder data for reports in a maintenance context
   const maintenanceReports = [
     {
@@ -123,11 +125,17 @@ const App = () => {
                 Dashboard
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navItem}>
+            <TouchableOpacity
+              style={styles.navItem}
+              onPress={() => navigation.navigate("AllReports")}
+            >
               <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>All Reports</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navItem}>
+            <TouchableOpacity
+              style={styles.navItem}
+              onPress={() => navigation.navigate("AssignedReports")}
+            >
               <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>Assigned Reports</Text>
             </TouchableOpacity>
@@ -143,7 +151,10 @@ const App = () => {
               <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>Profile</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navItem}>
+            <TouchableOpacity
+              style={styles.navItem}
+              onPress={() => navigation.navigate("Help")}
+            >
               <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>Help</Text>
             </TouchableOpacity>
