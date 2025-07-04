@@ -7,13 +7,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import { useState } from 'react'
 import { useAuth } from '../src/contexts/AuthContexts'
 import { useNavigation } from '@react-navigation/native'
 
 const Login = () => {
-    const { login, user, loading } = useAuth();
+    const { login, user, loading, logout, loginWithGoogle } = useAuth();
     const navigation = useNavigation();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -57,6 +58,34 @@ const Login = () => {
               Facility Maintenance Reporting System
             </Text>
           </View>
+
+          {/* Continue with Google Button */}
+          <TouchableOpacity
+            onPress={loginWithGoogle}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'white',
+              borderWidth: 1,
+              borderColor: '#d1d5db',
+              borderRadius: 8,
+              paddingVertical: 12,
+              marginBottom: 20,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            }}
+            activeOpacity={0.8}
+          >
+            {/* Google logo (optional, use a local asset if available) */}
+            {/* <Image source={require('../assets/google-logo.png')} style={{ width: 20, height: 20, marginRight: 8 }} /> */}
+            <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>
+              Continue with Google
+            </Text>
+          </TouchableOpacity>
 
           {/* Login Form */}
           <View style={{ 
