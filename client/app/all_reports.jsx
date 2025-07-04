@@ -87,7 +87,7 @@ const AllReports = () => {
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("MainTabs")}
+            onPress={() => navigation.navigate("Dashboard")}
           >
             <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Dashboard</Text>
@@ -105,11 +105,10 @@ const AllReports = () => {
             <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Assigned Reports</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Users size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Manage Users</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("Analytics")}
+          >
             <BarChart size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Analytics</Text>
           </TouchableOpacity>
