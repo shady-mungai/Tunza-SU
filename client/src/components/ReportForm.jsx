@@ -5,14 +5,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
   Button,
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from '../contexts/AuthContexts'
-
 
 const categories = ["Plumbing", "Electrical", "Furniture", "Cleaning", "Other"];
 const priorities = ["Low", "Medium", "High", "Urgent"];
@@ -66,53 +64,31 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
       formData.append('location', location);
       formData.append('category', category);
       formData.append('priority', priority);
-      
-      console.log('=== DEBUG: FormData creation ===');
-      console.log('imageUri:', imageUri);
-      
       if (imageUri) {
         try {
-          // Convert image URI to blob for React Native
           const response = await fetch(imageUri);
           const blob = await response.blob();
-          
-          // Determine file type from the blob
           let fileType = 'image/jpeg';
           let fileName = 'photo.jpg';
-          
           if (imageUri.includes('.')) {
             const extension = imageUri.split('.').pop().toLowerCase();
-            if (['jpg', 'jpeg'].includes(extension)) {
+            if (["jpg", "jpeg"].includes(extension)) {
               fileType = 'image/jpeg';
               fileName = `photo.${extension}`;
-            } else if (['png'].includes(extension)) {
+            } else if (["png"].includes(extension)) {
               fileType = 'image/png';
               fileName = `photo.${extension}`;
-            } else if (['webp'].includes(extension)) {
+            } else if (["webp"].includes(extension)) {
               fileType = 'image/webp';
               fileName = `photo.${extension}`;
             }
           }
-          
-          console.log('Blob created:', blob);
-          console.log('File type:', fileType);
-          console.log('File name:', fileName);
-          
-          // Append the blob as a file
           formData.append('image', blob, fileName);
         } catch (imageError) {
-          console.error('Error processing image:', imageError);
           // Continue without image if there's an error
         }
       }
-      
-      // Debug: Log what's in FormData
-      console.log('FormData entries:');
-      for (let [key, value] of formData.entries()) {
-        console.log(key, ':', value);
-      }
-      
-      await onSubmit(formData, true); // pass true to indicate FormData
+      await onSubmit(formData, true);
       setTitle("");
       setDescription("");
       setLocation("");
@@ -121,7 +97,6 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
       setImageUri("");
       onClose();
     } catch (e) {
-      console.error('Submit error:', e);
       setError("Failed to submit report.");
     } finally {
       setLoading(false);
@@ -135,111 +110,90 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContent}>
-          <ScrollView>
-            <Text style={styles.title}>Submit a New Report</Text>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+      <View className="flex-1 bg-black/30 justify-center items-center">
+        <View className="bg-white rounded-2xl p-6 w-11/12 max-h-[90%] shadow-xl border border-gray-200">
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text className="text-2xl font-bold mb-4 text-blue-700 text-center">Submit a New Report</Text>
+            {error ? <Text className="text-red-500 mb-2 text-center">{error}</Text> : null}
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-lg px-4 py-3 mb-3 text-base bg-gray-50"
               placeholder="Title*"
               value={title}
               onChangeText={setTitle}
             />
             <TextInput
-              style={[styles.input, { height: 80 }]}
+              className="border border-gray-300 rounded-lg px-4 py-3 mb-3 text-base bg-gray-50 min-h-[80px]"
               placeholder="Description*"
               value={description}
               onChangeText={setDescription}
               multiline
             />
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-lg px-4 py-3 mb-3 text-base bg-gray-50"
               placeholder="Location*"
               value={location}
               onChangeText={setLocation}
             />
-            <Text style={styles.label}>Category</Text>
-            <View style={styles.pickerRow}>
+            <Text className="font-medium mb-1 text-gray-700">Category</Text>
+            <View className="flex-row flex-wrap mb-3">
               {categories.map((cat) => (
                 <TouchableOpacity
                   key={cat}
-                  style={[
-                    styles.pickerOption,
-                    category === cat && styles.pickerSelected,
-                  ]}
+                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${category === cat ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}
                   onPress={() => setCategory(cat)}
                 >
-                  <Text
-                    style={
-                      category === cat
-                        ? styles.pickerSelectedText
-                        : styles.pickerText
-                    }
-                  >
-                    {cat}
-                  </Text>
+                  <Text className={`${category === cat ? 'text-white font-bold' : 'text-gray-700'}`}>{cat}</Text>
                 </TouchableOpacity>
               ))}
             </View>
-            <Text style={styles.label}>Priority</Text>
-            <View style={styles.pickerRow}>
+            <Text className="font-medium mb-1 text-gray-700">Priority</Text>
+            <View className="flex-row flex-wrap mb-3">
               {priorities.map((pri) => (
                 <TouchableOpacity
                   key={pri}
-                  style={[
-                    styles.pickerOption,
-                    priority === pri && styles.pickerSelected,
-                  ]}
+                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${priority === pri ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}
                   onPress={() => setPriority(pri)}
                 >
-                  <Text
-                    style={
-                      priority === pri
-                        ? styles.pickerSelectedText
-                        : styles.pickerText
-                    }
-                  >
-                    {pri}
-                  </Text>
+                  <Text className={`${priority === pri ? 'text-white font-bold' : 'text-gray-700'}`}>{pri}</Text>
                 </TouchableOpacity>
               ))}
             </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 12,
-              }}
-            >
-              <Button title="Pick Image" onPress={handlePickImage} />
-              <Button title="Take Photo" onPress={handleTakePhoto} />
+            <View className="flex-row justify-between mb-3 space-x-2">
+              <TouchableOpacity
+                className="flex-1 bg-blue-50 border border-blue-200 rounded-lg py-3 items-center mr-2"
+                onPress={handlePickImage}
+              >
+                <Text className="text-blue-700 font-semibold">Pick Image</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 bg-blue-50 border border-blue-200 rounded-lg py-3 items-center"
+                onPress={handleTakePhoto}
+              >
+                <Text className="text-blue-700 font-semibold">Take Photo</Text>
+              </TouchableOpacity>
             </View>
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
-                style={{
-                  width: "100%",
-                  height: 180,
-                  borderRadius: 8,
-                  marginBottom: 12,
-                }}
+                className="w-full h-44 rounded-lg mb-3"
                 resizeMode="cover"
               />
             ) : null}
-            <View style={styles.buttonRow}>
-              <Button
-                title="Cancel"
+            <View className="flex-row justify-between mt-4 space-x-2">
+              <TouchableOpacity
+                className="flex-1 bg-gray-200 rounded-lg py-3 items-center mr-2"
                 onPress={onClose}
-                color="#6b7280"
                 disabled={loading}
-              />
-              <Button
-                title={loading ? "Submitting..." : "Submit"}
+              >
+                <Text className="text-gray-700 font-semibold">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`flex-1 rounded-lg py-3 items-center ${loading ? 'bg-blue-300' : 'bg-blue-600'}`}
                 onPress={handleSubmit}
                 disabled={loading}
-              />
+              >
+                <Text className="text-white font-semibold">{loading ? "Submitting..." : "Submit"}</Text>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         </View>
@@ -247,79 +201,5 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    padding: 20,
-    width: "90%",
-    maxHeight: "90%",
-    elevation: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#2563eb",
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    fontSize: 16,
-    backgroundColor: "#f9fafb",
-  },
-  label: {
-    fontWeight: "500",
-    marginBottom: 4,
-    color: "#374151",
-  },
-  pickerRow: {
-    flexDirection: "row",
-    marginBottom: 12,
-    flexWrap: "wrap",
-  },
-  pickerOption: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    marginRight: 8,
-    marginBottom: 8,
-    backgroundColor: "#fff",
-  },
-  pickerSelected: {
-    backgroundColor: "#2563eb",
-    borderColor: "#2563eb",
-  },
-  pickerText: {
-    color: "#374151",
-  },
-  pickerSelectedText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 16,
-  },
-  error: {
-    color: "red",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-});
 
 export default ReportForm;

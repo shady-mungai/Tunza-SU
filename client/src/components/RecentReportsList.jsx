@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'
+
 
 const reports = [
   {
@@ -30,11 +32,14 @@ const priorityBadge = (priority) => {
   return null;
 };
 
-const RecentReportsList = () => (
+const RecentReportsList = () => {
+  const navigation = useNavigation();
+
+  return(
   <View className="bg-white rounded-2xl p-6 border border-gray-200">
     <View className="flex-row justify-between items-center mb-4">
       <Text className="font-bold text-lg text-gray-900">Recent Reports</Text>
-      <TouchableOpacity onPress={() => navigation.navigate( { screen: 'MyReports' })}>
+      <TouchableOpacity onPress={() => navigation.navigate('My Reports')}>
         <Text className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 text-sm">View All</Text>
       </TouchableOpacity>
     </View>
@@ -56,5 +61,5 @@ const RecentReportsList = () => (
     </View>
   </View>
 );
-
+}
 export default RecentReportsList; 

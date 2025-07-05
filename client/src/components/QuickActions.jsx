@@ -1,7 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const QuickActions = ({ onNewReport }) => (
+
+const QuickActions = ({ onNewReport }) => {
+  const navigation = useNavigation();
+
+  return (
   <View className="bg-white rounded-2xl p-6 mb-6 flex flex-col border border-gray-200">
     <Text className="font-bold text-lg mb-4 text-gray-900">Quick Actions</Text>
     <View className="flex-row space-x-4">
@@ -15,7 +20,7 @@ const QuickActions = ({ onNewReport }) => (
       </TouchableOpacity>
       <TouchableOpacity
         className="flex-1 flex items-center justify-center border border-gray-200 rounded-xl py-6 mr-2 bg-white"
-        onPress={() => navigation.navigate('MyReports', { screen: 'MyReports' })}
+        onPress={() => navigation.navigate('My Reports')}
         activeOpacity={0.8}
       >
         <Text className="text-2xl mb-2">👁️</Text>
@@ -25,5 +30,6 @@ const QuickActions = ({ onNewReport }) => (
     </View>
   </View>
 );
+}
 
 export default QuickActions; 

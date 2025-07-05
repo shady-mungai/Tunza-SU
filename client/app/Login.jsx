@@ -40,7 +40,6 @@ const Login = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={{ maxWidth: 400, alignSelf: 'center', width: '100%' }}>
-          {/* Header */}
           <View style={{ alignItems: 'center', marginBottom: 32 }}>
             <Text style={{ 
               fontSize: 36, 
@@ -80,14 +79,11 @@ const Login = () => {
             }}
             activeOpacity={0.8}
           >
-            {/* Google logo (optional, use a local asset if available) */}
-            {/* <Image source={require('../assets/google-logo.png')} style={{ width: 20, height: 20, marginRight: 8 }} /> */}
             <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>
               Continue with Google
             </Text>
           </TouchableOpacity>
 
-          {/* Login Form */}
           <View style={{ 
             backgroundColor: 'white', 
             borderRadius: 16, 
@@ -112,7 +108,6 @@ const Login = () => {
               </Text>
             </View>
 
-            {/* Email/Admission Number Field */}
             <View style={{ marginBottom: 16 }}>
               <Text style={{ 
                 fontSize: 14, 
@@ -175,7 +170,6 @@ const Login = () => {
               />
             </View>
 
-            {/* Sign In Button */}
             <TouchableOpacity
               onPress={handleLogin}
               disabled={isLoading}
@@ -203,7 +197,6 @@ const Login = () => {
               </Text>
             </TouchableOpacity>
 
-            {/* Footer */}
             <View style={{ alignItems: 'center', marginTop: 24 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={{ fontSize: 14, color: '#6b7280' }}>

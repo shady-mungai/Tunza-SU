@@ -1,26 +1,34 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const navItems = [
-  { label: 'Dashboard', icon: '⚙️', active: true },
-  { label: 'My Reports', icon: '⚠️' },
-  { label: 'Map View', icon: '📍' },
-  { label: 'Profile', icon: '👤' },
-  { label: 'Help', icon: '❓' },
+  { label: 'Dashboard', icon: '⚙️', route: 'Student Dash' },
+  { label: 'My Reports', icon: '⚠️', route: 'My Reports' },
+  // The following are not currently available in your navigator:
+  // { label: 'Map View', icon: '📍', route: 'Map View' },
+  // { label: 'Profile', icon: '👤', route: 'Profile' },
+  // { label: 'Help', icon: '❓', route: 'Help' },
 ];
 
-const SidebarNavigation = () => (
-  <View className="bg-white rounded-2xl p-4 mt-6 ml-2 w-48 shadow border border-gray-200">
-    {navItems.map((item, idx) => (
-      <View
-        key={item.label}
-        className={`flex-row items-center px-3 py-2 mb-2 rounded-lg ${item.active ? 'bg-blue-50' : ''}`}
-      >
-        <Text className={`mr-3 text-lg ${item.active ? 'text-blue-600' : 'text-gray-500'}`}>{item.icon}</Text>
-        <Text className={`font-medium ${item.active ? 'text-blue-600' : 'text-gray-700'}`}>{item.label}</Text>
-      </View>
-    ))}
-  </View>
-);
+const SidebarNavigation = () => {
+  const navigation = useNavigation();
+
+  return (
+    <View className="bg-white rounded-2xl p-4 mt-6 ml-2 w-48 shadow border border-gray-200">
+      {navItems.map((item) => (
+        <TouchableOpacity
+          key={item.label}
+          className="flex-row items-center px-3 py-2 mb-2 rounded-lg"
+          onPress={() => navigation.navigate(item.route)}
+          activeOpacity={0.7}
+        >
+          <Text className="mr-3 text-lg text-gray-500">{item.icon}</Text>
+          <Text className="font-medium text-gray-700">{item.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
 
 export default SidebarNavigation; 

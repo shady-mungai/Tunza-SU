@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, ScrollView, Alert } from 'react-native';
 import HeaderBar from './HeaderBar';
-import StatCardList from './StatCardList';
+// import StatCardList from './StatCardList';
 import QuickActions from './QuickActions';
 import RecentReportsList from './RecentReportsList';
 import SidebarNavigation from './SidebarNavigation';
@@ -53,7 +53,7 @@ const StudentDashboard = () => {
       <View style={styles.contentRow}>
         {isLargeScreen && <SidebarNavigation />}
         <ScrollView style={styles.mainContent} contentContainerStyle={{ paddingBottom: 24 }}>
-          <StatCardList />
+          {/* <StatCardList /> */}
           <QuickActions onNewReport={handleOpenReportModal} />
           <RecentReportsList />
         </ScrollView>
