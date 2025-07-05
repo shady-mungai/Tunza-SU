@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  Modal,
 } from "react-native";
 import {
   useNavigation,
@@ -30,6 +31,7 @@ import {
   ListChecks,
   Users,
   BarChart,
+  X,
 } from "lucide-react-native";
 
 const { width } = Dimensions.get("window");
@@ -37,6 +39,8 @@ const { width } = Dimensions.get("window");
 const Dashboard = ({ navigation: propNavigation, route }) => {
   const navigation = useNavigation();
   const navigationRef = useNavigationContainerRef();
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Use prop navigation if available, otherwise use hook
 
@@ -50,6 +54,18 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
     navigationState: navigation?.getState(),
     parentNavigation: navigation?.getParent?.(),
   });
+
+  // Function to handle opening report modal
+  const handleOpenReport = (report) => {
+    setSelectedReport(report);
+    setModalVisible(true);
+  };
+
+  // Function to close report modal
+  const handleCloseReport = () => {
+    setModalVisible(false);
+    setSelectedReport(null);
+  };
 
   // Function to handle Help navigation
   const handleHelpNavigation = () => {
@@ -442,6 +458,16 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
                           Overdue
                         </Text>
                       )}
+                      <TouchableOpacity
+                        onPress={() => handleOpenReport(report)}
+                        style={styles.eyeButton}
+                      >
+                        <Eye
+                          size={20}
+                          color="#6B7280"
+                          style={styles.reportEyeIcon}
+                        />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 ))}
@@ -555,11 +581,16 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
                         Low
                       </Text>
                     )}
-                    <Eye
-                      size={20}
-                      color="#6B7280"
-                      style={styles.reportEyeIcon}
-                    />
+                    <TouchableOpacity
+                      onPress={() => handleOpenReport(report)}
+                      style={styles.eyeButton}
+                    >
+                      <Eye
+                        size={20}
+                        color="#6B7280"
+                        style={styles.reportEyeIcon}
+                      />
+                    </TouchableOpacity>
                   </View>
                 </View>
               ))}
@@ -567,6 +598,157 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
           </View>
         </ScrollView>
       </View>
+
+      {/* Report Detail Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseReport}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Report Details</Text>
+              <TouchableOpacity
+                onPress={handleCloseReport}
+                style={styles.closeButton}
+              >
+                <X size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {selectedReport && (
+              <ScrollView style={styles.modalBody}>
+                <View style={styles.reportDetailSection}>
+                  <Text style={styles.reportDetailTitle}>
+                    {selectedReport.title}
+                  </Text>
+                  <Text style={styles.reportDetailLocation}>
+                    <MapPin
+                      size={16}
+                      color="#6B7280"
+                      style={styles.detailIcon}
+                    />
+                    {selectedReport.location}
+                  </Text>
+                  <Text style={styles.reportDetailDate}>
+                    <Clock
+                      size={16}
+                      color="#6B7280"
+                      style={styles.detailIcon}
+                    />
+                    {selectedReport.date}
+                  </Text>
+                  <Text style={styles.reportDetailAssigned}>
+                    <User size={16} color="#6B7280" style={styles.detailIcon} />
+                    Assigned To: {selectedReport.assignedTo}
+                  </Text>
+                </View>
+
+                <View style={styles.reportDetailBadges}>
+                  <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeLabel}>Status:</Text>
+                    {selectedReport.status === "New" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#E0E7FF", color: "#4F46E5" },
+                        ]}
+                      >
+                        New
+                      </Text>
+                    )}
+                    {selectedReport.status === "In Progress" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#DBEAFE", color: "#2563EB" },
+                        ]}
+                      >
+                        In Progress
+                      </Text>
+                    )}
+                    {selectedReport.status === "Pending Review" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#FEF3C7", color: "#D97706" },
+                        ]}
+                      >
+                        Pending Review
+                      </Text>
+                    )}
+                    {selectedReport.status === "Resolved" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#D1FAE5", color: "#10B981" },
+                        ]}
+                      >
+                        Resolved
+                      </Text>
+                    )}
+                    {selectedReport.status === "Overdue" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#FEE2E2", color: "#EF4444" },
+                        ]}
+                      >
+                        Overdue
+                      </Text>
+                    )}
+                  </View>
+
+                  <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeLabel}>Priority:</Text>
+                    {selectedReport.priority === "High" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#FEE2E2", color: "#EF4444" },
+                        ]}
+                      >
+                        High
+                      </Text>
+                    )}
+                    {selectedReport.priority === "Medium" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#FFF7ED", color: "#F97316" },
+                        ]}
+                      >
+                        Medium
+                      </Text>
+                    )}
+                    {selectedReport.priority === "Low" && (
+                      <Text
+                        style={[
+                          styles.detailBadge,
+                          { backgroundColor: "#E5E7EB", color: "#4B5563" },
+                        ]}
+                      >
+                        Low
+                      </Text>
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.reportDetailActions}>
+                  <TouchableOpacity style={styles.actionButton}>
+                    <Text style={styles.actionButtonText}>Update Status</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.actionButton}>
+                    <Text style={styles.actionButtonText}>Assign to Me</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -838,6 +1020,120 @@ const styles = StyleSheet.create({
   },
   halfSection: {
     flex: 1,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 0,
+    width: "90%",
+    maxHeight: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1F2937",
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  reportDetailSection: {
+    marginBottom: 24,
+  },
+  reportDetailTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#1F2937",
+    marginBottom: 16,
+  },
+  reportDetailLocation: {
+    fontSize: 16,
+    color: "#4B5563",
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  reportDetailDate: {
+    fontSize: 16,
+    color: "#4B5563",
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  reportDetailAssigned: {
+    fontSize: 16,
+    color: "#4B5563",
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  detailIcon: {
+    marginRight: 8,
+  },
+  reportDetailBadges: {
+    marginBottom: 24,
+  },
+  badgeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  badgeLabel: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#374151",
+    marginRight: 12,
+    minWidth: 60,
+  },
+  detailBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 9999,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  reportDetailActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: "#2563EB",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  actionButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  eyeButton: {
+    padding: 4,
   },
 });
 
