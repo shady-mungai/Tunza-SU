@@ -5,12 +5,15 @@ import * as Google from "expo-auth-session/providers/google";
 import { createContext, useContext, useState, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { WEB_CLIENT_ID, IOS_CLIENT_ID } from '@env'
+import * as AuthSession from "expo-auth-session";
 
 const AuthContext = createContext(undefined)
 WebBrowser.maybeCompleteAuthSession();
 
+console.log(`RedirectURl is: ${AuthSession.makeRedirectUri({ useProxy: true })}`);
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState('')
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState("");
 
@@ -18,10 +21,12 @@ export function AuthProvider({ children }) {
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: IOS_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
+    useProxy: true,
   });
 
   // Handle Google sign-in response
   useEffect(() => {
+    console.log("Google response:", response);
     const handleGoogleResponse = async () => {
       if (response?.type === "success") {
         const accessToken = response.authentication.accessToken;
@@ -30,8 +35,16 @@ export function AuthProvider({ children }) {
             headers: { Authorization: `Bearer ${accessToken}` },
           });
           const googleUser = await res.json();
-          await AsyncStorage.setItem("user", JSON.stringify(googleUser));
-          setUser(googleUser);
+          // Send Google user info to backend to get or create app user
+          const backendRes = await fetch("http://localhost:4000/auth/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(googleUser),
+          });
+          if (!backendRes.ok) throw new Error("Failed to sync Google user with backend");
+          const appUser = await backendRes.json();
+          await AsyncStorage.setItem("user", JSON.stringify(appUser));
+          setUser(appUser);
         } catch (error) {
           console.error("Google sign-in error:", error);
         }

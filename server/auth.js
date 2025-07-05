@@ -169,11 +169,6 @@ app.post("/login", async (req, res) => {
 });
 
 app.post('/addReport', upload.single('image'), async (req, res) => {
-  console.log('=== DEBUG: addReport endpoint ===');
-  console.log('req.body:', req.body);
-  console.log('req.file:', req.file);
-  console.log('req.headers:', req.headers);
-  
   const {
     user_id,
     title,
@@ -252,6 +247,48 @@ app.get('/userReports', async (req, res) => {
   } catch (err) {
     console.error("Error fetching user reports:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Google OAuth endpoint
+app.post('/auth/google', async (req, res) => {
+  const { email, name} = req.body;
+  console.log(`Email address is ${email}`)
+  console.log('-----------------------------------------');
+  console.log(`Name from google ${name}`)
+  
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required from Google user info.' });
+  }
+  try {
+    // Check if user exists
+    const [records] = await con
+      .promise()
+      .query('SELECT * FROM users2 WHERE email = ?', [email]);
+    let user;
+    if (records.length > 0) {
+      user = records[0];
+    } else {
+      // Create a new user with Google info
+      const admission_number = 'GGL-' + Math.floor(Math.random() * 1000000); // random fallback
+      const role = 'student';
+      const password = 123;
+      const phone_number = '0712345678';
+      const totp_secret = null;
+      const [result] = await con.promise().query(
+        'INSERT INTO users2 (name, email, admission_number, password, totp_secret, phone_number, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [name, email, admission_number, password, totp_secret, phone_number, role]
+      );
+      // Fetch the newly created user
+      const [newUserRecords] = await con
+        .promise()
+        .query('SELECT * FROM users2 WHERE email = ?', [email]);
+      user = newUserRecords[0];
+    }
+    return res.status(200).json(user);
+  } catch (err) {
+    console.error('Google auth error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
