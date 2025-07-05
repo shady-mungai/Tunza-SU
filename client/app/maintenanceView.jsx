@@ -268,7 +268,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View
                 style={[styles.cardIconCircle, { backgroundColor: "#DBEAFE" }]}
               >
-                <AlertTriangle size={24} color="#2563EB" />
+                <AlertTriangle size={20} color="#2563EB" />
               </View>
             </View>
 
@@ -281,7 +281,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View
                 style={[styles.cardIconCircle, { backgroundColor: "#E0E7FF" }]}
               >
-                <Plus size={24} color="#4F46E5" />
+                <Plus size={20} color="#4F46E5" />
               </View>
             </View>
 
@@ -294,7 +294,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View
                 style={[styles.cardIconCircle, { backgroundColor: "#FEF3C7" }]}
               >
-                <Clock size={24} color="#D97706" />
+                <Clock size={20} color="#D97706" />
               </View>
             </View>
 
@@ -307,7 +307,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View
                 style={[styles.cardIconCircle, { backgroundColor: "#EDE9FE" }]}
               >
-                <Settings size={24} color="#7C3AED" />
+                <Settings size={20} color="#7C3AED" />
               </View>
             </View>
 
@@ -320,7 +320,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View
                 style={[styles.cardIconCircle, { backgroundColor: "#D1FAE5" }]}
               >
-                <CheckCircle size={24} color="#10B981" />
+                <CheckCircle size={20} color="#10B981" />
               </View>
             </View>
 
@@ -333,35 +333,119 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View
                 style={[styles.cardIconCircle, { backgroundColor: "#FEE2E2" }]}
               >
-                <Clock size={24} color="#EF4444" />
+                <Clock size={20} color="#EF4444" />
               </View>
             </View>
           </View>
 
-          {/* Quick Actions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <View style={styles.quickActionsGrid}>
-              <TouchableOpacity style={styles.quickActionButton}>
-                <Eye size={32} color="#2563EB" style={styles.quickActionIcon} />
-                <Text style={styles.quickActionText}>View New Reports</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.quickActionButton}>
-                <ListChecks
-                  size={32}
-                  color="#2563EB"
-                  style={styles.quickActionIcon}
-                />
-                <Text style={styles.quickActionText}>Manage Assignments</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.quickActionButton}>
-                <BarChart
-                  size={32}
-                  color="#2563EB"
-                  style={styles.quickActionIcon}
-                />
-                <Text style={styles.quickActionText}>Generate Reports</Text>
-              </TouchableOpacity>
+          {/* Quick Actions and Recent Reports in a row */}
+          <View style={styles.horizontalSection}>
+            {/* Quick Actions */}
+            <View style={styles.halfSection}>
+              <Text style={styles.sectionTitle}>Quick Actions</Text>
+              <View style={styles.quickActionsGrid}>
+                <TouchableOpacity style={styles.quickActionButton}>
+                  <Eye
+                    size={24}
+                    color="#2563EB"
+                    style={styles.quickActionIcon}
+                  />
+                  <Text style={styles.quickActionText}>View New Reports</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.quickActionButton}>
+                  <ListChecks
+                    size={24}
+                    color="#2563EB"
+                    style={styles.quickActionIcon}
+                  />
+                  <Text style={styles.quickActionText}>Manage Assignments</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.quickActionButton}>
+                  <BarChart
+                    size={24}
+                    color="#2563EB"
+                    style={styles.quickActionIcon}
+                  />
+                  <Text style={styles.quickActionText}>Generate Reports</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Recent Reports */}
+            <View style={styles.halfSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Recent Reports</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("all_reports")}
+                >
+                  <Text style={styles.viewAllText}>View All</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.reportsList}>
+                {maintenanceReports.slice(0, 3).map((report) => (
+                  <View key={report.id} style={styles.reportItem}>
+                    <View style={styles.reportDetails}>
+                      <Text style={styles.reportTitle}>{report.title}</Text>
+                      <Text style={styles.reportLocation}>
+                        {report.location}
+                      </Text>
+                      <Text style={styles.reportDate}>{report.date}</Text>
+                    </View>
+                    <View style={styles.reportBadges}>
+                      {report.status === "New" && (
+                        <Text
+                          style={[
+                            styles.badge,
+                            { backgroundColor: "#E0E7FF", color: "#4F46E5" },
+                          ]}
+                        >
+                          New
+                        </Text>
+                      )}
+                      {report.status === "In Progress" && (
+                        <Text
+                          style={[
+                            styles.badge,
+                            { backgroundColor: "#DBEAFE", color: "#2563EB" },
+                          ]}
+                        >
+                          In Progress
+                        </Text>
+                      )}
+                      {report.status === "Pending Review" && (
+                        <Text
+                          style={[
+                            styles.badge,
+                            { backgroundColor: "#FEF3C7", color: "#D97706" },
+                          ]}
+                        >
+                          Pending Review
+                        </Text>
+                      )}
+                      {report.status === "Resolved" && (
+                        <Text
+                          style={[
+                            styles.badge,
+                            { backgroundColor: "#D1FAE5", color: "#10B981" },
+                          ]}
+                        >
+                          Resolved
+                        </Text>
+                      )}
+                      {report.status === "Overdue" && (
+                        <Text
+                          style={[
+                            styles.badge,
+                            { backgroundColor: "#FEE2E2", color: "#EF4444" },
+                          ]}
+                        >
+                          Overdue
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
 
@@ -369,7 +453,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>All Reports</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("all_reports")}
+              >
                 <Text style={styles.viewAllText}>View All</Text>
               </TouchableOpacity>
             </View>
@@ -560,13 +646,13 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    padding: 32, // Equivalent to p-8
+    padding: 24, // Reduced from 32
   },
   header: {
     flexDirection: "row",
     justifyContent: "flex-end", // Align to end for user info
     alignItems: "center",
-    marginBottom: 32, // Equivalent to mb-8
+    marginBottom: 24, // Reduced from 32
   },
   headerRight: {
     flexDirection: "row",
@@ -598,13 +684,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 32, // Equivalent to mb-8
+    marginBottom: 24, // Reduced from 32
     // Adjust item width based on screen size for responsive grid
-    // For 2 cols on small, 5 on large
+    // For 3 cols on small, 6 on large
   },
   card: {
     backgroundColor: "#FFFFFF", // Equivalent to bg-white
-    padding: 24, // Equivalent to p-6
+    padding: 16, // Reduced from 24
     borderRadius: 12, // Equivalent to rounded-xl
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -614,8 +700,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: (width - 64 - 32) / 2 - 12, // (screen_width - sidebar_width - main_padding) / 2 - gap
-    marginBottom: 24, // Equivalent to gap-6
+    width: (width - 64 - 32) / 3 - 8, // (screen_width - sidebar_width - main_padding) / 3 - gap
+    marginBottom: 16, // Reduced from 24
   },
   cardLabel: {
     color: "#6B7280", // Equivalent to text-gray-500
@@ -623,25 +709,25 @@ const styles = StyleSheet.create({
     marginBottom: 4, // Equivalent to mb-1
   },
   cardValue: {
-    fontSize: 30, // Equivalent to text-3xl
+    fontSize: 24, // Reduced from 30
     fontWeight: "bold",
     color: "#1F2937", // Equivalent to text-gray-800
   },
   cardIconCircle: {
-    width: 48, // Equivalent to w-12
-    height: 48, // Equivalent to h-12
-    borderRadius: 24, // Equivalent to rounded-full
+    width: 40, // Reduced from 48
+    height: 40, // Reduced from 48
+    borderRadius: 20, // Reduced from 24
     alignItems: "center",
     justifyContent: "center",
   },
   section: {
-    marginBottom: 32, // Equivalent to mb-8
+    marginBottom: 24, // Reduced from 32
   },
   sectionTitle: {
-    fontSize: 20, // Equivalent to text-xl
+    fontSize: 18, // Reduced from 20
     fontWeight: "600", // Equivalent to font-semibold
     color: "#1F2937", // Equivalent to text-gray-800
-    marginBottom: 16, // Equivalent to mb-4
+    marginBottom: 12, // Reduced from 16
   },
   quickActionsGrid: {
     flexDirection: "row",
@@ -650,7 +736,7 @@ const styles = StyleSheet.create({
   },
   quickActionButton: {
     backgroundColor: "#FFFFFF", // Equivalent to bg-white
-    padding: 24, // Equivalent to p-6
+    padding: 16, // Reduced from 24
     borderRadius: 12, // Equivalent to rounded-xl
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -661,20 +747,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: (width - 64 - 32) / 3 - 16, // (screen_width - sidebar_width - main_padding) / 3 - gap
-    marginBottom: 24, // Equivalent to gap-6
+    marginBottom: 16, // Reduced from 24
   },
   quickActionIcon: {
-    marginBottom: 8, // Equivalent to mb-2
+    marginBottom: 6, // Reduced from 8
   },
   quickActionText: {
     color: "#4B5563", // Equivalent to text-gray-700
     fontWeight: "500", // Equivalent to font-medium
+    fontSize: 12, // Added smaller font size
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16, // Equivalent to mb-4
+    marginBottom: 12, // Reduced from 16
   },
   viewAllText: {
     color: "#2563EB", // Equivalent to text-blue-600
@@ -685,7 +772,7 @@ const styles = StyleSheet.create({
   },
   reportItem: {
     backgroundColor: "#FFFFFF", // Equivalent to bg-white
-    padding: 24, // Equivalent to p-6
+    padding: 16, // Reduced from 24
     borderRadius: 12, // Equivalent to rounded-xl
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -695,7 +782,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start", // Default for md:flex-row
-    marginBottom: 16, // Equivalent to space-y-4
+    marginBottom: 12, // Reduced from 16
     flexWrap: "wrap", // Allow wrapping on smaller screens
   },
   reportDetails: {
@@ -705,42 +792,52 @@ const styles = StyleSheet.create({
   reportTitle: {
     color: "#1F2937", // Equivalent to text-gray-800
     fontWeight: "500", // Equivalent to font-medium
-    fontSize: 18, // Equivalent to text-lg
+    fontSize: 16, // Reduced from 18
   },
   reportLocation: {
     color: "#6B7280", // Equivalent to text-gray-500
-    fontSize: 14, // Equivalent to text-sm
-    marginTop: 4, // Equivalent to mt-1
+    fontSize: 12, // Reduced from 14
+    marginTop: 2, // Reduced from 4
   },
   reportDate: {
     color: "#6B7280", // Equivalent to text-gray-500
-    fontSize: 14, // Equivalent to text-sm
+    fontSize: 12, // Reduced from 14
   },
   reportAssignedTo: {
     color: "#4B5563", // Equivalent to text-gray-600
-    fontSize: 14, // Equivalent to text-sm
+    fontSize: 12, // Reduced from 14
     fontWeight: "500", // Equivalent to font-medium
-    marginTop: 4, // Equivalent to mt-1
+    marginTop: 2, // Reduced from 4
   },
   reportBadges: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12, // Equivalent to space-x-3
-    marginTop: 12, // Equivalent to mt-3 md:mt-0
+    gap: 8, // Reduced from 12
+    marginTop: 8, // Reduced from 12
     flexWrap: "wrap", // Allow badges to wrap
     justifyContent: "flex-end", // Align badges to the right on small screens
     flexShrink: 0,
   },
   badge: {
-    paddingHorizontal: 12, // Equivalent to px-3
-    paddingVertical: 4, // Equivalent to py-1
+    paddingHorizontal: 8, // Reduced from 12
+    paddingVertical: 2, // Reduced from 4
     borderRadius: 9999, // Equivalent to rounded-full
-    fontSize: 12, // Equivalent to text-xs
+    fontSize: 10, // Reduced from 12
     fontWeight: "600", // Equivalent to font-semibold
     // Background and color are set inline based on status/priority
   },
   reportEyeIcon: {
     // Styles for eye icon
+  },
+  horizontalSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start", // Changed from center to flex-start
+    marginBottom: 24, // Reduced from 32
+    gap: 16, // Added gap between sections
+  },
+  halfSection: {
+    flex: 1,
   },
 });
 
