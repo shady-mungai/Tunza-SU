@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import {
   ChevronDown,
   ChevronRight,
@@ -27,6 +28,7 @@ import LayoutWrapper from "../src/components/LayoutWrapper";
 const { width } = Dimensions.get("window");
 
 const Help = () => {
+  const navigation = useNavigation();
   const faqData = [
     {
       question: "How do I view all reports?",
@@ -99,7 +101,7 @@ const Help = () => {
                 style={styles.guideCard}
                 onPress={() => {
                   if (guide.title === "Getting Started") {
-                    navigation.navigate("gettingStarted");
+                    navigation.navigate("GettingStarted");
                   }
                 }}
               >

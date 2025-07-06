@@ -24,7 +24,17 @@ const { width } = Dimensions.get("window");
 const SidebarNavigation = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { user } = useAuth();
+
+  // Try to get auth context, but handle the case where it's not available
+  let user = null;
+  try {
+    const auth = useAuth();
+    user = auth.user;
+  } catch (error) {
+    // If auth context is not available, use default values
+    console.log("Auth context not available, using default navigation");
+    user = { role: "student" }; // Default to student role
+  }
 
   // Get role display name
   const getRoleDisplayName = (role) => {
@@ -129,7 +139,11 @@ const SidebarNavigation = () => {
       },
     ];
 
-    return baseItems.filter((item) => item.showFor.includes(user?.role));
+    return baseItems.filter((item) =>
+      user?.role
+        ? item.showFor.includes(user.role)
+        : item.showFor.includes("student")
+    );
   };
 
   const navItems = getNavItems();
