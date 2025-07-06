@@ -41,6 +41,54 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
   const navigationRef = useNavigationContainerRef();
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [maintenanceReports, setMaintenanceReports] = useState([
+    {
+      id: 1,
+      title: "Broken Window in Library",
+      location: "Main Library, 2nd Floor",
+      date: "Jan 16, 2024",
+      status: "In Progress",
+      priority: "High",
+      assignedTo: "Engineer A",
+    },
+    {
+      id: 2,
+      title: "Leaking Faucet in Dormitory",
+      location: "Dormitory Block A, Room 205",
+      date: "Jan 14, 2024",
+      status: "Pending Review",
+      priority: "Medium",
+      assignedTo: "Unassigned",
+    },
+    {
+      id: 3,
+      title: "Lights Flickering in Lecture Hall",
+      location: "Science Building, Lecture Hall 3",
+      date: "Jan 12, 2024",
+      status: "Resolved",
+      priority: "Low",
+      assignedTo: "Electrician B",
+    },
+    {
+      id: 4,
+      title: "Damaged Chair in Classroom",
+      location: "Block C, Room 101",
+      date: "Jan 10, 2024",
+      status: "New",
+      priority: "Low",
+      assignedTo: "Unassigned",
+    },
+    {
+      id: 5,
+      title: "Clogged Toilet in Washroom",
+      location: "Administration Building, Ground Floor",
+      date: "Jan 08, 2024",
+      status: "Overdue",
+      priority: "High",
+      assignedTo: "Plumber C",
+    },
+  ]);
 
   // Use prop navigation if available, otherwise use hook
 
@@ -65,6 +113,36 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
   const handleCloseReport = () => {
     setModalVisible(false);
     setSelectedReport(null);
+  };
+
+  // Function to open status update modal
+  const handleUpdateStatus = () => {
+    setStatusModalVisible(true);
+  };
+
+  // Function to close status update modal
+  const handleCloseStatusModal = () => {
+    setStatusModalVisible(false);
+  };
+
+  // Function to update report status
+  const handleStatusChange = (newStatus) => {
+    if (selectedReport) {
+      const updatedReports = maintenanceReports.map((report) =>
+        report.id === selectedReport.id
+          ? { ...report, status: newStatus }
+          : report
+      );
+      setMaintenanceReports(updatedReports);
+
+      // Update the selected report in the modal
+      const updatedSelectedReport = updatedReports.find(
+        (report) => report.id === selectedReport.id
+      );
+      setSelectedReport(updatedSelectedReport);
+
+      setStatusModalVisible(false);
+    }
   };
 
   // Function to handle Help navigation
@@ -115,54 +193,6 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       }
     }
   };
-  // Placeholder data for reports in a maintenance context
-  const maintenanceReports = [
-    {
-      id: 1,
-      title: "Broken Window in Library",
-      location: "Main Library, 2nd Floor",
-      date: "Jan 16, 2024",
-      status: "In Progress",
-      priority: "High",
-      assignedTo: "Engineer A",
-    },
-    {
-      id: 2,
-      title: "Leaking Faucet in Dormitory",
-      location: "Dormitory Block A, Room 205",
-      date: "Jan 14, 2024",
-      status: "Pending Review",
-      priority: "Medium",
-      assignedTo: "Unassigned",
-    },
-    {
-      id: 3,
-      title: "Lights Flickering in Lecture Hall",
-      location: "Science Building, Lecture Hall 3",
-      date: "Jan 12, 2024",
-      status: "Resolved",
-      priority: "Low",
-      assignedTo: "Electrician B",
-    },
-    {
-      id: 4,
-      title: "Damaged Chair in Classroom",
-      location: "Block C, Room 101",
-      date: "Jan 10, 2024",
-      status: "New",
-      priority: "Low",
-      assignedTo: "Unassigned",
-    },
-    {
-      id: 5,
-      title: "Clogged Toilet in Washroom",
-      location: "Administration Building, Ground Floor",
-      date: "Jan 08, 2024",
-      status: "Overdue",
-      priority: "High",
-      assignedTo: "Plumber C",
-    },
-  ];
 
   // Calculate dashboard statistics based on maintenanceReports data
   const totalReports = maintenanceReports.length;
@@ -737,7 +767,10 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
                 </View>
 
                 <View style={styles.reportDetailActions}>
-                  <TouchableOpacity style={styles.actionButton}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={handleUpdateStatus}
+                  >
                     <Text style={styles.actionButtonText}>Update Status</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.actionButton}>
@@ -746,6 +779,57 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
                 </View>
               </ScrollView>
             )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Status Update Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={statusModalVisible}
+        onRequestClose={handleCloseStatusModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Update Status</Text>
+              <TouchableOpacity
+                onPress={handleCloseStatusModal}
+                style={styles.closeButton}
+              >
+                <X size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Text style={styles.statusUpdateText}>
+                Select a new status for this report:
+              </Text>
+
+              <View style={styles.statusOptions}>
+                <TouchableOpacity
+                  style={styles.statusOption}
+                  onPress={() => handleStatusChange("In Progress")}
+                >
+                  <Text style={styles.statusOptionText}>In Progress</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.statusOption}
+                  onPress={() => handleStatusChange("Pending Review")}
+                >
+                  <Text style={styles.statusOptionText}>Pending Review</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.statusOption}
+                  onPress={() => handleStatusChange("Resolved")}
+                >
+                  <Text style={styles.statusOptionText}>Resolved</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </Modal>
@@ -1134,6 +1218,30 @@ const styles = StyleSheet.create({
   },
   eyeButton: {
     padding: 4,
+  },
+  // Status Update Modal Styles
+  statusUpdateText: {
+    fontSize: 16,
+    color: "#374151",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  statusOptions: {
+    gap: 12,
+  },
+  statusOption: {
+    backgroundColor: "#F9FAFB",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  statusOptionText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#374151",
+    textAlign: "center",
   },
 });
 
