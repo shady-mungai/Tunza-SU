@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const navItems = [
-  { label: 'Dashboard', icon: '⚙️', route: 'Student Dash' },
-  { label: 'My Reports', icon: '⚠️', route: 'My Reports' },
+  { label: "Dashboard", icon: "🏠", route: "StudentDashboard" },
+  { label: "My Reports", icon: "📋", route: "MyReports" },
 ];
 
 const SidebarNavigation = () => {
@@ -27,4 +27,4 @@ const SidebarNavigation = () => {
   );
 };
 
-export default SidebarNavigation; 
+export default SidebarNavigation;
