@@ -153,7 +153,15 @@ const Help = () => {
           <Text style={styles.sectionTitle}>Quick Guides</Text>
           <View style={styles.guidesGrid}>
             {quickGuides.map((guide, index) => (
-              <TouchableOpacity key={index} style={styles.guideCard}>
+              <TouchableOpacity
+                key={index}
+                style={styles.guideCard}
+                onPress={() => {
+                  if (guide.title === "Getting Started") {
+                    navigation.navigate("gettingStarted");
+                  }
+                }}
+              >
                 <View style={styles.guideIcon}>{guide.icon}</View>
                 <Text style={styles.guideTitle}>{guide.title}</Text>
                 <Text style={styles.guideDescription}>{guide.description}</Text>

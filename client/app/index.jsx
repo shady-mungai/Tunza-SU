@@ -1,32 +1,22 @@
 import React from "react";
-import { StyleSheet, Text, View, Platform } from "react-native";
-import {
-  NavigationContainer,
-  NavigationIndependentTree,
-} from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./Login";
 import Signup from "./Signup";
-import "../global.css";
 import { AuthProvider, useAuth } from "../src/contexts/AuthContexts";
 import RoleBasedNavigator from "../src/navigation/RoleBasedNavigator";
-import React from "react";
-import { StyleSheet, Text, View, Platform } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import {
   NavigationContainer,
   NavigationIndependentTree,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Login from "./Login";
-import Signup from "./Signup";
 import StudentDashboard from "../src/components/StudentDashboard";
 import MyReports from "../src/components/MyReports";
 import AllReports from "./all_reports";
 import "../global.css";
-import { AuthProvider, useAuth } from "../src/contexts/AuthContexts";
 import Help from "./help";
 import AssignedReports from "./assigned_reports";
+import GettingStarted from "./gettingStarted";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -87,6 +77,7 @@ function RootNavigator() {
           <Stack.Screen name="AllReports" component={AllReports} />
           <Stack.Screen name="AssignedReports" component={AssignedReports} />
           <Stack.Screen name="Help" component={Help} />
+          <Stack.Screen name="gettingStarted" component={GettingStarted} />
           {/* Add any modal screens or additional screens here */}
         </>
       ) : (
@@ -106,14 +97,10 @@ const Home = () => {
         <NavigationContainer>
           <RootNavigator />
         </NavigationContainer>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
       </NavigationIndependentTree>
     </AuthProvider>
   );
 };
- 
 
 export default Home;
 
