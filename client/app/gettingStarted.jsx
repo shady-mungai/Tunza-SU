@@ -7,15 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import {
-  LayoutDashboard,
-  ListTodo,
-  ListChecks,
-  Users,
-  BarChart,
-  UserCircle,
-  HelpCircle,
   ChevronDown,
   ChevronRight,
   Mail,
@@ -36,13 +28,19 @@ import {
   Zap,
   Bell,
   Camera,
+  LayoutDashboard,
+  ListTodo,
+  ListChecks,
+  Users,
+  BarChart,
+  UserCircle,
+  HelpCircle,
 } from "lucide-react-native";
+import LayoutWrapper from "../src/components/LayoutWrapper";
 
 const { width } = Dimensions.get("window");
 
 const GettingStarted = () => {
-  const navigation = useNavigation();
-
   const gettingStartedSections = [
     {
       title: "Dashboard Overview",
@@ -174,63 +172,7 @@ const GettingStarted = () => {
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      <View style={styles.sidebar}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>T</Text>
-          </View>
-          <Text style={styles.appTitle}>TunzaSU</Text>
-        </View>
-        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
-        <View style={styles.navContainer}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("dashboard")}
-          >
-            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Dashboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("all_reports")}
-          >
-            <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>All Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("assigned_reports")}
-          >
-            <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Assigned Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("analytics")}
-          >
-            <BarChart size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Analytics</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("profile")}
-          >
-            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("help")}
-          >
-            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Help</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Main Content */}
+    <LayoutWrapper>
       <ScrollView style={styles.mainContent}>
         {/* Header */}
         <View style={styles.header}>
@@ -358,73 +300,11 @@ const GettingStarted = () => {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </LayoutWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  sidebar: {
-    width: 256,
-    backgroundColor: "#FFFFFF",
-    padding: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 40,
-  },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#2563EB",
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  appTitle: {
-    marginLeft: 12,
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  dashboardSubtitle: {
-    color: "#6B7280",
-    fontSize: 14,
-    marginBottom: 24,
-  },
-  navContainer: {
-    flexGrow: 1,
-  },
-  navItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  navIcon: {
-    marginRight: 12,
-  },
-  navText: {
-    color: "#4B5563",
-    fontWeight: "500",
-  },
   mainContent: {
     flex: 1,
     padding: 32,

@@ -13,6 +13,8 @@ import Analytics from "../../app/analytics";
 import Profile from "../../app/profile";
 import Help from "../../app/help";
 import GettingStarted from "../../app/gettingStarted";
+import Dashboard from "../../app/dashboard";
+import AdminDashboard from "../../app/admin";
 
 const Tab = createBottomTabNavigator();
 
@@ -118,6 +120,66 @@ const MaintenanceNavigator = () => (
       }}
     />
     <Tab.Screen
+      name="Help"
+      component={Help}
+      options={{
+        tabBarLabel: "Help",
+        tabBarIcon: () => <Text>❓</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="GettingStarted"
+      component={GettingStarted}
+      options={{
+        tabBarLabel: "Getting Started",
+        tabBarIcon: () => <Text>📚</Text>,
+      }}
+    />
+  </Tab.Navigator>
+);
+
+// Staff Navigation
+const StaffNavigator = () => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: false,
+      tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
+      tabBarLabelStyle: { fontSize: 12 },
+    }}
+  >
+    <Tab.Screen
+      name="Dashboard"
+      component={Dashboard}
+      options={{
+        tabBarLabel: "Dashboard",
+        tabBarIcon: () => <Text>🏢</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="AllReports"
+      component={AllReports}
+      options={{
+        tabBarLabel: "All Reports",
+        tabBarIcon: () => <Text>📊</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={Profile}
+      options={{
+        tabBarLabel: "Profile",
+        tabBarIcon: () => <Text>👤</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Help"
+      component={Help}
+      options={{
+        tabBarLabel: "Help",
+        tabBarIcon: () => <Text>❓</Text>,
+      }}
+    />
+    <Tab.Screen
       name="GettingStarted"
       component={GettingStarted}
       options={{
@@ -139,7 +201,7 @@ const AdminNavigator = () => (
   >
     <Tab.Screen
       name="Dashboard"
-      component={Dashboard}
+      component={AdminDashboard}
       options={{
         tabBarLabel: "Dashboard",
         tabBarIcon: () => <Text>👑</Text>,
@@ -167,6 +229,14 @@ const AdminNavigator = () => (
       options={{
         tabBarLabel: "Profile",
         tabBarIcon: () => <Text>👤</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Help"
+      component={Help}
+      options={{
+        tabBarLabel: "Help",
+        tabBarIcon: () => <Text>❓</Text>,
       }}
     />
     <Tab.Screen
