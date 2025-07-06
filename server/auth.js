@@ -43,10 +43,16 @@ async function getCurrentUser(email, admission_number, res) {
     if (records.length > 0) {
       currentUser = records[0]; //gets the retrieved user using admission_number or email
       return currentUser;
-    } else
-      return res
-        .status(400)
-        .json({ message: "User doesn't exist. Create an account" });
+    } else {
+      currentUser = {}; // Reset currentUser to empty object
+      // Only return error response if res parameter is provided (for login)
+      if (res) {
+        return res
+          .status(400)
+          .json({ message: "User doesn't exist. Create an account" });
+      }
+      return null; // For registration checks, just return null
+    }
   } catch (err) {
     if (err.code === "ER_ACCESS_DENIED_ERROR") {
       console.error("Database access denied. Check your credentials.");
@@ -61,6 +67,11 @@ async function getCurrentUser(email, admission_number, res) {
     } else {
       console.error("Unexpected error:", err.message);
     }
+    // Only return error response if res parameter is provided
+    if (res) {
+      return res.status(500).json({ message: "Database error occurred" });
+    }
+    return null;
   }
 }
 // generate a secret key for each user and generate an OTP
@@ -72,11 +83,14 @@ app.post("/register", async (req, res) => {
   const { name, email, admission_number, password, phone_number, role } =
     req.body;
 
+  // Check if user already exists
   await getCurrentUser(email, admission_number);
 
-  if (!currentUser == undefined || !currentUser == null) {
+  // If user exists, return error
+  if (currentUser && Object.keys(currentUser).length > 0) {
     return res.status(400).json({ message: "User already exists, Login" });
   }
+
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   const secret = generateSecret();
@@ -90,7 +104,8 @@ app.post("/register", async (req, res) => {
     phone_number,
     role,
   ]);
-  // Insert user into DBerr.message
+  
+  // Insert user into DB
   try {
     const [records] = await con
       .promise()
@@ -107,15 +122,35 @@ app.post("/register", async (req, res) => {
         ]
       );
     console.log("---------------------------------------");
-
     console.log(records);
-
     console.log("---------------------------------------");
+    
     if (records.affectedRows > 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Registration successful",
-        user: currentUser, // This is what your frontend expects
+      // Fetch the newly created user to get complete data including ID
+      const [newUserRecords] = await con
+        .promise()
+        .query("SELECT * FROM users2 WHERE email = ? OR admission_number = ?", [
+          email,
+          admission_number,
+        ]);
+      
+      if (newUserRecords.length > 0) {
+        const newUser = newUserRecords[0];
+        return res.status(200).json({
+          success: true,
+          message: "Registration successful",
+          user: newUser, // Return the complete user data
+        });
+      } else {
+        return res.status(500).json({
+          success: false,
+          message: "User created but could not retrieve user data",
+        });
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to create user",
       });
     }
   } catch (err) {
@@ -177,7 +212,7 @@ app.post('/addReport', upload.single('image'), async (req, res) => {
     category,
     priority,
     status = "in_progress",
-    assigned_to = null,
+    assigned_to = 6,
     estimated_cost = null,
     actual_cost = null,
     estimated_completion_date = null,
@@ -246,6 +281,33 @@ app.get('/userReports', async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching user reports:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+app.get('/assignedReports', async (req, res) => {
+  const { maintenance_id } = req.query;
+
+  if (!maintenance_id) {
+    return res.status(400).json({ success: false, message: "maintenance_id is required" });
+  }
+
+  try {
+    const [reports] = await con.promise().query(
+      `SELECT r.*, u.name as reporter_name, u.email as reporter_email 
+       FROM reports2 r 
+       LEFT JOIN users2 u ON r.user_id = u.id 
+       WHERE r.assigned_to = ? 
+       ORDER BY r.created_at DESC`,
+      [maintenance_id]
+    );
+    
+    res.status(200).json({ 
+      success: true, 
+      reports: reports 
+    });
+  } catch (err) {
+    console.error("Error fetching assigned reports:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });

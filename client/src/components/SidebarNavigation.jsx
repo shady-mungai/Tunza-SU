@@ -5,10 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 const navItems = [
   { label: 'Dashboard', icon: '⚙️', route: 'Student Dash' },
   { label: 'My Reports', icon: '⚠️', route: 'My Reports' },
-  // The following are not currently available in your navigator:
-  // { label: 'Map View', icon: '📍', route: 'Map View' },
-  // { label: 'Profile', icon: '👤', route: 'Profile' },
-  // { label: 'Help', icon: '❓', route: 'Help' },
 ];
 
 const SidebarNavigation = () => {

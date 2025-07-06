@@ -1,8 +1,109 @@
-setup complete. 23/06/2025
-...
---
-!
-WARNING: The legacy expo-cli does not support Node +17. Migrate to the new local Expo CLI: https://blog.expo.dev/the-new-expo-cli-f4250d8e3421.
-
-expo-cli package installed that is outdated.
-.
+Tunza-SU/
+├── client/
+│   ├── src/
+│   │   ├── screens/
+│   │   │   ├── auth/
+│   │   │   │   ├── Login.jsx
+│   │   │   │   └── Signup.jsx
+│   │   │   ├── dashboard/
+│   │   │   │   ├── Dashboard.jsx
+│   │   │   │   ├── StudentDashboard.jsx
+│   │   │   │   └── AdminDashboard.jsx
+│   │   │   ├── reports/
+│   │   │   │   ├── AllReports.jsx
+│   │   │   │   ├── AssignedReports.jsx
+│   │   │   │   ├── MyReports.jsx
+│   │   │   │   └── ReportForm.jsx
+│   │   │   ├── profile/
+│   │   │   │   ├── Profile.jsx
+│   │   │   │   └── MaintenanceProfile.jsx
+│   │   │   ├── analytics/
+│   │   │   │   └── Analytics.jsx
+│   │   │   └── help/
+│   │   │       └── Help.jsx
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── HeaderBar.jsx
+│   │   │   │   ├── SidebarNavigation.jsx
+│   │   │   │   └── LoadingSpinner.jsx
+│   │   │   ├── dashboard/
+│   │   │   │   ├── StatCardList.jsx
+│   │   │   │   ├── QuickActions.jsx
+│   │   │   │   └── RecentReportsList.jsx
+│   │   │   ├── reports/
+│   │   │   │   ├── ReportCard.jsx
+│   │   │   │   ├── ReportStatusBadge.jsx
+│   │   │   │   └── ReportFilter.jsx
+│   │   │   └── forms/
+│   │   │       ├── FormField.jsx
+│   │   │       └── ValidationMessage.jsx
+│   │   ├── navigation/
+│   │   │   ├── AppNavigator.jsx
+│   │   │   ├── AuthNavigator.jsx
+│   │   │   ├── MainNavigator.jsx
+│   │   │   └── TabNavigator.jsx
+│   │   ├── contexts/
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── ReportContext.jsx
+│   │   ├── hooks/
+│   │   │   ├── useAuth.js
+│   │   │   ├── useReports.js
+│   │   │   └── useForm.js
+│   │   ├── services/
+│   │   │   ├── api.js
+│   │   │   ├── authService.js
+│   │   │   └── reportService.js
+│   │   ├── utils/
+│   │   │   ├── validation.js
+│   │   │   ├── constants.js
+│   │   │   ├── helpers.js
+│   │   │   └── storage.js
+│   │   ├── styles/
+│   │   │   ├── theme.js
+│   │   │   ├── colors.js
+│   │   │   └── typography.js
+│   │   └── assets/
+│   │       ├── images/
+│   │       ├── icons/
+│   │       └── fonts/
+│   ├── app/
+│   │   └── index.jsx (entry point)
+│   ├── android/
+│   ├── ios/
+│   ├── package.json
+│   └── ...
+├── server/
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── authController.js
+│   │   │   ├── reportController.js
+│   │   │   └── userController.js
+│   │   ├── models/
+│   │   │   ├── User.js
+│   │   │   └── Report.js
+│   │   ├── routes/
+│   │   │   ├── auth.js
+│   │   │   ├── reports.js
+│   │   │   └── users.js
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   ├── validation.js
+│   │   │   └── upload.js
+│   │   ├── services/
+│   │   │   ├── emailService.js
+│   │   │   └── notificationService.js
+│   │   ├── utils/
+│   │   │   ├── database.js
+│   │   │   ├── helpers.js
+│   │   │   └── constants.js
+│   │   └── config/
+│   │       ├── database.js
+│   │       └── environment.js
+│   ├── uploads/
+│   ├── package.json
+│   └── server.js
+└── shared/
+    ├── types/
+    │   └── index.ts
+    └── constants/
+        └── index.js

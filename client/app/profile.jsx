@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -28,42 +29,96 @@ import {
   Calendar,
   User,
 } from "lucide-react-native";
+import { useAuth } from "../src/contexts/AuthContexts";
 
 const { width } = Dimensions.get("window");
 
 const Profile = () => {
   const navigation = useNavigation();
+  const { user, logout } = useAuth();
 
-  // Mock user data
-  const userProfile = {
-    name: "Richard Mungai",
-    email: "richard.mungai@tunzasu.com",
-    phone: "+254 700 123 456",
-    employeeId: "MNT/001",
-    department: "Maintenance",
-    position: "Maintenance Manager",
-    location: "Nairobi, Kenya",
-    joinDate: "January 2023",
-    avatar: null, // Would be an image in real app
+  // Get role display name
+  const getRoleDisplayName = (role) => {
+    const roleNames = {
+      student: "Student",
+      maintenance_staff: "Maintenance Staff",
+      staff: "Staff",
+      admin: "Administrator",
+    };
+    return roleNames[role] || "User";
   };
 
+  // Get department based on role
+  const getDepartment = (role) => {
+    const departments = {
+      student: "Student Affairs",
+      maintenance_staff: "Facilities & Maintenance",
+      staff: "Administration",
+      admin: "IT Administration",
+    };
+    return departments[role] || "General";
+  };
+
+  // Get position based on role
+  const getPosition = (role) => {
+    const positions = {
+      student: "Student",
+      maintenance_staff: "Maintenance Personnel",
+      staff: "Staff Member",
+      admin: "System Administrator",
+    };
+    return positions[role] || "User";
+  };
+
+  // Format join date (using current date as fallback)
+  const getJoinDate = () => {
+    const date = new Date();
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long' 
+    });
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+            // Navigation will be handled by the auth context
+          },
+        },
+      ]
+    );
+  };
+
+  // Create profile sections based on actual user data
   const profileSections = [
     {
       title: "Personal Information",
       icon: <User size={20} color="#2563EB" />,
       items: [
-        { label: "Full Name", value: userProfile.name, editable: true },
-        { label: "Email", value: userProfile.email, editable: true },
-        { label: "Phone", value: userProfile.phone, editable: true },
+        { label: "Full Name", value: user?.name || "Not provided", editable: true },
+        { label: "Email", value: user?.email || "Not provided", editable: true },
+        { label: "Phone", value: user?.phone_number || user?.phoneNumber || "Not provided", editable: true },
         {
-          label: "Employee ID",
-          value: userProfile.employeeId,
+          label: user?.role === "student" ? "Admission Number" : "Employee ID",
+          value: user?.admission_number || user?.employeeId || "Not provided",
           editable: false,
         },
-        { label: "Department", value: userProfile.department, editable: false },
-        { label: "Position", value: userProfile.position, editable: false },
-        { label: "Location", value: userProfile.location, editable: true },
-        { label: "Join Date", value: userProfile.joinDate, editable: false },
+        { label: "Department", value: getDepartment(user?.role), editable: false },
+        { label: "Position", value: getPosition(user?.role), editable: false },
+        { label: "Role", value: getRoleDisplayName(user?.role), editable: false },
+        { label: "Join Date", value: getJoinDate(), editable: false },
       ],
     },
     {
@@ -113,6 +168,69 @@ const Profile = () => {
     },
   ];
 
+  // Get role-specific dashboard subtitle
+  const getDashboardSubtitle = () => {
+    switch (user?.role) {
+      case 'student':
+        return 'Student Dashboard';
+      case 'maintenance':
+        return 'Maintenance Dashboard';
+      case 'staff':
+        return 'Staff Dashboard';
+      case 'admin':
+        return 'Admin Dashboard';
+      default:
+        return 'Dashboard';
+    }
+  };
+
+  // Get role-specific navigation items
+  const getNavItems = () => {
+    const baseItems = [
+      {
+        icon: <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />,
+        text: "Dashboard",
+        route: "dashboard",
+        showFor: ["student", "maintenance", "staff", "admin"]
+      },
+      {
+        icon: <ListTodo size={20} color="#4B5563" style={styles.navIcon} />,
+        text: "All Reports",
+        route: "all_reports",
+        showFor: ["maintenance", "staff", "admin"]
+      },
+      {
+        icon: <ListChecks size={20} color="#4B5563" style={styles.navIcon} />,
+        text: "Assigned Reports",
+        route: "assigned_reports",
+        showFor: ["maintenance"]
+      },
+      {
+        icon: <BarChart size={20} color="#4B5563" style={styles.navIcon} />,
+        text: "Analytics",
+        route: "analytics",
+        showFor: ["maintenance", "admin"]
+      },
+      {
+        icon: <UserCircle size={20} color="#2563EB" style={styles.navIcon} />,
+        text: "Profile",
+        route: "profile",
+        showFor: ["student", "maintenance", "staff", "admin"],
+        isActive: true
+      },
+      {
+        icon: <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />,
+        text: "Help",
+        route: "help",
+        showFor: ["student", "maintenance", "staff", "admin"]
+      },
+    ];
+
+    return baseItems.filter(item => 
+      item.showFor.includes(user?.role) || item.showFor.includes("admin")
+    );
+  };
+
   return (
     <View style={styles.container}>
       {/* Sidebar */}
@@ -123,47 +241,26 @@ const Profile = () => {
           </View>
           <Text style={styles.appTitle}>TunzaSU</Text>
         </View>
-        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
+        <Text style={styles.dashboardSubtitle}>{getDashboardSubtitle()}</Text>
         <View style={styles.navContainer}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("dashboard")}
-          >
-            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Dashboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("all_reports")}
-          >
-            <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>All Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("assigned_reports")}
-          >
-            <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Assigned Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("analytics")}
-          >
-            <BarChart size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Analytics</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-            <UserCircle size={20} color="#2563EB" style={styles.navIcon} />
-            <Text style={[styles.navText, styles.activeNavText]}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("help")}
-          >
-            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Help</Text>
-          </TouchableOpacity>
+          {getNavItems().map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.navItem,
+                item.isActive && styles.activeNavItem
+              ]}
+              onPress={() => !item.isActive && navigation.navigate(item.route)}
+            >
+              {item.icon}
+              <Text style={[
+                styles.navText,
+                item.isActive && styles.activeNavText
+              ]}>
+                {item.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
 
@@ -189,10 +286,10 @@ const Profile = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{userProfile.name}</Text>
-              <Text style={styles.profilePosition}>{userProfile.position}</Text>
+              <Text style={styles.profileName}>{user?.name || "User"}</Text>
+              <Text style={styles.profilePosition}>{getPosition(user?.role)}</Text>
               <Text style={styles.profileDepartment}>
-                {userProfile.department}
+                {getDepartment(user?.role)}
               </Text>
             </View>
             <TouchableOpacity style={styles.editButton}>
@@ -239,7 +336,7 @@ const Profile = () => {
 
         {/* Logout Section */}
         <View style={styles.logoutSection}>
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <LogOut size={20} color="#EF4444" />
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>

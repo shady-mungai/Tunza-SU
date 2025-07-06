@@ -5,48 +5,13 @@ import {
   NavigationIndependentTree,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Login from "./Login";
 import Signup from "./Signup";
-import StudentDashboard from "../src/components/StudentDashboard";
-import MyReports from "../src/components/MyReports";
-import AllReports from "./all_reports";
 import "../global.css";
 import { AuthProvider, useAuth } from "../src/contexts/AuthContexts";
-import Help from "./help";
-import AssignedReports from "./assigned_reports";
-import Profile from "./profile";
-import Analytics from "./analytics";
-import Dashboard from "./dashboard";
+import RoleBasedNavigator from "../src/navigation/RoleBasedNavigator";
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-        tabBarLabelStyle: { fontSize: 12 },
-      }}
-    >
-      <Tab.Screen
-        name="Student Dash"
-        component={StudentDashboard}
-        options={{ tabBarIcon: () => <Text>⚙️</Text> }}
-      />
-      <Tab.Screen
-        name="My Reports"
-        component={MyReports}
-        options={{ tabBarIcon: () => <Text>⚠️</Text> }}
-      />
-      {/* <Tab.Screen name="Map View" component={MapScreen} options={{ tabBarIcon: () => <Text>📍</Text> }} /> */}
-      {/* <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: () => <Text>👤</Text> }} /> */}
-      {/* <Tab.Screen name="Help" component={HelpScreen} options={{ tabBarIcon: () => <Text>❓</Text> }} /> */}
-    </Tab.Navigator>
-  );
-}
 
 function RootNavigator() {
   const { user, loading } = useAuth();
@@ -63,13 +28,8 @@ function RootNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
         <>
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-          <Stack.Screen name="Dashboard" component={Dashboard} />
-          <Stack.Screen name="AllReports" component={AllReports} />
-          <Stack.Screen name="AssignedReports" component={AssignedReports} />
-          <Stack.Screen name="Profile" component={Profile} />
-          <Stack.Screen name="Analytics" component={Analytics} />
-          <Stack.Screen name="Help" component={Help} />
+          <Stack.Screen name="MainApp" component={RoleBasedNavigator} />
+          {/* Add any modal screens or additional screens here */}
         </>
       ) : (
         <>
