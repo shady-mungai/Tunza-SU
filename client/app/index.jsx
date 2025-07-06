@@ -50,6 +50,16 @@ function MainTabs() {
         component={MyReports}
         options={{ tabBarIcon: () => <Text>⚠️</Text> }}
       />
+      <Tab.Screen
+        name="Student Dash"
+        component={StudentDashboard}
+        options={{ tabBarIcon: () => <Text>⚙️</Text> }}
+      />
+      <Tab.Screen
+        name="My Reports"
+        component={MyReports}
+        options={{ tabBarIcon: () => <Text>⚠️</Text> }}
+      />
       {/* <Tab.Screen name="Map View" component={MapScreen} options={{ tabBarIcon: () => <Text>📍</Text> }} /> */}
       {/* <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: () => <Text>👤</Text> }} /> */}
       {/* <Tab.Screen name="Help" component={HelpScreen} options={{ tabBarIcon: () => <Text>❓</Text> }} /> */}
@@ -103,6 +113,7 @@ const Home = () => {
     </AuthProvider>
   );
 };
+ 
 
 export default Home;
 
