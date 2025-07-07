@@ -6,6 +6,8 @@ import { createContext, useContext, useState, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { WEB_CLIENT_ID, IOS_CLIENT_ID } from '@env'
 import * as AuthSession from "expo-auth-session";
+import emailjs from "@emailjs/react-native";
+
 
 const AuthContext = createContext(undefined)
 WebBrowser.maybeCompleteAuthSession();
@@ -143,6 +145,41 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // code to send an email to users
+  const sendMail = (object) => {
+
+    const { location, priority, category } = object;
+
+    console.log("From the email function");
+
+    console.log(`${location} and ${priority}`);
+
+    console.log("---------------------------");
+    
+    
+    
+  const serviceId = 'service_yo68z0r';
+  const templateId = 'template_zj2tfar';
+  const publicKey = 'waI8hdlB5hAlhE6tP';
+
+  const templateParams = {
+    to_name: "Shadrack Njau",
+    to_email: "shadrackmungai10@gmail.com",
+    location: location,
+    priority: priority,
+    category: category
+  };
+  emailjs
+    .send(serviceId, templateId, templateParams,{
+      publicKey: publicKey,
+    })
+    .then((res) => {
+      console.log("Email sent successfully", res);
+    })
+    .catch((err) => console.error("Error sending email", err));
+};
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -152,6 +189,7 @@ export function AuthProvider({ children }) {
         register,
         logout,
         loginWithGoogle,
+        sendMail
       }}
     >
       {children}

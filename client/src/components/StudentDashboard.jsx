@@ -12,7 +12,7 @@ const StudentDashboard = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(Dimensions.get('window').width >= 768);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const { user } = useAuth();
+  const { user, sendMail } = useAuth();
 
   useEffect(() => {
     const onChange = ({ window }) => setIsLargeScreen(window.width >= 768);
@@ -37,6 +37,8 @@ const StudentDashboard = () => {
       });
       if (response.ok) {
         Alert.alert('Success', 'Report submitted successfully!');
+
+
       } else {
         Alert.alert('Error', 'Failed to submit report.');
       }
