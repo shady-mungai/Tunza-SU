@@ -12,10 +12,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import StudentDashboard from "../src/components/StudentDashboard";
 import MyReports from "../src/components/MyReports";
-import AllReports from "./all_reports";
+import AllReports from "./allReports";
 import "../global.css";
 import Help from "./help";
-import AssignedReports from "./assigned_reports";
+import AssignedReports from "./assignedReports";
 import GettingStarted from "./gettingStarted";
 
 const Stack = createNativeStackNavigator();
@@ -77,7 +77,7 @@ function RootNavigator() {
           <Stack.Screen name="AllReports" component={AllReports} />
           <Stack.Screen name="AssignedReports" component={AssignedReports} />
           <Stack.Screen name="Help" component={Help} />
-          <Stack.Screen name="gettingStarted" component={GettingStarted} />
+          <Stack.Screen name="GettingStarted" component={GettingStarted} />
           {/* Add any modal screens or additional screens here */}
         </>
       ) : (

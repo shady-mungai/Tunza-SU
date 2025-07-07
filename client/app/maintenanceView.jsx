@@ -157,16 +157,16 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       },
       () => {
         console.log("Attempt 2: Prop navigation");
-        return propNavigation?.navigate("help");
+        return propNavigation?.navigate("Help");
       },
       () => {
         console.log("Attempt 3: Parent navigation");
         const parent = navigation?.getParent?.();
-        return parent?.navigate("help");
+        return parent?.navigate("Help");
       },
       () => {
         console.log("Attempt 4: Push navigation");
-        return navigation.push("help");
+        return navigation.push("Help");
       },
       () => {
         console.log("Attempt 5: Reset to Help");
@@ -239,21 +239,21 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.navItem}
-              onPress={() => navigation.navigate("all_reports")}
+              onPress={() => navigation.navigate("AllReports")}
             >
               <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>All Reports</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.navItem}
-              onPress={() => navigation.navigate("assigned_reports")}
+              onPress={() => navigation.navigate("AssignedReports")}
             >
               <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>Assigned Reports</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.navItem}
-              onPress={() => navigation.navigate("analytics")}
+              onPress={() => navigation.navigate("Analytics")}
             >
               <BarChart size={20} color="#4B5563" style={styles.navIcon} />
               <Text style={styles.navText}>Analytics</Text>
@@ -262,7 +262,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               style={styles.navItem}
               onPress={() => {
                 console.log("Profile button pressed");
-                navigation.navigate("profile");
+                navigation.navigate("Profile");
               }}
               activeOpacity={0.7}
               delayPressIn={0}
@@ -274,7 +274,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               style={styles.navItem}
               onPress={() => {
                 console.log("help button pressed");
-                navigation.navigate("help");
+                navigation.navigate("Help");
               }}
               activeOpacity={0.7}
               delayPressIn={0}
@@ -422,7 +422,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Recent Reports</Text>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("all_reports")}
+                  onPress={() => navigation.navigate("AllReports")}
                 >
                   <Text style={styles.viewAllText}>View All</Text>
                 </TouchableOpacity>
@@ -510,7 +510,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>All Reports</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("all_reports")}
+                onPress={() => navigation.navigate("AllReports")}
               >
                 <Text style={styles.viewAllText}>View All</Text>
               </TouchableOpacity>

@@ -65,20 +65,11 @@ const Profile = () => {
 
   // Handle logout
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
-          // Navigation will be handled by the auth context
-        },
-      },
-    ]);
+    console.log("[Profile] handleLogout called");
+    if (window.confirm("Are you sure you want to logout?")) {
+      console.log("[Profile] Alert Logout button pressed");
+      logout();
+    }
   };
 
   // Create profile sections based on actual user data

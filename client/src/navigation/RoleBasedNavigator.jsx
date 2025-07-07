@@ -127,14 +127,6 @@ const MaintenanceNavigator = () => (
         tabBarIcon: () => <Text>❓</Text>,
       }}
     />
-    <Tab.Screen
-      name="GettingStarted"
-      component={GettingStarted}
-      options={{
-        tabBarLabel: "Getting Started",
-        tabBarIcon: () => <Text>📚</Text>,
-      }}
-    />
   </Tab.Navigator>
 );
 

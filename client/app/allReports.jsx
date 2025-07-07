@@ -135,7 +135,7 @@ const AllReports = () => {
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("dashboard")}
+            onPress={() => navigation.navigate("Dashboard")}
           >
             <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Dashboard</Text>
@@ -148,14 +148,14 @@ const AllReports = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("assigned_reports")}
+            onPress={() => navigation.navigate("AssignedReports")}
           >
             <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Assigned Reports</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("analytics")}
+            onPress={() => navigation.navigate("Analytics")}
           >
             <BarChart size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Analytics</Text>
@@ -164,7 +164,7 @@ const AllReports = () => {
             style={styles.navItem}
             onPress={() => {
               console.log("Profile button pressed");
-              navigation.navigate("profile");
+              navigation.navigate("Profile");
             }}
             activeOpacity={0.7}
             delayPressIn={0}
@@ -176,7 +176,7 @@ const AllReports = () => {
             style={styles.navItem}
             onPress={() => {
               console.log("help button pressed");
-              navigation.navigate("help");
+              navigation.navigate("Help");
             }}
             activeOpacity={0.7}
             delayPressIn={0}

@@ -1,20 +1,22 @@
-"use client"
+"use client";
 
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import { createContext, useContext, useState, useEffect } from "react"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { WEB_CLIENT_ID, IOS_CLIENT_ID } from '@env'
+import { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WEB_CLIENT_ID, IOS_CLIENT_ID } from "@env";
 import * as AuthSession from "expo-auth-session";
 
-const AuthContext = createContext(undefined)
+const AuthContext = createContext(undefined);
 WebBrowser.maybeCompleteAuthSession();
 
-console.log(`RedirectURl is: ${AuthSession.makeRedirectUri({ useProxy: true })}`);
+console.log(
+  `RedirectURl is: ${AuthSession.makeRedirectUri({ useProxy: true })}`
+);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [token, setToken] = useState("");
 
   // Google Auth Request setup
@@ -41,7 +43,8 @@ export function AuthProvider({ children }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(googleUser),
           });
-          if (!backendRes.ok) throw new Error("Failed to sync Google user with backend");
+          if (!backendRes.ok)
+            throw new Error("Failed to sync Google user with backend");
           const appUser = await backendRes.json();
           await AsyncStorage.setItem("user", JSON.stringify(appUser));
           setUser(appUser);
@@ -60,20 +63,20 @@ export function AuthProvider({ children }) {
 
   const checkAuthState = async () => {
     try {
-      const userData = await AsyncStorage.getItem("user")
+      const userData = await AsyncStorage.getItem("user");
       if (userData) {
-        setUser(JSON.parse(userData))
+        setUser(JSON.parse(userData));
       }
     } catch (error) {
-      console.error("Error checking auth state:", error)
+      console.error("Error checking auth state:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loginWithGoogle = async () => {
     promptAsync();
-  }
+  };
 
   const login = async (email, password) => {
     try {
@@ -85,10 +88,10 @@ export function AuthProvider({ children }) {
           email: "admin@tunzasu.com",
           phoneNumber: "+1234567890",
           role: "admin",
-        }
-        setUser(adminUser)
-        await AsyncStorage.setItem("user", JSON.stringify(adminUser))
-        return true
+        };
+        setUser(adminUser);
+        await AsyncStorage.setItem("user", JSON.stringify(adminUser));
+        return true;
       }
       // API call for regular users
       const response = await fetch("http://localhost:4000/login", {
@@ -97,20 +100,20 @@ export function AuthProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      })
+      });
       if (response.ok) {
-        const userData = await response.json()
-        setUser(userData.user)
+        const userData = await response.json();
+        setUser(userData.user);
         console.log(`The user logged in is: ${user}`);
-        await AsyncStorage.setItem("user", JSON.stringify(userData.user))
-        return true
+        await AsyncStorage.setItem("user", JSON.stringify(userData.user));
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error("Login error:", error)
-      return false
+      console.error("Login error:", error);
+      return false;
     }
-  }
+  };
 
   const register = async (userData) => {
     try {
@@ -120,28 +123,44 @@ export function AuthProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
-      })
+      });
       if (response.ok) {
-        const result = await response.json()
-        setUser(result.user)
-        await AsyncStorage.setItem("user", JSON.stringify(result.user))
-        return true
+        const result = await response.json();
+        setUser(result.user);
+        await AsyncStorage.setItem("user", JSON.stringify(result.user));
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error("Registration error:", error)
-      return false
+      console.error("Registration error:", error);
+      return false;
     }
-  }
+  };
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem("user")
-      setUser(null)
+      console.log("[Logout] Called for user:", user);
+      // Clear user data from AsyncStorage
+      await AsyncStorage.removeItem("user");
+      const userAfterRemove = await AsyncStorage.getItem("user");
+      console.log("[Logout] user after remove:", userAfterRemove);
+
+      // Clear any other stored tokens or session data
+      await AsyncStorage.multiRemove(["user", "token", "refreshToken"]);
+      const userAfterMultiRemove = await AsyncStorage.getItem("user");
+      console.log("[Logout] user after multiRemove:", userAfterMultiRemove);
+
+      // Reset user state
+      setUser(null);
+      setToken("");
+      console.log("[Logout] State reset to null");
     } catch (error) {
-      console.error("Logout error:", error)
+      console.error("Logout error:", error);
+      // Even if there's an error, we should still clear the user state
+      setUser(null);
+      setToken("");
     }
-  }
+  };
 
   return (
     <AuthContext.Provider
@@ -156,13 +175,13 @@ export function AuthProvider({ children }) {
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
+  return context;
 }

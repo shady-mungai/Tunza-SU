@@ -158,16 +158,16 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       },
       () => {
         console.log("Attempt 2: Prop navigation");
-        return propNavigation?.navigate("help");
+        return propNavigation?.navigate("Help");
       },
       () => {
         console.log("Attempt 3: Parent navigation");
         const parent = navigation?.getParent?.();
-        return parent?.navigate("help");
+        return parent?.navigate("Help");
       },
       () => {
         console.log("Attempt 4: Push navigation");
-        return navigation.push("help");
+        return navigation.push("Help");
       },
       () => {
         console.log("Attempt 5: Reset to Help");
@@ -346,7 +346,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Recent Reports</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("all_reports")}
+                onPress={() => navigation.navigate("AllReports")}
               >
                 <Text style={styles.viewAllText}>View All</Text>
               </TouchableOpacity>
@@ -431,9 +431,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>All Reports</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("all_reports")}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate("AllReports")}>
               <Text style={styles.viewAllText}>View All</Text>
             </TouchableOpacity>
           </View>

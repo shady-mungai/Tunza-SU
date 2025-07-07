@@ -146,14 +146,14 @@ const AssignedReports = () => {
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("dashboard")}
+                          onPress={() => navigation.navigate("Dashboard")}
           >
             <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Dashboard</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("all_reports")}
+                          onPress={() => navigation.navigate("AllReports")}
           >
             <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>All Reports</Text>
@@ -166,21 +166,21 @@ const AssignedReports = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("analytics")}
+                          onPress={() => navigation.navigate("Analytics")}
           >
             <BarChart size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Analytics</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("profile")}
+                          onPress={() => navigation.navigate("Profile")}
           >
             <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("help")}
+                          onPress={() => navigation.navigate("Help")}
           >
             <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
             <Text style={styles.navText}>Help</Text>

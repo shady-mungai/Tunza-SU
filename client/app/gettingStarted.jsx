@@ -277,21 +277,21 @@ const GettingStarted = () => {
             <View style={styles.nextStepsList}>
               <TouchableOpacity
                 style={styles.nextStepButton}
-                onPress={() => navigation.navigate("dashboard")}
+                onPress={() => navigation.navigate("Dashboard")}
               >
                 <LayoutDashboard size={20} color="#FFFFFF" />
                 <Text style={styles.nextStepButtonText}>Go to Dashboard</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.nextStepButton}
-                onPress={() => navigation.navigate("all_reports")}
+                onPress={() => navigation.navigate("AllReports")}
               >
                 <ListTodo size={20} color="#FFFFFF" />
                 <Text style={styles.nextStepButtonText}>View All Reports</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.nextStepButton}
-                onPress={() => navigation.navigate("help")}
+                onPress={() => navigation.navigate("Help")}
               >
                 <HelpCircle size={20} color="#FFFFFF" />
                 <Text style={styles.nextStepButtonText}>Get Help</Text>
