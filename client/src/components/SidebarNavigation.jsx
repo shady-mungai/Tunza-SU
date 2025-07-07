@@ -117,7 +117,7 @@ const SidebarNavigation = () => {
         icon: <BarChart size={20} color="#4B5563" style={styles.navIcon} />,
         text: "Analytics",
         route: "Analytics",
-        showFor: ["maintenance_staff", "admin"],
+        showFor: ["admin"],
       },
       {
         icon: <UserCircle size={20} color="#4B5563" style={styles.navIcon} />,
@@ -129,12 +129,6 @@ const SidebarNavigation = () => {
         icon: <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />,
         text: "Help",
         route: "Help",
-        showFor: ["student", "maintenance_staff", "staff", "admin"],
-      },
-      {
-        icon: <BookOpen size={20} color="#4B5563" style={styles.navIcon} />,
-        text: "Getting Started",
-        route: "GettingStarted",
         showFor: ["student", "maintenance_staff", "staff", "admin"],
       },
     ];

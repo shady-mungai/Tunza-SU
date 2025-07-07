@@ -77,7 +77,6 @@ function RootNavigator() {
           <Stack.Screen name="AllReports" component={AllReports} />
           <Stack.Screen name="AssignedReports" component={AssignedReports} />
           <Stack.Screen name="Help" component={Help} />
-          <Stack.Screen name="GettingStarted" component={GettingStarted} />
           {/* Add any modal screens or additional screens here */}
         </>
       ) : (

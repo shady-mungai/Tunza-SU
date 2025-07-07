@@ -21,6 +21,7 @@ import {
   Eye,
 } from "lucide-react-native";
 import { useAuth } from "../src/contexts/AuthContexts";
+import LayoutWrapper from "../src/components/LayoutWrapper";
 
 const { width } = Dimensions.get("window");
 
@@ -43,17 +44,19 @@ const AssignedReports = () => {
       setError(null);
 
       try {
-        const response = await fetch(`http://localhost:4000/assignedReports?maintenance_id=${user.id}`);
-        
+        const response = await fetch(
+          `http://localhost:4000/assignedReports?maintenance_id=${user.id}`
+        );
+
         if (!response.ok) {
-          throw new Error('Failed to fetch assigned reports');
+          throw new Error("Failed to fetch assigned reports");
         }
 
         const data = await response.json();
         setAssignedReports(data.reports || []);
       } catch (err) {
-        console.error('Error fetching assigned reports:', err);
-        setError('Failed to load assigned reports. Please try again.');
+        console.error("Error fetching assigned reports:", err);
+        setError("Failed to load assigned reports. Please try again.");
         setAssignedReports([]);
       } finally {
         setLoading(false);
@@ -82,11 +85,7 @@ const AssignedReports = () => {
       }
     };
 
-    return (
-      <Text style={[styles.badge, getStatusStyle()]}>
-        {status}
-      </Text>
-    );
+    return <Text style={[styles.badge, getStatusStyle()]}>{status}</Text>;
   };
 
   // Priority badge component
@@ -104,96 +103,37 @@ const AssignedReports = () => {
       }
     };
 
-    return (
-      <Text style={[styles.badge, getPriorityStyle()]}>
-        {priority}
-      </Text>
-    );
+    return <Text style={[styles.badge, getPriorityStyle()]}>{priority}</Text>;
   };
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return 'Date not available';
+    if (!dateString) return "Date not available";
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch (err) {
-      return 'Invalid date';
+      return "Invalid date";
     }
   };
 
   // Handle report view
   const handleViewReport = (reportId) => {
     // TODO: Navigate to report details page
-    console.log('Viewing report:', reportId);
-    Alert.alert('View Report', `Viewing report ${reportId}`);
+    console.log("Viewing report:", reportId);
+    Alert.alert("View Report", `Viewing report ${reportId}`);
   };
 
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      <View style={styles.sidebar}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>T</Text>
-          </View>
-          <Text style={styles.appTitle}>TunzaSU</Text>
-        </View>
-        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
-        <View style={styles.navContainer}>
-          <TouchableOpacity
-            style={styles.navItem}
-                          onPress={() => navigation.navigate("Dashboard")}
-          >
-            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Dashboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-                          onPress={() => navigation.navigate("AllReports")}
-          >
-            <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>All Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-            <ListChecks size={20} color="#2563EB" style={styles.navIcon} />
-            <Text style={[styles.navText, styles.activeNavText]}>
-              Assigned Reports
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-                          onPress={() => navigation.navigate("Analytics")}
-          >
-            <BarChart size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Analytics</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-                          onPress={() => navigation.navigate("Profile")}
-          >
-            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-                          onPress={() => navigation.navigate("Help")}
-          >
-            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Help</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Main Content */}
+    <LayoutWrapper>
       <ScrollView style={styles.mainContent}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Assigned Reports</Text>
           <Text style={styles.sectionSubtitle}>
-            Reports assigned to {user?.name || 'you'}
+            Reports assigned to {user?.name || "you"}
           </Text>
         </View>
 
@@ -201,12 +141,14 @@ const AssignedReports = () => {
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#2563EB" />
-              <Text style={styles.loadingText}>Loading assigned reports...</Text>
+              <Text style={styles.loadingText}>
+                Loading assigned reports...
+              </Text>
             </View>
           ) : error ? (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.retryButton}
                 onPress={() => {
                   setLoading(true);
@@ -233,23 +175,27 @@ const AssignedReports = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.reportDetails}>
-                  <Text style={styles.reportTitle}>{report.title || 'Untitled Report'}</Text>
-                  <Text style={styles.reportLocation}>{report.location || 'Location not specified'}</Text>
+                  <Text style={styles.reportTitle}>
+                    {report.title || "Untitled Report"}
+                  </Text>
+                  <Text style={styles.reportLocation}>
+                    {report.location || "Location not specified"}
+                  </Text>
                   <Text style={styles.reportDate}>
                     {formatDate(report.created_at)}
                   </Text>
                   <Text style={styles.reportDescription}>
-                    {report.description || 'No description available'}
+                    {report.description || "No description available"}
                   </Text>
                   <Text style={styles.reporterInfo}>
-                    Reported by: {report.reporter_name || 'Unknown'} 
+                    Reported by: {report.reporter_name || "Unknown"}
                     {report.reporter_email && ` (${report.reporter_email})`}
                   </Text>
                 </View>
                 <View style={styles.reportBadges}>
                   <StatusBadge status={report.status} />
                   <PriorityBadge priority={report.priority} />
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.viewButton}
                     onPress={() => handleViewReport(report.id)}
                   >
@@ -261,79 +207,11 @@ const AssignedReports = () => {
           )}
         </View>
       </ScrollView>
-    </View>
+    </LayoutWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  sidebar: {
-    width: 256,
-    backgroundColor: "#FFFFFF",
-    padding: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 40,
-  },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#2563EB",
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  appTitle: {
-    marginLeft: 12,
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  dashboardSubtitle: {
-    color: "#6B7280",
-    fontSize: 14,
-    marginBottom: 24,
-  },
-  navContainer: {
-    flexGrow: 1,
-  },
-  navItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  activeNavItem: {
-    backgroundColor: "#DBEAFE",
-  },
-  navIcon: {
-    marginRight: 12,
-  },
-  navText: {
-    color: "#4B5563",
-    fontWeight: "500",
-  },
-  activeNavText: {
-    color: "#2563EB",
-  },
   mainContent: {
     flex: 1,
     padding: 32,

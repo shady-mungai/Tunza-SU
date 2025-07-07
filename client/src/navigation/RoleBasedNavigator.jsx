@@ -59,14 +59,6 @@ const StudentNavigator = () => (
         tabBarIcon: () => <Text>❓</Text>,
       }}
     />
-    <Tab.Screen
-      name="GettingStarted"
-      component={GettingStarted}
-      options={{
-        tabBarLabel: "Getting Started",
-        tabBarIcon: () => <Text>📚</Text>,
-      }}
-    />
   </Tab.Navigator>
 );
 
@@ -101,14 +93,6 @@ const MaintenanceNavigator = () => (
       options={{
         tabBarLabel: "Assigned",
         tabBarIcon: () => <Text>✅</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Analytics"
-      component={Analytics}
-      options={{
-        tabBarLabel: "Analytics",
-        tabBarIcon: () => <Text>📈</Text>,
       }}
     />
     <Tab.Screen
@@ -171,14 +155,6 @@ const StaffNavigator = () => (
         tabBarIcon: () => <Text>❓</Text>,
       }}
     />
-    <Tab.Screen
-      name="GettingStarted"
-      component={GettingStarted}
-      options={{
-        tabBarLabel: "Getting Started",
-        tabBarIcon: () => <Text>📚</Text>,
-      }}
-    />
   </Tab.Navigator>
 );
 
@@ -229,14 +205,6 @@ const AdminNavigator = () => (
       options={{
         tabBarLabel: "Help",
         tabBarIcon: () => <Text>❓</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="GettingStarted"
-      component={GettingStarted}
-      options={{
-        tabBarLabel: "Getting Started",
-        tabBarIcon: () => <Text>📚</Text>,
       }}
     />
   </Tab.Navigator>

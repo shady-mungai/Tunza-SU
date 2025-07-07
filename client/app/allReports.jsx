@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../src/contexts/AuthContexts";
 import {
   Bell,
   User,
@@ -23,11 +24,13 @@ import {
   MapPin,
   Clock,
 } from "lucide-react-native";
+import LayoutWrapper from "../src/components/LayoutWrapper";
 
 const { width } = Dimensions.get("window");
 
 const AllReports = () => {
   const navigation = useNavigation();
+  const { user } = useAuth();
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
@@ -122,72 +125,7 @@ const AllReports = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      <View style={styles.sidebar}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>T</Text>
-          </View>
-          <Text style={styles.appTitle}>TunzaSU</Text>
-        </View>
-        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
-        <View style={styles.navContainer}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Dashboard")}
-          >
-            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Dashboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-            <ListTodo size={20} color="#2563EB" style={styles.navIcon} />
-            <Text style={[styles.navText, styles.activeNavText]}>
-              All Reports
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("AssignedReports")}
-          >
-            <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Assigned Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Analytics")}
-          >
-            <BarChart size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Analytics</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => {
-              console.log("Profile button pressed");
-              navigation.navigate("Profile");
-            }}
-            activeOpacity={0.7}
-            delayPressIn={0}
-          >
-            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => {
-              console.log("help button pressed");
-              navigation.navigate("Help");
-            }}
-            activeOpacity={0.7}
-            delayPressIn={0}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Help</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      {/* Main Content */}
+    <LayoutWrapper>
       <ScrollView style={styles.mainContent}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All Reports</Text>
@@ -502,7 +440,7 @@ const AllReports = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </LayoutWrapper>
   );
 };
 

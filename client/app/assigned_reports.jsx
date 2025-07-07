@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../src/contexts/AuthContexts";
 import {
   LayoutDashboard,
   ListTodo,
@@ -79,6 +80,7 @@ const assignedReports = maintenanceReports.filter(
 
 const AssignedReports = () => {
   const navigation = useNavigation();
+  const { user } = useAuth();
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
@@ -209,13 +211,15 @@ const AssignedReports = () => {
               Assigned Reports
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("analytics")}
-          >
-            <BarChart size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Analytics</Text>
-          </TouchableOpacity>
+          {user?.role === "admin" && (
+            <TouchableOpacity
+              style={styles.navItem}
+              onPress={() => navigation.navigate("analytics")}
+            >
+              <BarChart size={20} color="#4B5563" style={styles.navIcon} />
+              <Text style={styles.navText}>Analytics</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={styles.navItem}
             onPress={() => navigation.navigate("profile")}
