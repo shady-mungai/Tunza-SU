@@ -1,17 +1,20 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
-import { useAuth } from '../contexts/AuthContexts';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Text } from "react-native";
+import { useAuth } from "../contexts/AuthContexts";
 
 // Import screens
-import StudentDashboard from '../components/StudentDashboard';
-import MyReports from '../components/MyReports';
-import Maintenance from '../../app/maintenanceView';
-import AllReports from '../../app/allReports';
-import AssignedReports from '../../app/assignedReports';
-import Analytics from '../../app/analytics';
-import Profile from '../../app/profile';
-import Help from '../../app/help';
+import StudentDashboard from "../components/StudentDashboard";
+import MyReports from "../components/MyReports";
+import Maintenance from "../../app/maintenanceView";
+import AllReports from "../../app/allReports";
+import AssignedReports from "../../app/assignedReports";
+import Analytics from "../../app/analytics";
+import Profile from "../../app/profile";
+import Help from "../../app/help";
+import GettingStarted from "../../app/gettingStarted";
+import Dashboard from "../../app/dashboard";
+import AdminDashboard from "../../app/admin";
 
 const Tab = createBottomTabNavigator();
 
@@ -27,33 +30,33 @@ const StudentNavigator = () => (
     <Tab.Screen
       name="StudentDashboard"
       component={StudentDashboard}
-      options={{ 
+      options={{
         tabBarLabel: "Dashboard",
-        tabBarIcon: () => <Text>🏠</Text> 
+        tabBarIcon: () => <Text>🏠</Text>,
       }}
     />
     <Tab.Screen
       name="MyReports"
       component={MyReports}
-      options={{ 
+      options={{
         tabBarLabel: "My Reports",
-        tabBarIcon: () => <Text>📋</Text> 
+        tabBarIcon: () => <Text>📋</Text>,
       }}
     />
     <Tab.Screen
       name="Profile"
       component={Profile}
-      options={{ 
+      options={{
         tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text> 
+        tabBarIcon: () => <Text>👤</Text>,
       }}
     />
     <Tab.Screen
       name="Help"
       component={Help}
-      options={{ 
+      options={{
         tabBarLabel: "Help",
-        tabBarIcon: () => <Text>❓</Text> 
+        tabBarIcon: () => <Text>❓</Text>,
       }}
     />
   </Tab.Navigator>
@@ -71,41 +74,85 @@ const MaintenanceNavigator = () => (
     <Tab.Screen
       name="Maintenance Dashboard"
       component={Maintenance}
-      options={{ 
+      options={{
         tabBarLabel: "Maintenance Dashboard",
-        tabBarIcon: () => <Text>⚙️</Text> 
+        tabBarIcon: () => <Text>⚙️</Text>,
       }}
     />
     <Tab.Screen
       name="AllReports"
       component={AllReports}
-      options={{ 
+      options={{
         tabBarLabel: "All Reports",
-        tabBarIcon: () => <Text>📊</Text> 
+        tabBarIcon: () => <Text>📊</Text>,
       }}
     />
     <Tab.Screen
       name="AssignedReports"
       component={AssignedReports}
-      options={{ 
+      options={{
         tabBarLabel: "Assigned",
-        tabBarIcon: () => <Text>✅</Text> 
-      }}
-    />
-    <Tab.Screen
-      name="Analytics"
-      component={Analytics}
-      options={{ 
-        tabBarLabel: "Analytics",
-        tabBarIcon: () => <Text>📈</Text> 
+        tabBarIcon: () => <Text>✅</Text>,
       }}
     />
     <Tab.Screen
       name="Profile"
       component={Profile}
-      options={{ 
+      options={{
         tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text> 
+        tabBarIcon: () => <Text>👤</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Help"
+      component={Help}
+      options={{
+        tabBarLabel: "Help",
+        tabBarIcon: () => <Text>❓</Text>,
+      }}
+    />
+  </Tab.Navigator>
+);
+
+// Staff Navigation
+const StaffNavigator = () => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: false,
+      tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
+      tabBarLabelStyle: { fontSize: 12 },
+    }}
+  >
+    <Tab.Screen
+      name="Dashboard"
+      component={Dashboard}
+      options={{
+        tabBarLabel: "Dashboard",
+        tabBarIcon: () => <Text>🏢</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="AllReports"
+      component={AllReports}
+      options={{
+        tabBarLabel: "All Reports",
+        tabBarIcon: () => <Text>📊</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={Profile}
+      options={{
+        tabBarLabel: "Profile",
+        tabBarIcon: () => <Text>👤</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Help"
+      component={Help}
+      options={{
+        tabBarLabel: "Help",
+        tabBarIcon: () => <Text>❓</Text>,
       }}
     />
   </Tab.Navigator>
@@ -125,31 +172,39 @@ const AdminNavigator = () => (
       component={Maintenance}
       options={{ 
         tabBarLabel: "Dashboard",
-        tabBarIcon: () => <Text>👑</Text> 
+        tabBarIcon: () => <Text>👑</Text>,
       }}
     />
     <Tab.Screen
       name="AllReports"
       component={AllReports}
-      options={{ 
+      options={{
         tabBarLabel: "All Reports",
-        tabBarIcon: () => <Text>📊</Text> 
+        tabBarIcon: () => <Text>📊</Text>,
       }}
     />
     <Tab.Screen
       name="Analytics"
       component={Analytics}
-      options={{ 
+      options={{
         tabBarLabel: "Analytics",
-        tabBarIcon: () => <Text>📈</Text> 
+        tabBarIcon: () => <Text>📈</Text>,
       }}
     />
     <Tab.Screen
       name="Profile"
       component={Profile}
-      options={{ 
+      options={{
         tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text> 
+        tabBarIcon: () => <Text>👤</Text>,
+      }}
+    />
+    <Tab.Screen
+      name="Help"
+      component={Help}
+      options={{
+        tabBarLabel: "Help",
+        tabBarIcon: () => <Text>❓</Text>,
       }}
     />
   </Tab.Navigator>
@@ -163,13 +218,13 @@ const RoleBasedNavigator = () => {
   // Determine which navigator to show based on user role
   const getNavigatorByRole = () => {
     switch (user?.role) {
-      case 'student':
+      case "student":
         return <StudentNavigator />;
-      case 'maintenance_staff':
+      case "maintenance_staff":
         return <MaintenanceNavigator />;
-      case 'staff':
+      case "staff":
         return <StaffNavigator />;
-      case 'admin':
+      case "admin":
         return <AdminNavigator />;
       default:
         return <StudentNavigator />; // Fallback
@@ -179,4 +234,4 @@ const RoleBasedNavigator = () => {
   return getNavigatorByRole();
 };
 
-export default RoleBasedNavigator; 
+export default RoleBasedNavigator;

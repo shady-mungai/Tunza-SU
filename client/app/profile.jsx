@@ -5,36 +5,20 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import {
-  LayoutDashboard,
-  ListTodo,
-  ListChecks,
-  Users,
-  BarChart,
-  UserCircle,
-  HelpCircle,
-  Bell,
   Settings,
   Shield,
   LogOut,
   Edit,
   Camera,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
   User,
 } from "lucide-react-native";
 import { useAuth } from "../src/contexts/AuthContexts";
-
-const { width } = Dimensions.get("window");
+import LayoutWrapper from "../src/components/LayoutWrapper";
 
 const Profile = () => {
-  const navigation = useNavigation();
   const { user, logout } = useAuth();
 
   // Get role display name
@@ -73,32 +57,19 @@ const Profile = () => {
   // Format join date (using current date as fallback)
   const getJoinDate = () => {
     const date = new Date();
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
     });
   };
 
   // Handle logout
   const handleLogout = () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: async () => {
-            await logout();
-            // Navigation will be handled by the auth context
-          },
-        },
-      ]
-    );
+    console.log("[Profile] handleLogout called");
+    if (window.confirm("Are you sure you want to logout?")) {
+      console.log("[Profile] Alert Logout button pressed");
+      logout();
+    }
   };
 
   // Create profile sections based on actual user data
@@ -107,17 +78,37 @@ const Profile = () => {
       title: "Personal Information",
       icon: <User size={20} color="#2563EB" />,
       items: [
-        { label: "Full Name", value: user?.name || "Not provided", editable: true },
-        { label: "Email", value: user?.email || "Not provided", editable: true },
-        { label: "Phone", value: user?.phone_number || user?.phoneNumber || "Not provided", editable: true },
+        {
+          label: "Full Name",
+          value: user?.name || "Not provided",
+          editable: true,
+        },
+        {
+          label: "Email",
+          value: user?.email || "Not provided",
+          editable: true,
+        },
+        {
+          label: "Phone",
+          value: user?.phone_number || user?.phoneNumber || "Not provided",
+          editable: true,
+        },
         {
           label: user?.role === "student" ? "Admission Number" : "Employee ID",
           value: user?.admission_number || user?.employeeId || "Not provided",
           editable: false,
         },
-        { label: "Department", value: getDepartment(user?.role), editable: false },
+        {
+          label: "Department",
+          value: getDepartment(user?.role),
+          editable: false,
+        },
         { label: "Position", value: getPosition(user?.role), editable: false },
-        { label: "Role", value: getRoleDisplayName(user?.role), editable: false },
+        {
+          label: "Role",
+          value: getRoleDisplayName(user?.role),
+          editable: false,
+        },
         { label: "Join Date", value: getJoinDate(), editable: false },
       ],
     },
@@ -168,103 +159,8 @@ const Profile = () => {
     },
   ];
 
-  // Get role-specific dashboard subtitle
-  const getDashboardSubtitle = () => {
-    switch (user?.role) {
-      case 'student':
-        return 'Student Dashboard';
-      case 'maintenance':
-        return 'Maintenance Dashboard';
-      case 'staff':
-        return 'Staff Dashboard';
-      case 'admin':
-        return 'Admin Dashboard';
-      default:
-        return 'Dashboard';
-    }
-  };
-
-  // Get role-specific navigation items
-  const getNavItems = () => {
-    const baseItems = [
-      {
-        icon: <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />,
-        text: "Dashboard",
-        route: "dashboard",
-        showFor: ["student", "maintenance", "staff", "admin"]
-      },
-      {
-        icon: <ListTodo size={20} color="#4B5563" style={styles.navIcon} />,
-        text: "All Reports",
-        route: "all_reports",
-        showFor: ["maintenance", "staff", "admin"]
-      },
-      {
-        icon: <ListChecks size={20} color="#4B5563" style={styles.navIcon} />,
-        text: "Assigned Reports",
-        route: "assigned_reports",
-        showFor: ["maintenance"]
-      },
-      {
-        icon: <BarChart size={20} color="#4B5563" style={styles.navIcon} />,
-        text: "Analytics",
-        route: "analytics",
-        showFor: ["maintenance", "admin"]
-      },
-      {
-        icon: <UserCircle size={20} color="#2563EB" style={styles.navIcon} />,
-        text: "Profile",
-        route: "profile",
-        showFor: ["student", "maintenance", "staff", "admin"],
-        isActive: true
-      },
-      {
-        icon: <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />,
-        text: "Help",
-        route: "help",
-        showFor: ["student", "maintenance", "staff", "admin"]
-      },
-    ];
-
-    return baseItems.filter(item => 
-      item.showFor.includes(user?.role) || item.showFor.includes("admin")
-    );
-  };
-
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      <View style={styles.sidebar}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>T</Text>
-          </View>
-          <Text style={styles.appTitle}>TunzaSU</Text>
-        </View>
-        <Text style={styles.dashboardSubtitle}>{getDashboardSubtitle()}</Text>
-        <View style={styles.navContainer}>
-          {getNavItems().map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.navItem,
-                item.isActive && styles.activeNavItem
-              ]}
-              onPress={() => !item.isActive && navigation.navigate(item.route)}
-            >
-              {item.icon}
-              <Text style={[
-                styles.navText,
-                item.isActive && styles.activeNavText
-              ]}>
-                {item.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Main Content */}
+    <LayoutWrapper>
       <ScrollView style={styles.mainContent}>
         {/* Header */}
         <View style={styles.header}>
@@ -287,7 +183,9 @@ const Profile = () => {
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>{user?.name || "User"}</Text>
-              <Text style={styles.profilePosition}>{getPosition(user?.role)}</Text>
+              <Text style={styles.profilePosition}>
+                {getPosition(user?.role)}
+              </Text>
               <Text style={styles.profileDepartment}>
                 {getDepartment(user?.role)}
               </Text>
@@ -342,79 +240,11 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </LayoutWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  sidebar: {
-    width: 256,
-    backgroundColor: "#FFFFFF",
-    padding: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 40,
-  },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#2563EB",
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  appTitle: {
-    marginLeft: 12,
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  dashboardSubtitle: {
-    color: "#6B7280",
-    fontSize: 14,
-    marginBottom: 24,
-  },
-  navContainer: {
-    flexGrow: 1,
-  },
-  navItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  activeNavItem: {
-    backgroundColor: "#DBEAFE",
-  },
-  navIcon: {
-    marginRight: 12,
-  },
-  navText: {
-    color: "#4B5563",
-    fontWeight: "500",
-  },
-  activeNavText: {
-    color: "#2563EB",
-  },
   mainContent: {
     flex: 1,
     padding: 32,

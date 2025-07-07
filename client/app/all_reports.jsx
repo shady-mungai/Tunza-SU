@@ -24,7 +24,6 @@ import {
   MapPin,
   Clock,
 } from "lucide-react-native";
-import LayoutWrapper from "../src/components/LayoutWrapper";
 
 const { width } = Dimensions.get("window");
 
@@ -125,7 +124,74 @@ const AllReports = () => {
   };
 
   return (
-    <LayoutWrapper>
+    <View style={styles.container}>
+      {/* Sidebar */}
+      <View style={styles.sidebar}>
+        <View style={styles.logoContainer}>
+          <View style={styles.logoCircle}>
+            <Text style={styles.logoText}>T</Text>
+          </View>
+          <Text style={styles.appTitle}>TunzaSU</Text>
+        </View>
+        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
+        <View style={styles.navContainer}>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("dashboard")}
+          >
+            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Dashboard</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
+            <ListTodo size={20} color="#2563EB" style={styles.navIcon} />
+            <Text style={[styles.navText, styles.activeNavText]}>
+              All Reports
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("assigned_reports")}
+          >
+            <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Assigned Reports</Text>
+          </TouchableOpacity>
+          {user?.role === "admin" && (
+            <TouchableOpacity
+              style={styles.navItem}
+              onPress={() => navigation.navigate("analytics")}
+            >
+              <BarChart size={20} color="#4B5563" style={styles.navIcon} />
+              <Text style={styles.navText}>Analytics</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => {
+              console.log("Profile button pressed");
+              navigation.navigate("profile");
+            }}
+            activeOpacity={0.7}
+            delayPressIn={0}
+          >
+            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => {
+              console.log("help button pressed");
+              navigation.navigate("help");
+            }}
+            activeOpacity={0.7}
+            delayPressIn={0}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Help</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      {/* Main Content */}
       <ScrollView style={styles.mainContent}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All Reports</Text>
@@ -440,7 +506,7 @@ const AllReports = () => {
           </View>
         </View>
       </Modal>
-    </LayoutWrapper>
+    </View>
   );
 };
 

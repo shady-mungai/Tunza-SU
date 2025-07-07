@@ -11,8 +11,6 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../src/contexts/AuthContexts";
 import {
-  Bell,
-  User,
   LayoutDashboard,
   ListTodo,
   ListChecks,
@@ -23,12 +21,64 @@ import {
   X,
   MapPin,
   Clock,
+  User,
 } from "lucide-react-native";
-import LayoutWrapper from "../src/components/LayoutWrapper";
 
 const { width } = Dimensions.get("window");
 
-const AllReports = () => {
+const maintenanceReports = [
+  {
+    id: 1,
+    title: "Broken Window in Library",
+    location: "Main Library, 2nd Floor",
+    date: "Jan 16, 2024",
+    status: "In Progress",
+    priority: "High",
+    assignedTo: "Engineer A",
+  },
+  {
+    id: 2,
+    title: "Leaking Faucet in Dormitory",
+    location: "Dormitory Block A, Room 205",
+    date: "Jan 14, 2024",
+    status: "Pending Review",
+    priority: "Medium",
+    assignedTo: "Unassigned",
+  },
+  {
+    id: 3,
+    title: "Lights Flickering in Lecture Hall",
+    location: "Science Building, Lecture Hall 3",
+    date: "Jan 12, 2024",
+    status: "Resolved",
+    priority: "Low",
+    assignedTo: "Electrician B",
+  },
+  {
+    id: 4,
+    title: "Damaged Chair in Classroom",
+    location: "Block C, Room 101",
+    date: "Jan 10, 2024",
+    status: "New",
+    priority: "Low",
+    assignedTo: "Unassigned",
+  },
+  {
+    id: 5,
+    title: "Clogged Toilet in Washroom",
+    location: "Administration Building, Ground Floor",
+    date: "Jan 08, 2024",
+    status: "Overdue",
+    priority: "High",
+    assignedTo: "Plumber C",
+  },
+];
+
+const assignedReports = maintenanceReports.filter(
+  (r) => r.assignedTo !== "Unassigned"
+);
+
+const AssignedReports = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const [selectedReport, setSelectedReport] = useState(null);
@@ -124,115 +174,182 @@ const AllReports = () => {
     }
   };
 
+  // Calculate assigned reports dynamically
+  const assignedReports = maintenanceReports.filter(
+    (r) => r.assignedTo !== "Unassigned"
+  );
+
   return (
-    <LayoutWrapper>
+    <View style={styles.container}>
+      {/* Sidebar */}
+      <View style={styles.sidebar}>
+        <View style={styles.logoContainer}>
+          <View style={styles.logoCircle}>
+            <Text style={styles.logoText}>T</Text>
+          </View>
+          <Text style={styles.appTitle}>TunzaSU</Text>
+        </View>
+        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
+        <View style={styles.navContainer}>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("dashboard")}
+          >
+            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Dashboard</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("all_reports")}
+          >
+            <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>All Reports</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
+            <ListChecks size={20} color="#2563EB" style={styles.navIcon} />
+            <Text style={[styles.navText, styles.activeNavText]}>
+              Assigned Reports
+            </Text>
+          </TouchableOpacity>
+          {user?.role === "admin" && (
+            <TouchableOpacity
+              style={styles.navItem}
+              onPress={() => navigation.navigate("analytics")}
+            >
+              <BarChart size={20} color="#4B5563" style={styles.navIcon} />
+              <Text style={styles.navText}>Analytics</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("profile")}
+          >
+            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("help")}
+          >
+            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
+            <Text style={styles.navText}>Help</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      {/* Main Content */}
       <ScrollView style={styles.mainContent}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>All Reports</Text>
+          <Text style={styles.sectionTitle}>Assigned Reports</Text>
         </View>
         <View style={styles.reportsList}>
-          {maintenanceReports.map((report) => (
-            <TouchableOpacity
-              key={report.id}
-              style={styles.reportItem}
-              onPress={() => handleOpenReport(report)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.reportDetails}>
-                <Text style={styles.reportTitle}>{report.title}</Text>
-                <Text style={styles.reportLocation}>{report.location}</Text>
-                <Text style={styles.reportDate}>{report.date}</Text>
-                <Text style={styles.reportAssignedTo}>
-                  Assigned To:{" "}
-                  <Text style={{ fontWeight: "normal" }}>
-                    {report.assignedTo}
+          {assignedReports.length === 0 ? (
+            <Text style={{ color: "#6B7280", fontSize: 16 }}>
+              No assigned reports found.
+            </Text>
+          ) : (
+            assignedReports.map((report) => (
+              <TouchableOpacity
+                key={report.id}
+                style={styles.reportItem}
+                onPress={() => handleOpenReport(report)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.reportDetails}>
+                  <Text style={styles.reportTitle}>{report.title}</Text>
+                  <Text style={styles.reportLocation}>{report.location}</Text>
+                  <Text style={styles.reportDate}>{report.date}</Text>
+                  <Text style={styles.reportAssignedTo}>
+                    Assigned To:{" "}
+                    <Text style={{ fontWeight: "normal" }}>
+                      {report.assignedTo}
+                    </Text>
                   </Text>
-                </Text>
-              </View>
-              <View style={styles.reportBadges}>
-                {report.status === "New" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#E0E7FF", color: "#4F46E5" },
-                    ]}
-                  >
-                    New
-                  </Text>
-                )}
-                {report.status === "In Progress" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#DBEAFE", color: "#2563EB" },
-                    ]}
-                  >
-                    In Progress
-                  </Text>
-                )}
-                {report.status === "Pending Review" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#FEF3C7", color: "#D97706" },
-                    ]}
-                  >
-                    Pending Review
-                  </Text>
-                )}
-                {report.status === "Resolved" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#D1FAE5", color: "#10B981" },
-                    ]}
-                  >
-                    Resolved
-                  </Text>
-                )}
-                {report.status === "Overdue" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#FEE2E2", color: "#EF4444" },
-                    ]}
-                  >
-                    Overdue
-                  </Text>
-                )}
-                {report.priority === "High" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#FEE2E2", color: "#EF4444" },
-                    ]}
-                  >
-                    High
-                  </Text>
-                )}
-                {report.priority === "Medium" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#FFF7ED", color: "#F97316" },
-                    ]}
-                  >
-                    Medium
-                  </Text>
-                )}
-                {report.priority === "Low" && (
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: "#E5E7EB", color: "#4B5563" },
-                    ]}
-                  >
-                    Low
-                  </Text>
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
+                </View>
+                <View style={styles.reportBadges}>
+                  {report.status === "New" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#E0E7FF", color: "#4F46E5" },
+                      ]}
+                    >
+                      New
+                    </Text>
+                  )}
+                  {report.status === "In Progress" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#DBEAFE", color: "#2563EB" },
+                      ]}
+                    >
+                      In Progress
+                    </Text>
+                  )}
+                  {report.status === "Pending Review" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#FEF3C7", color: "#D97706" },
+                      ]}
+                    >
+                      Pending Review
+                    </Text>
+                  )}
+                  {report.status === "Resolved" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#D1FAE5", color: "#10B981" },
+                      ]}
+                    >
+                      Resolved
+                    </Text>
+                  )}
+                  {report.status === "Overdue" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#FEE2E2", color: "#EF4444" },
+                      ]}
+                    >
+                      Overdue
+                    </Text>
+                  )}
+                  {report.priority === "High" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#FEE2E2", color: "#EF4444" },
+                      ]}
+                    >
+                      High
+                    </Text>
+                  )}
+                  {report.priority === "Medium" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#FFF7ED", color: "#F97316" },
+                      ]}
+                    >
+                      Medium
+                    </Text>
+                  )}
+                  {report.priority === "Low" && (
+                    <Text
+                      style={[
+                        styles.badge,
+                        { backgroundColor: "#E5E7EB", color: "#4B5563" },
+                      ]}
+                    >
+                      Low
+                    </Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </ScrollView>
 
@@ -440,7 +557,7 @@ const AllReports = () => {
           </View>
         </View>
       </Modal>
-    </LayoutWrapper>
+    </View>
   );
 };
 
@@ -723,4 +840,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AllReports;
+export default AssignedReports;

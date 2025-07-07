@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import LayoutWrapper from "../src/components/LayoutWrapper";
 import {
   LayoutDashboard,
   ListTodo,
@@ -98,62 +99,7 @@ const Analytics = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      <View style={styles.sidebar}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>T</Text>
-          </View>
-          <Text style={styles.appTitle}>TunzaSU</Text>
-        </View>
-        <Text style={styles.dashboardSubtitle}>Maintenance Dashboard</Text>
-        <View style={styles.navContainer}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("dashboard")}
-          >
-            <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Dashboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("all_reports")}
-          >
-            <ListTodo size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>All Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("assigned_reports")}
-          >
-            <ListChecks size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Assigned Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-            <BarChart size={20} color="#2563EB" style={styles.navIcon} />
-            <Text style={[styles.navText, styles.activeNavText]}>
-              Analytics
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("profile")}
-          >
-            <UserCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("help")}
-          >
-            <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />
-            <Text style={styles.navText}>Help</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Main Content */}
+    <LayoutWrapper>
       <ScrollView style={styles.mainContent}>
         {/* Header */}
         <View style={styles.header}>
@@ -364,7 +310,7 @@ const Analytics = () => {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </LayoutWrapper>
   );
 };
 
@@ -493,7 +439,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
-    width: (width - 64 - 32) / 2 - 12,
+    width: (width - 64) / 2 - 12,
     marginBottom: 16,
   },
   metricHeader: {
@@ -544,7 +490,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
-    width: (width - 64 - 32) / 2 - 12,
+    width: (width - 64) / 2 - 12,
     marginBottom: 16,
   },
   performanceLabel: {
@@ -693,7 +639,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
     alignItems: "center",
-    width: (width - 64 - 32) / 3 - 16,
+    width: (width - 64) / 3 - 16,
     marginBottom: 16,
   },
   actionCardTitle: {

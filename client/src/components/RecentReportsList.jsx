@@ -39,7 +39,7 @@ const RecentReportsList = () => {
   <View className="bg-white rounded-2xl p-6 border border-gray-200">
     <View className="flex-row justify-between items-center mb-4">
       <Text className="font-bold text-lg text-gray-900">Recent Reports</Text>
-      <TouchableOpacity onPress={() => navigation.navigate('My Reports')}>
+              <TouchableOpacity onPress={() => navigation.navigate('MyReports')}>
         <Text className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 text-sm">View All</Text>
       </TouchableOpacity>
     </View>

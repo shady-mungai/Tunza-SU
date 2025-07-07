@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-  Dimensions,
   Modal,
+  Dimensions,
 } from "react-native";
 import {
   useNavigation,
@@ -33,15 +33,14 @@ import {
   BarChart,
   X,
 } from "lucide-react-native";
-import { useAuth } from "../src/contexts/AuthContexts";
 import LayoutWrapper from "../src/components/LayoutWrapper";
+import { useAuth } from "../src/contexts/AuthContexts";
 
 const { width } = Dimensions.get("window");
 
 const Dashboard = ({ navigation: propNavigation, route }) => {
   const navigation = useNavigation();
   const navigationRef = useNavigationContainerRef();
-  const { user } = useAuth();
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
@@ -92,6 +91,8 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       assignedTo: "Plumber C",
     },
   ]);
+
+  const { user } = useAuth();
 
   // Use prop navigation if available, otherwise use hook
 
@@ -214,6 +215,8 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
   const overdueReports = maintenanceReports.filter(
     (report) => report.status === "Overdue"
   ).length;
+
+  console.log("Dashboard user:", user);
 
   return (
     <LayoutWrapper>
@@ -835,8 +838,7 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    padding: 32,
-    backgroundColor: "#F3F4F6",
+    padding: 24, // Reduced from 32
   },
   header: {
     flexDirection: "row",
@@ -874,7 +876,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 32,
+    marginBottom: 24, // Reduced from 32
+    // Adjust item width based on screen size for responsive grid
+    // For 3 cols on small, 6 on large
   },
   card: {
     backgroundColor: "#FFFFFF", // Equivalent to bg-white
@@ -888,7 +892,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: (width - 64) / 3 - 8, // (screen_width - main_padding) / 3 - gap
+    width: (width - 64 - 32) / 3 - 8, // (screen_width - sidebar_width - main_padding) / 3 - gap
     marginBottom: 16, // Reduced from 24
   },
   cardLabel: {
@@ -934,7 +938,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    width: (width - 64) / 3 - 16, // (screen_width - main_padding) / 3 - gap
+    width: (width - 64 - 32) / 3 - 16, // (screen_width - sidebar_width - main_padding) / 3 - gap
     marginBottom: 16, // Reduced from 24
   },
   quickActionIcon: {

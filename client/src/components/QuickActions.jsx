@@ -20,7 +20,7 @@ const QuickActions = ({ onNewReport }) => {
       </TouchableOpacity>
       <TouchableOpacity
         className="flex-1 flex items-center justify-center border border-gray-200 rounded-xl py-6 mr-2 bg-white"
-        onPress={() => navigation.navigate('My Reports')}
+        onPress={() => navigation.navigate('MyReports')}
         activeOpacity={0.8}
       >
         <Text className="text-2xl mb-2">👁️</Text>
