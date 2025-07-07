@@ -284,7 +284,7 @@ const Signup = () => {
 
   const handleSignup = async () => {
     setIsLoading(true);
-    const success = await register({
+    const result = await register({
       name: formData.name,
       email: formData.email,
       admission_number: formData.admission_number,
@@ -293,7 +293,7 @@ const Signup = () => {
       password: formData.password,
     });
     setIsLoading(false);
-    if (success) {
+    if (result.success) {
       Toast.show({
         type: "success",
         text1: "Success!",
@@ -303,8 +303,9 @@ const Signup = () => {
     } else {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: "Failed to create account. Please try again.",
+        text1: "Registration Failed",
+        text2: result.message || "Failed to create account. Please try again.",
+        visibilityTime: 4000,
       });
     }
   };

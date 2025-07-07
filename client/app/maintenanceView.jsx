@@ -33,12 +33,14 @@ import {
   BarChart,
   X,
 } from "lucide-react-native";
+import { useAuth } from "../src/contexts/AuthContexts";
 
 const { width } = Dimensions.get("window");
 
 const Dashboard = ({ navigation: propNavigation, route }) => {
   const navigation = useNavigation();
   const navigationRef = useNavigationContainerRef();
+  const { user } = useAuth();
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
@@ -296,8 +298,10 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View style={styles.userInfo}>
                 <User size={32} color="#4B5563" style={styles.userAvatar} />
                 <View>
-                  <Text style={styles.userName}>Richard Mungai</Text>
-                  <Text style={styles.userId}>MNT/001</Text>
+                  <Text style={styles.userName}>{user?.name || "User"}</Text>
+                  <Text style={styles.userId}>
+                    {user?.admission_number || user?.employeeId || ""}
+                  </Text>
                 </View>
               </View>
             </View>

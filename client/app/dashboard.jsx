@@ -34,6 +34,7 @@ import {
   X,
 } from "lucide-react-native";
 import LayoutWrapper from "../src/components/LayoutWrapper";
+import { useAuth } from "../src/contexts/AuthContexts";
 
 const { width } = Dimensions.get("window");
 
@@ -90,6 +91,8 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       assignedTo: "Plumber C",
     },
   ]);
+
+  const { user } = useAuth();
 
   // Use prop navigation if available, otherwise use hook
 
@@ -213,6 +216,8 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
     (report) => report.status === "Overdue"
   ).length;
 
+  console.log("Dashboard user:", user);
+
   return (
     <LayoutWrapper>
       <ScrollView style={styles.mainContent}>
@@ -224,8 +229,10 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
             <View style={styles.userInfo}>
               <User size={32} color="#4B5563" style={styles.userAvatar} />
               <View>
-                <Text style={styles.userName}>Richard Mungai</Text>
-                <Text style={styles.userId}>MNT/001</Text>
+                <Text style={styles.userName}>{user?.name || "User"}</Text>
+                <Text style={styles.userId}>
+                  {user?.admission_number || user?.employeeId || ""}
+                </Text>
               </View>
             </View>
           </View>

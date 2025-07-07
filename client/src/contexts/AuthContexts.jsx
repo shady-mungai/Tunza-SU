@@ -104,7 +104,7 @@ export function AuthProvider({ children }) {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData.user);
-        console.log(`The user logged in is: ${user}`);
+        console.log("[AuthContext] Setting user after login:", userData.user);
         await AsyncStorage.setItem("user", JSON.stringify(userData.user));
         return true;
       }
@@ -117,6 +117,7 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
+      console.log("[AuthContext] Registering with data:", userData);
       const response = await fetch("http://localhost:4000/register", {
         method: "POST",
         headers: {
@@ -124,16 +125,35 @@ export function AuthProvider({ children }) {
         },
         body: JSON.stringify(userData),
       });
+      console.log("[AuthContext] Register response status:", response.status);
       if (response.ok) {
         const result = await response.json();
+        console.log("[AuthContext] Register success:", result);
         setUser(result.user);
         await AsyncStorage.setItem("user", JSON.stringify(result.user));
-        return true;
+        return { success: true };
+      } else {
+        const errorData = await response.text();
+        console.log("[AuthContext] Register error response:", errorData);
+
+        // Parse the error response to get the specific message
+        let errorMessage = "Registration failed. Please try again.";
+        try {
+          const errorJson = JSON.parse(errorData);
+          errorMessage = errorJson.message || errorMessage;
+        } catch (e) {
+          // If parsing fails, use the raw error data
+          errorMessage = errorData || errorMessage;
+        }
+
+        return { success: false, message: errorMessage };
       }
-      return false;
     } catch (error) {
       console.error("Registration error:", error);
-      return false;
+      return {
+        success: false,
+        message: "Network error. Please check your connection.",
+      };
     }
   };
 
