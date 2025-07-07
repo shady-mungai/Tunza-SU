@@ -10,7 +10,7 @@ import {
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useAuth } from '../contexts/AuthContexts'
+import { useAuth, sendMail } from '../contexts/AuthContexts'
 
 const categories = ["Plumbing", "Electrical", "Furniture", "Cleaning", "Other"];
 const priorities = ["Low", "Medium", "High", "Urgent"];
@@ -24,7 +24,7 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
   const [imageUri, setImageUri] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { user } = useAuth();
+  const { user, sendMail } = useAuth();
 
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -89,6 +89,12 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
         }
       }
       await onSubmit(formData, true);
+      sendMail({
+        location: location,
+        priority: priority,
+        category: category,
+
+      });
       setTitle("");
       setDescription("");
       setLocation("");

@@ -167,44 +167,13 @@ const AdminNavigator = () => (
       tabBarLabelStyle: { fontSize: 12 },
     }}
   >
-    <Tab.Screen
-      name="Dashboard"
-      component={Maintenance}
-      options={{ 
-        tabBarLabel: "Dashboard",
-        tabBarIcon: () => <Text>👑</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="AllReports"
-      component={AllReports}
-      options={{
-        tabBarLabel: "All Reports",
-        tabBarIcon: () => <Text>📊</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Analytics"
-      component={Analytics}
-      options={{
-        tabBarLabel: "Analytics",
-        tabBarIcon: () => <Text>📈</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Profile"
-      component={Profile}
-      options={{
-        tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text>,
-      }}
-    />
+  
     <Tab.Screen
       name="Help"
-      component={Help}
+      component={AdminDashboard}
       options={{
-        tabBarLabel: "Help",
-        tabBarIcon: () => <Text>❓</Text>,
+        tabBarLabel: "admin",
+        tabBarIcon: () => <Text>Admin</Text>,
       }}
     />
   </Tab.Navigator>
