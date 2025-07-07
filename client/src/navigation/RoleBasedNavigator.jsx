@@ -122,7 +122,7 @@ const AdminNavigator = () => (
   >
     <Tab.Screen
       name="Dashboard"
-      component={Dashboard}
+      component={Maintenance}
       options={{ 
         tabBarLabel: "Dashboard",
         tabBarIcon: () => <Text>👑</Text> 
