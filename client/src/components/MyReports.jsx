@@ -84,7 +84,7 @@ const MyReports = () => {
           {loading ? (
             <ActivityIndicator
               size="large"
-              color="#2563eb"
+              color="#97D60E"
               style={{ marginTop: 32 }}
             />
           ) : reports.length === 0 ? (
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   statusInProgress: {
     backgroundColor: "#DBEAFE",
-    color: "#2563EB",
+    color: "#97D60E",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,

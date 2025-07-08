@@ -912,7 +912,20 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
         <View style={styles.card}>
-          <TouchableOpacity style={styles.userCard} onPress={logout}>
+          <TouchableOpacity style={styles.userCard}>
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>Profile Settings</Text>
+              <Text style={styles.userEmail}>Manage your account</Text>
+            </View>
+            <UserCircle size={20} color={currentColors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.userCard} onPress={async () => {
+            await logout();
+            navigation.navigate("Login");
+          }}>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>Logout</Text>
               <Text style={styles.userEmail}>Sign out of your account</Text>

@@ -79,14 +79,7 @@ const MaintenanceNavigator = () => (
         tabBarIcon: () => <Text>⚙️</Text>,
       }}
     />
-    <Tab.Screen
-      name="AllReports"
-      component={AllReports}
-      options={{
-        tabBarLabel: "All Reports",
-        tabBarIcon: () => <Text>📊</Text>,
-      }}
-    />
+  
     <Tab.Screen
       name="AssignedReports"
       component={AssignedReports}
@@ -171,7 +164,7 @@ const AdminNavigator = () => (
       name="Admin Dashboard"
       component={AdminDashboard}
 
-      
+     
     />
   
 

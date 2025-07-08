@@ -44,7 +44,7 @@ const GettingStarted = () => {
   const gettingStartedSections = [
     {
       title: "Dashboard Overview",
-      icon: <LayoutDashboard size={24} color="#2563EB" />,
+      icon: <LayoutDashboard size={24} color="#97D60E" />,
       description: "Understanding your main dashboard and key metrics",
       content: [
         "View real-time maintenance statistics",
@@ -55,7 +55,7 @@ const GettingStarted = () => {
     },
     {
       title: "Creating Reports",
-      icon: <Plus size={24} color="#2563EB" />,
+      icon: <Plus size={24} color="#97D60E" />,
       description: "How to submit new maintenance requests",
       content: [
         "Click the 'New Report' button",
@@ -67,7 +67,7 @@ const GettingStarted = () => {
     },
     {
       title: "Managing Reports",
-      icon: <ListTodo size={24} color="#2563EB" />,
+      icon: <ListTodo size={24} color="#97D60E" />,
       description: "Viewing and updating maintenance reports",
       content: [
         "Browse all reports in the system",
@@ -79,7 +79,7 @@ const GettingStarted = () => {
     },
     {
       title: "User Management",
-      icon: <Users size={24} color="#2563EB" />,
+      icon: <Users size={24} color="#97D60E" />,
       description: "Managing maintenance personnel and assignments",
       content: [
         "View all maintenance staff profiles",
@@ -91,7 +91,7 @@ const GettingStarted = () => {
     },
     {
       title: "Analytics & Insights",
-      icon: <BarChart size={24} color="#2563EB" />,
+      icon: <BarChart size={24} color="#97D60E" />,
       description: "Understanding performance metrics and reports",
       content: [
         "View completion rates and trends",
@@ -103,7 +103,7 @@ const GettingStarted = () => {
     },
     {
       title: "Profile & Settings",
-      icon: <UserCircle size={24} color="#2563EB" />,
+      icon: <UserCircle size={24} color="#97D60E" />,
       description: "Managing your account and preferences",
       content: [
         "Update personal information",
@@ -187,7 +187,7 @@ const GettingStarted = () => {
         <View style={styles.section}>
           <View style={styles.welcomeCard}>
             <View style={styles.welcomeIcon}>
-              <Zap size={32} color="#2563EB" />
+              <Zap size={32} color="#97D60E" />
             </View>
             <Text style={styles.welcomeTitle}>Welcome to TunzaSU!</Text>
             <Text style={styles.welcomeDescription}>

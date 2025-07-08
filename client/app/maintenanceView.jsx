@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -45,55 +45,35 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
-  const [maintenanceReports, setMaintenanceReports] = useState([
-    {
-      id: 1,
-      title: "Broken Window in Library",
-      location: "Main Library, 2nd Floor",
-      date: "Jan 16, 2024",
-      status: "In Progress",
-      priority: "High",
-      assignedTo: "Engineer A",
-    },
-    {
-      id: 2,
-      title: "Leaking Faucet in Dormitory",
-      location: "Dormitory Block A, Room 205",
-      date: "Jan 14, 2024",
-      status: "Pending Review",
-      priority: "Medium",
-      assignedTo: "Unassigned",
-    },
-    {
-      id: 3,
-      title: "Lights Flickering in Lecture Hall",
-      location: "Science Building, Lecture Hall 3",
-      date: "Jan 12, 2024",
-      status: "Resolved",
-      priority: "Low",
-      assignedTo: "Electrician B",
-    },
-    {
-      id: 4,
-      title: "Damaged Chair in Classroom",
-      location: "Block C, Room 101",
-      date: "Jan 10, 2024",
-      status: "New",
-      priority: "Low",
-      assignedTo: "Unassigned",
-    },
-    {
-      id: 5,
-      title: "Clogged Toilet in Washroom",
-      location: "Administration Building, Ground Floor",
-      date: "Jan 08, 2024",
-      status: "Overdue",
-      priority: "High",
-      assignedTo: "Plumber C",
-    },
-  ]);
+  const [maintenanceReports, setMaintenanceReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Use prop navigation if available, otherwise use hook
+  // Fetch assigned reports for the logged-in maintenance user
+  useEffect(() => {
+    const fetchAssignedReports = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`http://localhost:4000/assignedReports?maintenance_id=${user.id}`);
+        if (!response.ok) throw new Error("Failed to fetch assigned reports");
+        const data = await response.json();
+        setMaintenanceReports(
+          (data.reports || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        );
+      } catch (err) {
+        setError("Failed to load assigned reports. Please try again.");
+        setMaintenanceReports([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAssignedReports();
+  }, [user?.id]);
 
   // Debug navigation context
   console.log("Dashboard navigation context:", {
@@ -200,19 +180,19 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
   // Calculate dashboard statistics based on maintenanceReports data
   const totalReports = maintenanceReports.length;
   const newReports = maintenanceReports.filter(
-    (report) => report.status === "New"
+    (report) => report.status?.toLowerCase() === "new"
   ).length;
   const pendingReports = maintenanceReports.filter(
-    (report) => report.status === "Pending Review"
+    (report) => ["pending review", "under_review"].includes(report.status?.toLowerCase())
   ).length;
   const inProgressReports = maintenanceReports.filter(
-    (report) => report.status === "In Progress"
+    (report) => ["in progress", "in_progress"].includes(report.status?.toLowerCase())
   ).length;
   const resolvedReports = maintenanceReports.filter(
-    (report) => report.status === "Resolved"
+    (report) => ["resolved", "completed"].includes(report.status?.toLowerCase())
   ).length;
   const overdueReports = maintenanceReports.filter(
-    (report) => report.status === "Overdue"
+    (report) => report.status?.toLowerCase() === "overdue"
   ).length;
 
   return (
@@ -244,9 +224,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{totalReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#DBEAFE" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#97D60E33" }]}
             >
-              <AlertTriangle size={20} color="#2563EB" />
+              <AlertTriangle size={20} color="#228C22" />
             </View>
           </View>
 
@@ -257,9 +237,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{newReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#E0E7FF" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#97D60E33" }]}
             >
-              <Plus size={20} color="#4F46E5" />
+              <Plus size={20} color="#228C22" />
             </View>
           </View>
 
@@ -270,9 +250,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{pendingReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#FEF3C7" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#97D60E33" }]}
             >
-              <Clock size={20} color="#D97706" />
+              <Clock size={20} color="#228C22" />
             </View>
           </View>
 
@@ -283,9 +263,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{inProgressReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#EDE9FE" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#97D60E33" }]}
             >
-              <Settings size={20} color="#7C3AED" />
+              <Settings size={20} color="#228C22" />
             </View>
           </View>
 
@@ -296,9 +276,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{resolvedReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#D1FAE5" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#97D60E33" }]}
             >
-              <CheckCircle size={20} color="#10B981" />
+              <CheckCircle size={20} color="#228C22" />
             </View>
           </View>
 
@@ -309,245 +289,47 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{overdueReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#FEE2E2" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#97D60E33" }]}
             >
-              <Clock size={20} color="#EF4444" />
+              <Clock size={20} color="#228C22" />
             </View>
           </View>
-        </View>
+        </View>       
 
-        {/* Quick Actions and Recent Reports in a row */}
-        <View style={styles.horizontalSection}>
-          {/* Quick Actions */}
-          <View style={styles.halfSection}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <View style={styles.quickActionsGrid}>
-              <TouchableOpacity style={styles.quickActionButton}>
-                <Eye size={24} color="#2563EB" style={styles.quickActionIcon} />
-                <Text style={styles.quickActionText}>View New Reports</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.quickActionButton}>
-                <ListChecks
-                  size={24}
-                  color="#2563EB"
-                  style={styles.quickActionIcon}
-                />
-                <Text style={styles.quickActionText}>Manage Assignments</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.quickActionButton}>
-                <BarChart
-                  size={24}
-                  color="#2563EB"
-                  style={styles.quickActionIcon}
-                />
-                <Text style={styles.quickActionText}>Generate Reports</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Recent Reports */}
-          <View style={styles.halfSection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Reports</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("AllReports")}
-              >
-                <Text style={styles.viewAllText}>View All</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.reportsList}>
-              {maintenanceReports.slice(0, 3).map((report) => (
-                <View key={report.id} style={styles.reportItem}>
-                  <View style={styles.reportDetails}>
-                    <Text style={styles.reportTitle}>{report.title}</Text>
-                    <Text style={styles.reportLocation}>{report.location}</Text>
-                    <Text style={styles.reportDate}>{report.date}</Text>
-                  </View>
-                  <View style={styles.reportBadges}>
-                    {report.status === "New" && (
-                      <Text
-                        style={[
-                          styles.badge,
-                          { backgroundColor: "#E0E7FF", color: "#4F46E5" },
-                        ]}
-                      >
-                        New
-                      </Text>
-                    )}
-                    {report.status === "In Progress" && (
-                      <Text
-                        style={[
-                          styles.badge,
-                          { backgroundColor: "#DBEAFE", color: "#2563EB" },
-                        ]}
-                      >
-                        In Progress
-                      </Text>
-                    )}
-                    {report.status === "Pending Review" && (
-                      <Text
-                        style={[
-                          styles.badge,
-                          { backgroundColor: "#FEF3C7", color: "#D97706" },
-                        ]}
-                      >
-                        Pending Review
-                      </Text>
-                    )}
-                    {report.status === "Resolved" && (
-                      <Text
-                        style={[
-                          styles.badge,
-                          { backgroundColor: "#D1FAE5", color: "#10B981" },
-                        ]}
-                      >
-                        Resolved
-                      </Text>
-                    )}
-                    {report.status === "Overdue" && (
-                      <Text
-                        style={[
-                          styles.badge,
-                          { backgroundColor: "#FEE2E2", color: "#EF4444" },
-                        ]}
-                      >
-                        Overdue
-                      </Text>
-                    )}
-                    <TouchableOpacity
-                      onPress={() => handleOpenReport(report)}
-                      style={styles.eyeButton}
-                    >
-                      <Eye
-                        size={20}
-                        color="#6B7280"
-                        style={styles.reportEyeIcon}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* All Reports */}
+        {/* Recent Reports */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>All Reports</Text>
+            <Text style={styles.sectionTitle}>Recent Reports</Text>
             <TouchableOpacity onPress={() => navigation.navigate("AllReports")}>
               <Text style={styles.viewAllText}>View All</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.reportsList}>
-            {maintenanceReports.map((report) => (
-              <View key={report.id} style={styles.reportItem}>
-                <View style={styles.reportDetails}>
-                  <Text style={styles.reportTitle}>{report.title}</Text>
-                  <Text style={styles.reportLocation}>{report.location}</Text>
-                  <Text style={styles.reportDate}>{report.date}</Text>
-                  <Text style={styles.reportAssignedTo}>
-                    Assigned To:{" "}
-                    <Text style={{ fontWeight: "normal" }}>
-                      {report.assignedTo}
-                    </Text>
-                  </Text>
+            {loading ? (
+              <Text>Loading...</Text>
+            ) : error ? (
+              <Text style={{ color: 'red' }}>{error}</Text>
+            ) : maintenanceReports.length === 0 ? (
+              <Text>No recent reports found.</Text>
+            ) : (
+              maintenanceReports.slice(0, 3).map((report) => (
+                <View key={report.id} style={styles.reportItem}>
+                  <View style={styles.reportDetails}>
+                    <Text style={styles.reportTitle}>{report.title}</Text>
+                    <Text style={styles.reportLocation}>{report.location}</Text>
+                    <Text style={styles.reportDate}>{report.created_at ? new Date(report.created_at).toLocaleDateString() : ''}</Text>
+                  </View>
+                  <View style={styles.reportBadges}>
+                    {report.status && (
+                      <Text style={[styles.badge, { backgroundColor: "#E0E7FF", color: "#4F46E5" }]}>{report.status}</Text>
+                    )}
+                    {report.priority && (
+                      <Text style={[styles.badge, { backgroundColor: "#FEE2E2", color: "#EF4444" }]}>{report.priority}</Text>
+                    )}
+                  </View>
                 </View>
-                <View style={styles.reportBadges}>
-                  {report.status === "New" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#E0E7FF", color: "#4F46E5" },
-                      ]}
-                    >
-                      New
-                    </Text>
-                  )}
-                  {report.status === "In Progress" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#DBEAFE", color: "#2563EB" },
-                      ]}
-                    >
-                      In Progress
-                    </Text>
-                  )}
-                  {report.status === "Pending Review" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#FEF3C7", color: "#D97706" },
-                      ]}
-                    >
-                      Pending Review
-                    </Text>
-                  )}
-                  {report.status === "Resolved" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#D1FAE5", color: "#10B981" },
-                      ]}
-                    >
-                      Resolved
-                    </Text>
-                  )}
-                  {report.status === "Overdue" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#FEE2E2", color: "#EF4444" },
-                      ]}
-                    >
-                      Overdue
-                    </Text>
-                  )}
-
-                  {report.priority === "High" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#FEE2E2", color: "#EF4444" },
-                      ]}
-                    >
-                      High
-                    </Text>
-                  )}
-                  {report.priority === "Medium" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#FFF7ED", color: "#F97316" },
-                      ]}
-                    >
-                      Medium
-                    </Text>
-                  )}
-                  {report.priority === "Low" && (
-                    <Text
-                      style={[
-                        styles.badge,
-                        { backgroundColor: "#E5E7EB", color: "#4B5563" },
-                      ]}
-                    >
-                      Low
-                    </Text>
-                  )}
-                  <TouchableOpacity
-                    onPress={() => handleOpenReport(report)}
-                    style={styles.eyeButton}
-                  >
-                    <Eye
-                      size={20}
-                      color="#6B7280"
-                      style={styles.reportEyeIcon}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
+              ))
+            )}
           </View>
         </View>
       </ScrollView>

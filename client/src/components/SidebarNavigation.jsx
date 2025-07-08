@@ -79,7 +79,7 @@ const SidebarNavigation = () => {
     const baseItems = [
       {
         icon: (
-          <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
+          <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
         ),
         text: "Dashboard",
         route: "StudentDashboard",
@@ -87,7 +87,7 @@ const SidebarNavigation = () => {
       },
       {
         icon: (
-          <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
+          <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
         ),
         text: "Dashboard",
         route: "Maintenance Dashboard",
@@ -95,41 +95,41 @@ const SidebarNavigation = () => {
       },
       {
         icon: (
-          <LayoutDashboard size={20} color="#4B5563" style={styles.navIcon} />
+          <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
         ),
         text: "Dashboard",
         route: "Dashboard",
         showFor: ["staff", "admin"],
       },
       {
-        icon: <ListTodo size={20} color="#4B5563" style={styles.navIcon} />,
+        icon: <ListTodo size={20} color="#97D60E" style={styles.navIcon} />,
         text: "All Reports",
         route: "AllReports",
-        showFor: ["maintenance_staff", "staff", "admin"],
+        showFor: ["staff", "admin"],
       },
       {
-        icon: <ListChecks size={20} color="#4B5563" style={styles.navIcon} />,
+        icon: <ListChecks size={20} color="#97D60E" style={styles.navIcon} />,
         text: "Assigned Reports",
         route: "AssignedReports",
         showFor: ["maintenance_staff"],
       },
       {
-        icon: <BarChart size={20} color="#4B5563" style={styles.navIcon} />,
+        icon: <BarChart size={20} color="#97D60E" style={styles.navIcon} />,
         text: "Analytics",
         route: "Analytics",
         showFor: ["admin"],
       },
       {
-        icon: <UserCircle size={20} color="#4B5563" style={styles.navIcon} />,
+        icon: <UserCircle size={20} color="#97D60E" style={styles.navIcon} />,
         text: "Profile",
         route: "Profile",
-        showFor: ["student", "maintenance_staff", "staff", "admin"],
+        showFor: ["student", "maintenance_staff", "admin"],
       },
       {
-        icon: <HelpCircle size={20} color="#4B5563" style={styles.navIcon} />,
+        icon: <HelpCircle size={20} color="#97D60E" style={styles.navIcon} />,
         text: "Help",
         route: "Help",
-        showFor: ["student", "maintenance_staff", "staff", "admin"],
+        showFor: ["student", "maintenance_staff", "admin"],
       },
     ];
 
@@ -161,7 +161,7 @@ const SidebarNavigation = () => {
               onPress={() => !isActive && navigation.navigate(item.route)}
             >
               {React.cloneElement(item.icon, {
-                color: isActive ? "#2563EB" : "#4B5563",
+                color: isActive ? "#97D60E" : "#4B5563",
               })}
               <Text style={[styles.navText, isActive && styles.activeNavText]}>
                 {item.text}
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   logoCircle: {
     width: 40,
     height: 40,
-    backgroundColor: "#2563EB",
+    backgroundColor: "#228C22",
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   activeNavItem: {
-    backgroundColor: "#DBEAFE",
+    backgroundColor: "#97D60E33",
   },
   navIcon: {
     marginRight: 12,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   activeNavText: {
-    color: "#2563EB",
+    color: "#97D60E",
   },
 });
 

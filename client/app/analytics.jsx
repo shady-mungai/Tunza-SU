@@ -111,11 +111,11 @@ const Analytics = () => {
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity style={styles.actionButton}>
-              <Filter size={16} color="#2563EB" />
+              <Filter size={16} color="#97D60E" />
               <Text style={styles.actionText}>Filter</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton}>
-              <Download size={16} color="#2563EB" />
+              <Download size={16} color="#97D60E" />
               <Text style={styles.actionText}>Export</Text>
             </TouchableOpacity>
           </View>
@@ -126,7 +126,7 @@ const Analytics = () => {
           <View style={styles.metricCard}>
             <View style={styles.metricHeader}>
               <Text style={styles.metricLabel}>Total Reports</Text>
-              <BarChart size={20} color="#2563EB" />
+              <BarChart size={20} color="#97D60E" />
             </View>
             <Text style={styles.metricValue}>{analyticsData.totalReports}</Text>
             <View style={styles.metricTrend}>
@@ -140,7 +140,7 @@ const Analytics = () => {
           <View style={styles.metricCard}>
             <View style={styles.metricHeader}>
               <Text style={styles.metricLabel}>Resolved</Text>
-              <CheckCircle size={20} color="#10B981" />
+              <CheckCircle size={20} color="#97D60E" />
             </View>
             <Text style={styles.metricValue}>
               {analyticsData.resolvedReports}
@@ -224,7 +224,7 @@ const Analytics = () => {
                   <Text style={styles.issueName}>{issue.issue}</Text>
                   <Text style={styles.issueCount}>{issue.count} reports</Text>
                 </View>
-                {renderProgressBar(issue.percentage, "#2563EB")}
+                {renderProgressBar(issue.percentage, "#97D60E")}
               </View>
             ))}
           </View>
@@ -256,7 +256,7 @@ const Analytics = () => {
                         styles.bar,
                         {
                           height: (stat.resolved / 60) * 100,
-                          backgroundColor: "#2563EB",
+                          backgroundColor: "#97D60E",
                         },
                       ]}
                     />
@@ -274,7 +274,7 @@ const Analytics = () => {
               </View>
               <View style={styles.legendItem}>
                 <View
-                  style={[styles.legendColor, { backgroundColor: "#2563EB" }]}
+                  style={[styles.legendColor, { backgroundColor: "#97D60E" }]}
                 />
                 <Text style={styles.legendText}>Resolved</Text>
               </View>
@@ -287,21 +287,21 @@ const Analytics = () => {
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.actionsGrid}>
             <TouchableOpacity style={styles.actionCard}>
-              <Eye size={24} color="#2563EB" />
+              <Eye size={24} color="#97D60E" />
               <Text style={styles.actionCardTitle}>View Detailed Report</Text>
               <Text style={styles.actionCardSubtitle}>
                 Generate comprehensive analytics report
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionCard}>
-              <Download size={24} color="#2563EB" />
+              <Download size={24} color="#97D60E" />
               <Text style={styles.actionCardTitle}>Export Data</Text>
               <Text style={styles.actionCardSubtitle}>
                 Download analytics data as CSV
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionCard}>
-              <Calendar size={24} color="#2563EB" />
+              <Calendar size={24} color="#97D60E" />
               <Text style={styles.actionCardTitle}>Schedule Report</Text>
               <Text style={styles.actionCardSubtitle}>
                 Set up automated report delivery
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   logoCircle: {
     width: 40,
     height: 40,
-    backgroundColor: "#2563EB",
+    backgroundColor: "#97D60E",
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   activeNavText: {
-    color: "#2563EB",
+    color: "#97D60E",
   },
   mainContent: {
     flex: 1,
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 14,
     fontWeight: "500",
-    color: "#2563EB",
+    color: "#97D60E",
   },
   metricsGrid: {
     flexDirection: "row",

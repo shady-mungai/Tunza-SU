@@ -60,22 +60,22 @@ const Help = () => {
   const quickGuides = [
     {
       title: "Getting Started",
-      icon: <BookOpen size={24} color="#2563EB" />,
+      icon: <BookOpen size={24} color="#97D60E" />,
       description: "Learn the basics of using the maintenance dashboard",
     },
     {
       title: "Report Management",
-      icon: <ListTodo size={24} color="#2563EB" />,
+      icon: <ListTodo size={24} color="#97D60E" />,
       description: "How to create, edit, and track maintenance reports",
     },
     {
       title: "User Management",
-      icon: <Users size={24} color="#2563EB" />,
+      icon: <Users size={24} color="#97D60E" />,
       description: "Managing maintenance personnel and assignments",
     },
     {
       title: "Analytics & Reports",
-      icon: <BarChart size={24} color="#2563EB" />,
+      icon: <BarChart size={24} color="#97D60E" />,
       description: "Understanding performance metrics and generating reports",
     },
   ];
@@ -201,12 +201,12 @@ const Help = () => {
           <Text style={styles.sectionTitle}>Contact Support</Text>
           <View style={styles.contactGrid}>
             <TouchableOpacity style={styles.contactCard}>
-              <Mail size={24} color="#2563EB" />
+              <Mail size={24} color="#97D60E" />
               <Text style={styles.contactTitle}>Email Support</Text>
               <Text style={styles.contactInfo}>support@tunzasu.com</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.contactCard}>
-              <Phone size={24} color="#2563EB" />
+              <Phone size={24} color="#97D60E" />
               <Text style={styles.contactTitle}>Phone Support</Text>
               <Text style={styles.contactInfo}>+254 700 000 000</Text>
             </TouchableOpacity>
