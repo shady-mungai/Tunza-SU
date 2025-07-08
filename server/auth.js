@@ -432,7 +432,7 @@ app.delete("/report/:id", async (req, res) => {
 });
 
 // Update report status
-app.patch("/report/:id/status", async (req, res) => {
+app.put("/reports/:id", async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   if (!status) {
