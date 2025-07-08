@@ -487,15 +487,18 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
 
   // Add this function to delete a user by ID
   const deleteUser = async (id) => {
+    console.log("Attempting to delete user with id:", id);
     try {
       const res = await fetch(`http://localhost:4000/user/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
+      console.log("Delete response:", data);
       if (data.success) {
         setUsers((prev) => prev.filter((u) => u.id !== id));
       } else {
         Alert.alert("Error", data.message || "Failed to delete user");
+        console.error("Backend error:", data.message);
       }
     } catch (err) {
       Alert.alert("Error", "Failed to delete user");
@@ -556,35 +559,27 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   }, []);
 
   const handleUserAction = (user, action) => {
-    Alert.alert(
-      "Confirm Action",
-      `Are you sure you want to ${action} ${user.name}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Confirm",
-          style: action === "delete" ? "destructive" : "default",
-          onPress: () => {
-            if (action === "delete") {
-              setUsers(users.filter((u) => u.id !== user.id));
-            } else if (action === "suspend") {
-              setUsers(
-                users.map((u) =>
-                  u.id === user.id ? { ...u, status: "Suspended" } : u
-                )
-              );
-            } else if (action === "activate") {
-              setUsers(
-                users.map((u) =>
-                  u.id === user.id ? { ...u, status: "Active" } : u
-                )
-              );
-            }
-            setModalVisible(false);
-          },
-        },
-      ]
-    );
+    if (action === "delete") {
+      if (
+        window.confirm(
+          `Are you sure you want to delete ${user.name}? This action cannot be undone!`
+        )
+      ) {
+        console.log("Web confirm Delete pressed for user id:", user.id);
+        deleteUser(user.id);
+        setModalVisible(false);
+      }
+    } else if (action === "suspend") {
+      setUsers(
+        users.map((u) => (u.id === user.id ? { ...u, status: "Suspended" } : u))
+      );
+      setModalVisible(false);
+    } else if (action === "activate") {
+      setUsers(
+        users.map((u) => (u.id === user.id ? { ...u, status: "Active" } : u))
+      );
+      setModalVisible(false);
+    }
   };
 
   const getStatusStyle = (status) => {
@@ -1098,7 +1093,13 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
                   )}
                   <TouchableOpacity
                     style={[styles.button, styles.dangerButton]}
-                    onPress={() => handleUserAction(selectedUser, "delete")}
+                    onPress={() => {
+                      console.log(
+                        "Delete button pressed for user:",
+                        selectedUser
+                      );
+                      handleUserAction(selectedUser, "delete");
+                    }}
                   >
                     <Text style={styles.dangerButtonText}>Delete</Text>
                   </TouchableOpacity>
