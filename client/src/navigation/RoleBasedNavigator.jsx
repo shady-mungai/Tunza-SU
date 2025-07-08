@@ -160,13 +160,15 @@ const AdminNavigator = () => (
       tabBarLabelStyle: { fontSize: 12 },
     }}
   >
-  
     <Tab.Screen
-      name="Help"
+      name="Admin Dashboard"
       component={AdminDashboard}
-      options={{
-      }}
+
+     
     />
+  
+
+   
   </Tab.Navigator>
 );
 
@@ -182,8 +184,6 @@ const RoleBasedNavigator = () => {
         return <StudentNavigator />;
       case "maintenance_staff":
         return <MaintenanceNavigator />;
-      case "staff":
-        return <StaffNavigator />;
       case "admin":
         return <AdminNavigator />;
       default:

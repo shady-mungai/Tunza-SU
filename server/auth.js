@@ -4,8 +4,8 @@ import con from "./dbConnection.js";
 import bcrypt from "bcrypt";
 import axios from "axios";
 import speakeasy from "speakeasy";
-import multer from 'multer';
-import path from 'path';
+import multer from "multer";
+import path from "path";
 
 const app = express();
 const port = 4000;
@@ -21,16 +21,16 @@ let currentUser = {}; // empty object to store the current user, attempting to l
 // Set up multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
-  }
+  },
 });
 const upload = multer({ storage: storage });
 
 // Serve uploads directory statically
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 async function getCurrentUser(email, admission_number, res) {
   try {
@@ -104,7 +104,7 @@ app.post("/register", async (req, res) => {
     phone_number,
     role,
   ]);
-  
+
   // Insert user into DB
   try {
     const [records] = await con
@@ -124,7 +124,7 @@ app.post("/register", async (req, res) => {
     console.log("---------------------------------------");
     console.log(records);
     console.log("---------------------------------------");
-    
+
     if (records.affectedRows > 0) {
       // Fetch the newly created user to get complete data including ID
       const [newUserRecords] = await con
@@ -133,7 +133,7 @@ app.post("/register", async (req, res) => {
           email,
           admission_number,
         ]);
-      
+
       if (newUserRecords.length > 0) {
         const newUser = newUserRecords[0];
         return res.status(200).json({
@@ -194,16 +194,13 @@ app.post("/login", async (req, res) => {
       user: currentUser, // This is what your frontend expects
     });
   } else {
-    res
-      .status(400)
-      .json({
-        message:
-          "Email, admission number and password confirmation do not match",
-      });
+    res.status(400).json({
+      message: "Email, admission number and password confirmation do not match",
+    });
   }
 });
 
-app.post('/addReport', upload.single('image'), async (req, res) => {
+app.post("/addReport", upload.single("image"), async (req, res) => {
   const {
     user_id,
     title,
@@ -212,7 +209,7 @@ app.post('/addReport', upload.single('image'), async (req, res) => {
     category,
     priority,
     status = "in_progress",
-    assigned_to = 6,
+    assigned_to = 31,
     estimated_cost = null,
     actual_cost = null,
     estimated_completion_date = null,
@@ -222,11 +219,20 @@ app.post('/addReport', upload.single('image'), async (req, res) => {
 
   // The uploaded file info is in req.file
   const image_url = req.file ? req.file.path : null;
-  console.log('image_url being saved:', image_url);
+  console.log("image_url being saved:", image_url);
 
   // Validation: check required fields
-  if (!user_id || !title || !description || !location || !category || !priority) {
-    return res.status(400).json({ success: false, message: "Missing required fields" });
+  if (
+    !user_id ||
+    !title ||
+    !description ||
+    !location ||
+    !category ||
+    !priority
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
   }
 
   try {
@@ -252,7 +258,9 @@ app.post('/addReport', upload.single('image'), async (req, res) => {
       ]
     );
     if (result.affectedRows > 0) {
-      res.status(200).json({ success: true, message: "Report added successfully" });
+      res
+        .status(200)
+        .json({ success: true, message: "Report added successfully" });
     } else {
       res.status(400).json({ success: false, message: "Failed to add report" });
     }
@@ -262,22 +270,26 @@ app.post('/addReport', upload.single('image'), async (req, res) => {
   }
 });
 
-app.get('/userReports', async (req, res) => {
+app.get("/userReports", async (req, res) => {
   const { user_id } = req.query;
 
   if (!user_id) {
-    return res.status(400).json({ success: false, message: "user_id is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "user_id is required" });
   }
 
   try {
-    const [reports] = await con.promise().query(
-      `SELECT * FROM reports2 WHERE user_id = ? ORDER BY created_at DESC`,
-      [user_id]
-    );
-    
-    res.status(200).json({ 
-      success: true, 
-      reports: reports 
+    const [reports] = await con
+      .promise()
+      .query(
+        `SELECT * FROM reports2 WHERE user_id = ? ORDER BY created_at DESC`,
+        [user_id]
+      );
+
+    res.status(200).json({
+      success: true,
+      reports: reports,
     });
   } catch (err) {
     console.error("Error fetching user reports:", err);
@@ -285,11 +297,13 @@ app.get('/userReports', async (req, res) => {
   }
 });
 
-app.get('/assignedReports', async (req, res) => {
+app.get("/assignedReports", async (req, res) => {
   const { maintenance_id } = req.query;
 
   if (!maintenance_id) {
-    return res.status(400).json({ success: false, message: "maintenance_id is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "maintenance_id is required" });
   }
 
   try {
@@ -301,10 +315,10 @@ app.get('/assignedReports', async (req, res) => {
        ORDER BY r.created_at DESC`,
       [maintenance_id]
     );
-    
-    res.status(200).json({ 
-      success: true, 
-      reports: reports 
+
+    res.status(200).json({
+      success: true,
+      reports: reports,
     });
   } catch (err) {
     console.error("Error fetching assigned reports:", err);
@@ -313,44 +327,183 @@ app.get('/assignedReports', async (req, res) => {
 });
 
 // Google OAuth endpoint
-app.post('/auth/google', async (req, res) => {
-  const { email, name} = req.body;
-  console.log(`Email address is ${email}`)
-  console.log('-----------------------------------------');
-  console.log(`Name from google ${name}`)
-  
+app.post("/auth/google", async (req, res) => {
+  const { email, name } = req.body;
+  console.log(`Email address is ${email}`);
+  console.log("-----------------------------------------");
+  console.log(`Name from google ${name}`);
+
   if (!email) {
-    return res.status(400).json({ message: 'Email is required from Google user info.' });
+    return res
+      .status(400)
+      .json({ message: "Email is required from Google user info." });
   }
   try {
     // Check if user exists
     const [records] = await con
       .promise()
-      .query('SELECT * FROM users2 WHERE email = ?', [email]);
+      .query("SELECT * FROM users2 WHERE email = ?", [email]);
     let user;
     if (records.length > 0) {
       user = records[0];
     } else {
       // Create a new user with Google info
-      const admission_number = 'GGL-' + Math.floor(Math.random() * 1000000); // random fallback
-      const role = 'student';
+      const admission_number = "GGL-" + Math.floor(Math.random() * 1000000); // random fallback
+      const role = "student";
       const password = 123;
-      const phone_number = '0712345678';
+      const phone_number = "0712345678";
       const totp_secret = null;
-      const [result] = await con.promise().query(
-        'INSERT INTO users2 (name, email, admission_number, password, totp_secret, phone_number, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [name, email, admission_number, password, totp_secret, phone_number, role]
-      );
+      const [result] = await con
+        .promise()
+        .query(
+          "INSERT INTO users2 (name, email, admission_number, password, totp_secret, phone_number, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [
+            name,
+            email,
+            admission_number,
+            password,
+            totp_secret,
+            phone_number,
+            role,
+          ]
+        );
       // Fetch the newly created user
       const [newUserRecords] = await con
         .promise()
-        .query('SELECT * FROM users2 WHERE email = ?', [email]);
+        .query("SELECT * FROM users2 WHERE email = ?", [email]);
       user = newUserRecords[0];
     }
     return res.status(200).json(user);
   } catch (err) {
-    console.error('Google auth error:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error("Google auth error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Get all users
+app.get("/allUsers", async (req, res) => {
+  try {
+    const [users] = await con.promise().query("SELECT * FROM users2");
+    res.status(200).json({ success: true, users });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Delete a user by ID
+app.delete("/user/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [result] = await con
+      .promise()
+      .query("DELETE FROM users2 WHERE id = ?", [id]);
+    if (result.affectedRows > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "User deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Delete a report by ID
+app.delete("/report/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [result] = await con
+      .promise()
+      .query("DELETE FROM reports2 WHERE id = ?", [id]);
+    if (result.affectedRows > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "Report deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Report not found" });
+    }
+  } catch (err) {
+    console.error("Error deleting report:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Update report status
+app.patch("/report/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Status is required" });
+  }
+  try {
+    const [result] = await con
+      .promise()
+      .query(
+        "UPDATE reports2 SET status = ?, updated_at = NOW() WHERE id = ?",
+        [status, id]
+      );
+    if (result.affectedRows > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "Status updated successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Report not found" });
+    }
+  } catch (err) {
+    console.error("Error updating report status:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Get report statistics for dashboard
+app.get("/reportStats", async (req, res) => {
+  try {
+    // Count active reports (status = 'in_progress' or 'active')
+    const [active] = await con
+      .promise()
+      .query(
+        "SELECT COUNT(*) as count FROM reports2 WHERE status IN ('in_progress', 'active', 'Pending Review')"
+      );
+    // Count resolved reports (status = 'resolved' or 'completed')
+    const [resolved] = await con
+      .promise()
+      .query(
+        "SELECT COUNT(*) as count FROM reports2 WHERE status IN ('resolved', 'completed', 'Resolved')"
+      );
+    // Count pending reports (status = 'pending', 'Pending', or 'Pending Review')
+    const [pending] = await con
+      .promise()
+      .query(
+        "SELECT COUNT(*) as count FROM reports2 WHERE status IN ('pending', 'Pending', 'Pending Review')"
+      );
+    res.status(200).json({
+      activeReports: active[0].count,
+      resolvedReports: resolved[0].count,
+      pendingReports: pending[0].count,
+    });
+  } catch (err) {
+    console.error("Error fetching report stats:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Get all active reports for admin panel
+app.get("/activeReports", async (req, res) => {
+  try {
+    const [reports] = await con
+      .promise()
+      .query(
+        `SELECT r.*, u.name as submittedBy FROM reports2 r LEFT JOIN users2 u ON r.user_id = u.id WHERE r.status IN ('in_progress', 'active', 'Pending Review') ORDER BY r.created_at DESC`
+      );
+    res.status(200).json({ success: true, reports });
+  } catch (err) {
+    console.error("Error fetching active reports:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 

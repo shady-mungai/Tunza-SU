@@ -11,15 +11,26 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContexts";
 import { useNavigation } from "@react-navigation/native";
 import SidebarNavigation from "./SidebarNavigation";
+import { useIsFocused } from "@react-navigation/native";
 
 const statusBadge = (status) => {
-  if (status === "In Progress")
+  if (!status) return null;
+  const normalized = status.toLowerCase();
+  if (
+    normalized === "in progress" ||
+    normalized === "in_progress" ||
+    normalized === "active"
+  )
     return <Text style={styles.statusInProgress}>In Progress</Text>;
-  if (status === "Pending Review")
+  if (
+    normalized === "pending review" ||
+    normalized === "pending" ||
+    normalized === "pending_review"
+  )
     return <Text style={styles.statusPending}>Pending Review</Text>;
-  if (status === "Resolved")
+  if (normalized === "resolved" || normalized === "completed")
     return <Text style={styles.statusResolved}>Resolved</Text>;
-  return null;
+  return <Text style={styles.statusInProgress}>{status}</Text>; // fallback to show unknown status
 };
 
 const priorityBadge = (priority) => {
@@ -38,6 +49,7 @@ const MyReports = () => {
     Dimensions.get("window").width >= 768
   );
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const onChange = ({ window }) => setIsLargeScreen(window.width >= 768);
@@ -60,8 +72,8 @@ const MyReports = () => {
         setLoading(false);
       }
     };
-    if (user?.id) fetchReports();
-  }, [user]);
+    if (user?.id && isFocused) fetchReports();
+  }, [user, isFocused]);
 
   return (
     <View style={styles.container}>

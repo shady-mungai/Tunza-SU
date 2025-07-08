@@ -11,6 +11,7 @@ import {
   Modal,
   Alert,
   RefreshControl,
+  Picker,
 } from "react-native";
 import {
   useNavigation,
@@ -58,6 +59,7 @@ import {
   Zap,
 } from "lucide-react-native";
 import { useAuth } from "../src/contexts/AuthContexts";
+import { useCallback } from "react";
 
 const { width, height } = Dimensions.get("window");
 
@@ -70,15 +72,17 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
 
   // Mock data for admin dashboard
   const [dashboardStats, setDashboardStats] = useState({
-    totalUsers: 1247,
-    activeReports: 89,
-    resolvedReports: 156,
-    pendingReports: 23,
-    totalRevenue: 45000,
-    monthlyGrowth: 12.5,
+    totalUsers: 0,
+    activeReports: 0,
+    resolvedReports: 0,
+    pendingReports: 0,
+    totalRevenue: 0,
+    monthlyGrowth: 0,
   });
 
   const [users, setUsers] = useState([
@@ -361,27 +365,22 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
       alignSelf: "flex-start",
     },
     statusActive: {
-      backgroundColor: currentColors.success + "20",
+      backgroundColor: currentColors.success + "80",
     },
     statusInactive: {
-      backgroundColor: currentColors.error + "20",
+      backgroundColor: currentColors.error + "80",
     },
     statusSuspended: {
-      backgroundColor: currentColors.warning + "20",
+      backgroundColor: currentColors.warning + "80",
     },
     statusText: {
       fontSize: 12,
       fontWeight: "500",
+      color: "#fff",
     },
-    statusActiveText: {
-      color: currentColors.success,
-    },
-    statusInactiveText: {
-      color: currentColors.error,
-    },
-    statusSuspendedText: {
-      color: currentColors.warning,
-    },
+    statusActiveText: {},
+    statusInactiveText: {},
+    statusSuspendedText: {},
     searchContainer: {
       flexDirection: "row",
       alignItems: "center",
@@ -493,6 +492,70 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     },
   });
 
+  // Fetch dashboard stats from backend
+  const fetchDashboardStats = useCallback(async () => {
+    try {
+      const usersRes = await fetch("http://localhost:4000/allUsers");
+      const usersData = await usersRes.json();
+      const userCount = usersData.success ? usersData.users.length : 0;
+
+      const statsRes = await fetch("http://localhost:4000/reportStats");
+      const statsData = await statsRes.json();
+
+      setDashboardStats((prev) => ({
+        ...prev,
+        totalUsers: userCount,
+        activeReports: statsData.activeReports || 0,
+        resolvedReports: statsData.resolvedReports || 0,
+        pendingReports: statsData.pendingReports || 0,
+      }));
+    } catch (err) {
+      console.error("Error fetching dashboard stats:", err);
+    }
+  }, []);
+
+  // Add this function to fetch active reports from the backend
+  const fetchActiveReports = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/activeReports");
+      const data = await res.json();
+      if (data.success) {
+        setReports(data.reports);
+      }
+    } catch (err) {
+      console.error("Error fetching active reports:", err);
+    }
+  };
+
+  // Add this function to delete a user by ID
+  const deleteUser = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:4000/user/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUsers((prev) => prev.filter((u) => u.id !== id));
+      } else {
+        Alert.alert("Error", data.message || "Failed to delete user");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Failed to delete user");
+      console.error("Error deleting user:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
+
+  // Update useEffect to fetch active reports when reports tab is selected
+  useEffect(() => {
+    if (selectedTab === "reports") {
+      fetchActiveReports();
+    }
+  }, [selectedTab]);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     // Simulate API call
@@ -546,11 +609,86 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     }
   };
 
+  // Handler to update report status
+  const handleUpdateReportStatus = async (status) => {
+    if (selectedReport) {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/report/${selectedReport.id}/status`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setReports((prevReports) =>
+            prevReports.map((r) =>
+              r.id === selectedReport.id ? { ...r, status } : r
+            )
+          );
+          setSelectedReport((prev) => ({ ...prev, status }));
+        } else {
+          Alert.alert("Error", data.message || "Failed to update status");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to update status");
+        console.error("Error updating report status:", err);
+      }
+    }
+  };
+
+  // Handler to assign report
+  const handleAssignReport = (assignedTo) => {
+    if (selectedReport) {
+      setReports((prevReports) =>
+        prevReports.map((r) =>
+          r.id === selectedReport.id ? { ...r, assignedTo } : r
+        )
+      );
+      setSelectedReport((prev) => ({ ...prev, assignedTo }));
+    }
+  };
+
+  // Handler to delete report
+  const handleDeleteReport = async () => {
+    if (selectedReport) {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/report/${selectedReport.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setReports((prevReports) =>
+            prevReports.filter((r) => r.id !== selectedReport.id)
+          );
+          setReportModalVisible(false);
+          setSelectedReport(null);
+        } else {
+          Alert.alert("Error", data.message || "Failed to delete report");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to delete report");
+        console.error("Error deleting report:", err);
+      }
+    }
+  };
+
   const renderDashboard = () => (
     <ScrollView
       showsVerticalScrollIndicator={false}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => {
+            fetchDashboardStats();
+            setRefreshing(false);
+          }}
+        />
       }
     >
       <View style={styles.statsGrid}>
@@ -602,7 +740,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Users</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedTab("users")}>
             <Text style={styles.viewAllButton}>View All</Text>
           </TouchableOpacity>
         </View>
@@ -633,7 +771,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Reports</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedTab("reports")}>
             <Text style={styles.viewAllButton}>View All</Text>
           </TouchableOpacity>
         </View>
@@ -723,7 +861,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
         <Search size={20} color={currentColors.textSecondary} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search reports..."
+          placeholder="Search by title, location, or reporter..."
           placeholderTextColor={currentColors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -737,10 +875,18 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
         .filter(
           (report) =>
             report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            report.location.toLowerCase().includes(searchQuery.toLowerCase())
+            report.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            report.submittedBy.toLowerCase().includes(searchQuery.toLowerCase())
         )
         .map((report) => (
-          <View key={report.id} style={styles.card}>
+          <TouchableOpacity
+            key={report.id}
+            style={styles.card}
+            onPress={() => {
+              setSelectedReport(report);
+              setReportModalVisible(true);
+            }}
+          >
             <View style={styles.userCard}>
               <View style={styles.userInfo}>
                 <Text style={styles.userName}>{report.title}</Text>
@@ -756,54 +902,13 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
                 <Text style={styles.statusText}>{report.status}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
     </ScrollView>
   );
 
   const renderSettings = () => (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Appearance</Text>
-        <View style={styles.card}>
-          <View style={styles.userCard}>
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>Dark Mode</Text>
-              <Text style={styles.userEmail}>
-                Switch between light and dark themes
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => setIsDarkMode(!isDarkMode)}
-              style={styles.actionButton}
-            >
-              {isDarkMode ? (
-                <Moon size={20} color={currentColors.text} />
-              ) : (
-                <Sun size={20} color={currentColors.text} />
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
-        <View style={styles.card}>
-          <View style={styles.userCard}>
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>Push Notifications</Text>
-              <Text style={styles.userEmail}>
-                Receive notifications for new reports
-              </Text>
-            </View>
-            <TouchableOpacity style={styles.actionButton}>
-              <BellRing size={20} color={currentColors.text} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
         <View style={styles.card}>
@@ -1000,6 +1105,146 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
                     onPress={() => handleUserAction(selectedUser, "delete")}
                   >
                     <Text style={styles.dangerButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={reportModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setReportModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Report Details</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setReportModalVisible(false)}
+              >
+                <X size={24} color={currentColors.text} />
+              </TouchableOpacity>
+            </View>
+            {selectedReport && (
+              <>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Title</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.title}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Location</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.location}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Category</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.category}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Priority</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.priority}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Submitted By</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.submittedBy}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Status</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {[
+                      "Pending Review",
+                      "In Progress",
+                      "Resolved",
+                      "Overdue",
+                    ].map((status) => (
+                      <TouchableOpacity
+                        key={status}
+                        style={{
+                          marginRight: 8,
+                          padding: 6,
+                          borderRadius: 8,
+                          backgroundColor:
+                            selectedReport.status === status
+                              ? currentColors.primary
+                              : currentColors.surface,
+                        }}
+                        onPress={() => handleUpdateReportStatus(status)}
+                      >
+                        <Text
+                          style={{
+                            color:
+                              selectedReport.status === status
+                                ? "#fff"
+                                : currentColors.text,
+                          }}
+                        >
+                          {status}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Assigned To</Text>
+                  <View
+                    style={{
+                      borderWidth: 1,
+                      borderColor: currentColors.border,
+                      borderRadius: 8,
+                      minWidth: 100,
+                      backgroundColor: currentColors.surface,
+                    }}
+                  >
+                    <Picker
+                      selectedValue={selectedReport.assignedTo}
+                      onValueChange={handleAssignReport}
+                      style={{
+                        color: currentColors.text,
+                        backgroundColor: currentColors.surface,
+                        fontSize: 16,
+                      }}
+                      itemStyle={{
+                        color: currentColors.text,
+                        fontSize: 16,
+                        backgroundColor: currentColors.surface,
+                      }}
+                    >
+                      <Picker.Item
+                        label="Omar Siddique"
+                        value="Omar Siddique"
+                      />
+                      <Picker.Item label="Peter Otieno" value="Peter Otieno" />
+                      <Picker.Item label="John Singh" value="John Singh" />
+                      <Picker.Item label="Paul Mwangi" value="Paul Mwangi" />
+                    </Picker>
+                  </View>
+                </View>
+                <View style={styles.buttonGroup}>
+                  <TouchableOpacity
+                    style={[styles.button, styles.dangerButton]}
+                    onPress={handleDeleteReport}
+                  >
+                    <Text style={styles.dangerButtonText}>Delete Report</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, styles.secondaryButton]}
+                    onPress={() => setReportModalVisible(false)}
+                  >
+                    <Text style={styles.secondaryButtonText}>Close</Text>
                   </TouchableOpacity>
                 </View>
               </>
