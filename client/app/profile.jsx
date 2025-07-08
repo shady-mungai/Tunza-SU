@@ -76,7 +76,7 @@ const Profile = () => {
   const profileSections = [
     {
       title: "Personal Information",
-      icon: <User size={20} color="#2563EB" />,
+      icon: <User size={20} color="#228C22" />,
       items: [
         {
           label: "Full Name",
@@ -114,7 +114,7 @@ const Profile = () => {
     },
     {
       title: "Account Settings",
-      icon: <Settings size={20} color="#2563EB" />,
+      icon: <Settings size={20} color="#228C22" />,
       items: [
         {
           label: "Change Password",
@@ -137,7 +137,7 @@ const Profile = () => {
     },
     {
       title: "Security & Privacy",
-      icon: <Shield size={20} color="#2563EB" />,
+      icon: <Shield size={20} color="#228C22" />,
       items: [
         {
           label: "Login History",
@@ -178,7 +178,7 @@ const Profile = () => {
                 <User size={40} color="#FFFFFF" />
               </View>
               <TouchableOpacity style={styles.cameraButton}>
-                <Camera size={16} color="#2563EB" />
+                <Camera size={16} color="#228C22" />
               </TouchableOpacity>
             </View>
             <View style={styles.profileInfo}>
@@ -191,7 +191,7 @@ const Profile = () => {
               </Text>
             </View>
             <TouchableOpacity style={styles.editButton}>
-              <Edit size={16} color="#2563EB" />
+              <Edit size={16} color="#228C22" />
             </TouchableOpacity>
           </View>
         </View>
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#2563EB",
+    backgroundColor: "#228C22",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   },
   itemLabel: {
     fontSize: 14,
-    color: "#6B7280",
+    color: "#228C22",
     marginBottom: 2,
   },
   itemValue: {
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   actionButton: {
-    backgroundColor: "#2563EB",
+    backgroundColor: "#228C22",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,

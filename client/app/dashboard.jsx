@@ -247,9 +247,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{totalReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#DBEAFE" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#228C22" }]}
             >
-              <AlertTriangle size={20} color="#2563EB" />
+              <AlertTriangle size={20} color="#228C22" />
             </View>
           </View>
 
@@ -273,9 +273,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <Text style={styles.cardValue}>{pendingReports}</Text>
             </View>
             <View
-              style={[styles.cardIconCircle, { backgroundColor: "#FEF3C7" }]}
+              style={[styles.cardIconCircle, { backgroundColor: "#228C22" }]}
             >
-              <Clock size={20} color="#D97706" />
+              <Clock size={20} color="#228C22" />
             </View>
           </View>
 
@@ -326,13 +326,13 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
             <Text style={styles.sectionTitle}>Quick Actions</Text>
             <View style={styles.quickActionsGrid}>
               <TouchableOpacity style={styles.quickActionButton}>
-                <Eye size={24} color="#2563EB" style={styles.quickActionIcon} />
+                <Eye size={24} color="#97D60E" style={styles.quickActionIcon} />
                 <Text style={styles.quickActionText}>View New Reports</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.quickActionButton}>
                 <ListChecks
                   size={24}
-                  color="#2563EB"
+                  color="#97D60E"
                   style={styles.quickActionIcon}
                 />
                 <Text style={styles.quickActionText}>Manage Assignments</Text>
@@ -340,7 +340,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <TouchableOpacity style={styles.quickActionButton}>
                 <BarChart
                   size={24}
-                  color="#2563EB"
+                  color="#97D60E"
                   style={styles.quickActionIcon}
                 />
                 <Text style={styles.quickActionText}>Generate Reports</Text>
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   logoCircle: {
     width: 40, // Equivalent to w-10
     height: 40, // Equivalent to h-10
-    backgroundColor: "#2563EB", // Equivalent to bg-blue-600
+    backgroundColor: "#228C22", // Equivalent to bg-blue-600
     borderRadius: 20, // Equivalent to rounded-full
     alignItems: "center",
     justifyContent: "center",
@@ -903,7 +903,7 @@ const styles = StyleSheet.create({
   cardValue: {
     fontSize: 24, // Reduced from 30
     fontWeight: "bold",
-    color: "#1F2937", // Equivalent to text-gray-800
+    color: "#228C22", // Equivalent to text-gray-800
   },
   cardIconCircle: {
     width: 40, // Reduced from 48

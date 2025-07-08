@@ -57,11 +57,13 @@ import {
   Award,
   Zap,
 } from "lucide-react-native";
+import { useAuth } from "../src/contexts/AuthContexts";
 
 const { width, height } = Dimensions.get("window");
 
 const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const navigation = useNavigation();
+  const { logout } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedTab, setSelectedTab] = useState("dashboard");
   const [modalVisible, setModalVisible] = useState(false);
@@ -815,7 +817,10 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
         </View>
 
         <View style={styles.card}>
-          <TouchableOpacity style={styles.userCard}>
+          <TouchableOpacity style={styles.userCard} onPress={async () => {
+            await logout();
+            navigation.navigate("Login");
+          }}>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>Logout</Text>
               <Text style={styles.userEmail}>Sign out of your account</Text>
