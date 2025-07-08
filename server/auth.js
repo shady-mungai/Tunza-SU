@@ -391,6 +391,75 @@ app.get("/allUsers", async (req, res) => {
   }
 });
 
+// Delete a user by ID
+app.delete("/user/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [result] = await con
+      .promise()
+      .query("DELETE FROM users2 WHERE id = ?", [id]);
+    if (result.affectedRows > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "User deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Delete a report by ID
+app.delete("/report/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [result] = await con
+      .promise()
+      .query("DELETE FROM reports2 WHERE id = ?", [id]);
+    if (result.affectedRows > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "Report deleted successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Report not found" });
+    }
+  } catch (err) {
+    console.error("Error deleting report:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Update report status
+app.patch("/report/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Status is required" });
+  }
+  try {
+    const [result] = await con
+      .promise()
+      .query(
+        "UPDATE reports2 SET status = ?, updated_at = NOW() WHERE id = ?",
+        [status, id]
+      );
+    if (result.affectedRows > 0) {
+      res
+        .status(200)
+        .json({ success: true, message: "Status updated successfully" });
+    } else {
+      res.status(404).json({ success: false, message: "Report not found" });
+    }
+  } catch (err) {
+    console.error("Error updating report status:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // Get report statistics for dashboard
 app.get("/reportStats", async (req, res) => {
   try {

@@ -365,27 +365,22 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
       alignSelf: "flex-start",
     },
     statusActive: {
-      backgroundColor: currentColors.success + "20",
+      backgroundColor: currentColors.success + "80",
     },
     statusInactive: {
-      backgroundColor: currentColors.error + "20",
+      backgroundColor: currentColors.error + "80",
     },
     statusSuspended: {
-      backgroundColor: currentColors.warning + "20",
+      backgroundColor: currentColors.warning + "80",
     },
     statusText: {
       fontSize: 12,
       fontWeight: "500",
+      color: "#fff",
     },
-    statusActiveText: {
-      color: currentColors.success,
-    },
-    statusInactiveText: {
-      color: currentColors.error,
-    },
-    statusSuspendedText: {
-      color: currentColors.warning,
-    },
+    statusActiveText: {},
+    statusInactiveText: {},
+    statusSuspendedText: {},
     searchContainer: {
       flexDirection: "row",
       alignItems: "center",
@@ -532,6 +527,24 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     }
   };
 
+  // Add this function to delete a user by ID
+  const deleteUser = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:4000/user/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUsers((prev) => prev.filter((u) => u.id !== id));
+      } else {
+        Alert.alert("Error", data.message || "Failed to delete user");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Failed to delete user");
+      console.error("Error deleting user:", err);
+    }
+  };
+
   useEffect(() => {
     fetchDashboardStats();
   }, [fetchDashboardStats]);
@@ -597,14 +610,32 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   };
 
   // Handler to update report status
-  const handleUpdateReportStatus = (status) => {
+  const handleUpdateReportStatus = async (status) => {
     if (selectedReport) {
-      setReports((prevReports) =>
-        prevReports.map((r) =>
-          r.id === selectedReport.id ? { ...r, status } : r
-        )
-      );
-      setSelectedReport((prev) => ({ ...prev, status }));
+      try {
+        const res = await fetch(
+          `http://localhost:4000/report/${selectedReport.id}/status`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setReports((prevReports) =>
+            prevReports.map((r) =>
+              r.id === selectedReport.id ? { ...r, status } : r
+            )
+          );
+          setSelectedReport((prev) => ({ ...prev, status }));
+        } else {
+          Alert.alert("Error", data.message || "Failed to update status");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to update status");
+        console.error("Error updating report status:", err);
+      }
     }
   };
 
@@ -621,13 +652,29 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   };
 
   // Handler to delete report
-  const handleDeleteReport = () => {
+  const handleDeleteReport = async () => {
     if (selectedReport) {
-      setReports((prevReports) =>
-        prevReports.filter((r) => r.id !== selectedReport.id)
-      );
-      setReportModalVisible(false);
-      setSelectedReport(null);
+      try {
+        const res = await fetch(
+          `http://localhost:4000/report/${selectedReport.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setReports((prevReports) =>
+            prevReports.filter((r) => r.id !== selectedReport.id)
+          );
+          setReportModalVisible(false);
+          setSelectedReport(null);
+        } else {
+          Alert.alert("Error", data.message || "Failed to delete report");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to delete report");
+        console.error("Error deleting report:", err);
+      }
     }
   };
 
