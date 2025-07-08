@@ -325,7 +325,7 @@ const Signup = () => {
             height: 4,
             marginHorizontal: 2,
             borderRadius: 2,
-            backgroundColor: index <= currentStep ? "#97D60E" : "#d1d5db",
+            backgroundColor: index <= currentStep ? "#228C22" : "#d1d5db",
             width: (width - 64) / steps.length - 8,
           }}
         />
@@ -914,7 +914,7 @@ const Signup = () => {
               style={{
                 fontSize: 36,
                 fontWeight: "bold",
-                color: "#97D60E",
+                color: "#228C22",
                 marginBottom: 8,
               }}
             >
@@ -1001,7 +1001,7 @@ const Signup = () => {
                 activeOpacity={0.7}
               >
                 <Text
-                  style={{ color: "#97D60E", fontWeight: "500", fontSize: 14 }}
+                  style={{ color: "#228C22", fontWeight: "500", fontSize: 14 }}
                 >
                   Sign in instead
                 </Text>
@@ -1013,7 +1013,7 @@ const Signup = () => {
                 paddingHorizontal: 40,
                 paddingVertical: 16,
                 borderRadius: 8,
-                backgroundColor: isLoading ? "#9ca3af" : "#97D60E",
+                backgroundColor: isLoading ? "#9ca3af" : "#228C22",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,

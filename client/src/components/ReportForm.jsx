@@ -119,7 +119,7 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
       <View className="flex-1 bg-black/30 justify-center items-center">
         <View className="bg-white rounded-2xl p-6 w-11/12 max-h-[90%] shadow-xl border border-gray-200">
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text className="text-2xl font-bold mb-4 text-blue-700 text-center">Submit a New Report</Text>
+            <Text className="text-2xl font-bold mb-4 text-[#228C22] text-center">Submit a New Report</Text>
             {error ? <Text className="text-red-500 mb-2 text-center">{error}</Text> : null}
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3 mb-3 text-base bg-gray-50"
@@ -145,7 +145,7 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
               {categories.map((cat) => (
                 <TouchableOpacity
                   key={cat}
-                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${category === cat ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}
+                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${category === cat ? 'bg-[#228C22] border-[#228C22]' : 'bg-white border-gray-300'}`}
                   onPress={() => setCategory(cat)}
                 >
                   <Text className={`${category === cat ? 'text-white font-bold' : 'text-gray-700'}`}>{cat}</Text>
@@ -157,7 +157,7 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
               {priorities.map((pri) => (
                 <TouchableOpacity
                   key={pri}
-                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${priority === pri ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}
+                  className={`px-4 py-2 rounded-full border mr-2 mb-2 ${priority === pri ? 'bg-[#228C22] border-[#228C22]' : 'bg-white border-gray-300'}`}
                   onPress={() => setPriority(pri)}
                 >
                   <Text className={`${priority === pri ? 'text-white font-bold' : 'text-gray-700'}`}>{pri}</Text>
@@ -166,16 +166,16 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
             </View>
             <View className="flex-row justify-between mb-3 space-x-2">
               <TouchableOpacity
-                className="flex-1 bg-blue-50 border border-blue-200 rounded-lg py-3 items-center mr-2"
+                className="flex-1 bg-[#228C221A] border border-[#228C22] rounded-lg py-3 items-center mr-2"
                 onPress={handlePickImage}
               >
-                <Text className="text-blue-700 font-semibold">Pick Image</Text>
+                <Text className="text-[#228C22] font-semibold">Pick Image</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-1 bg-blue-50 border border-blue-200 rounded-lg py-3 items-center"
+                className="flex-1 bg-[#228C221A] border border-[#228C22] rounded-lg py-3 items-center"
                 onPress={handleTakePhoto}
               >
-                <Text className="text-blue-700 font-semibold">Take Photo</Text>
+                <Text className="text-[#228C22] font-semibold">Take Photo</Text>
               </TouchableOpacity>
             </View>
             {imageUri ? (
@@ -194,7 +194,7 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
                 <Text className="text-gray-700 font-semibold">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className={`flex-1 rounded-lg py-3 items-center ${loading ? 'bg-blue-300' : 'bg-blue-600'}`}
+                className={`flex-1 rounded-lg py-3 items-center ${loading ? 'bg-[#228C2255]' : 'bg-[#228C22]'}`}
                 onPress={handleSubmit}
                 disabled={loading}
               >

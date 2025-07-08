@@ -86,6 +86,12 @@ const SidebarNavigation = () => {
         showFor: ["student"],
       },
       {
+        icon: <ListChecks size={20} color="#97D60E" style={styles.navIcon} />,
+        text: "My Reports",
+        route: "MyReports",
+        showFor: ["student"],
+      },
+      {
         icon: (
           <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
         ),

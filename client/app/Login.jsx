@@ -44,7 +44,7 @@ const Login = () => {
             <Text style={{ 
               fontSize: 36, 
               fontWeight: 'bold', 
-              color: '#2563eb', 
+              color: '#228C22', 
               marginBottom: 8 
             }}>
               TunzaSU
@@ -59,7 +59,7 @@ const Login = () => {
           </View>
 
           {/* Continue with Google Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={loginWithGoogle}
             style={{
               flexDirection: 'row',
@@ -82,7 +82,7 @@ const Login = () => {
             <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>
               Continue with Google
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={{ 
             backgroundColor: 'white', 
@@ -178,7 +178,7 @@ const Login = () => {
                 paddingVertical: 12,
                 paddingHorizontal: 16,
                 borderRadius: 8,
-                backgroundColor: isLoading ? '#9ca3af' : '#2563eb',
+                backgroundColor: isLoading ? '#9ca3af' : '#228C22',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -205,7 +205,7 @@ const Login = () => {
                 <TouchableOpacity onPress={()=>navigation.navigate("Signup")} activeOpacity={0.7}>
                   <Text style={{ 
                     fontSize: 14, 
-                    color: '#2563eb', 
+                    color: '#228C22', 
                     fontWeight: '500' 
                   }}>
                     Create account
