@@ -187,26 +187,29 @@ export function AuthProvider({ children }) {
   // code to send an email to users
   const sendMail = (object) => {
 
-    const { location, priority, category } = object;
+    const { to_name, to_email, location, priority, category, status } = object;
+
+    console.log(object);
+    
 
     console.log("From the email function");
 
-    console.log(`${location} and ${priority}`);
+    console.log(`${to_email} and ${to_name}`);
 
     console.log("---------------------------");
     
     
     
   const serviceId = 'service_yo68z0r';
-  const templateId = 'template_zj2tfar';
+  const templateId = to_email ? 'template_bn7m1pt' : 'template_zj2tfar';
   const publicKey = 'waI8hdlB5hAlhE6tP';
 
   const templateParams = {
-    to_name: "Shadrack Njau",
-    to_email: "shadrackmungai10@gmail.com",
+    to_name: to_name ? to_name : "Shadrack Njau",
+    to_email: to_email ? to_email : "shadrackmungai10@gmail.com",
     location: location,
     priority: priority,
-    category: category
+    category: category,
   };
   emailjs
     .send(serviceId, templateId, templateParams,{
