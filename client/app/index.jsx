@@ -50,9 +50,6 @@ function MainTabs() {
         component={MyReports}
         options={{ tabBarIcon: () => <Text>⚠️</Text> }}
       />
-      {/* <Tab.Screen name="Map View" component={MapScreen} options={{ tabBarIcon: () => <Text>📍</Text> }} /> */}
-      {/* <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: () => <Text>👤</Text> }} /> */}
-      {/* <Tab.Screen name="Help" component={HelpScreen} options={{ tabBarIcon: () => <Text>❓</Text> }} /> */}
     </Tab.Navigator>
   );
 }
