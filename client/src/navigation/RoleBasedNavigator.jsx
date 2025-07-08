@@ -168,45 +168,13 @@ const AdminNavigator = () => (
     }}
   >
     <Tab.Screen
-      name="Dashboard"
-      component={Maintenance}
-      options={{ 
-        tabBarLabel: "Dashboard",
-        tabBarIcon: () => <Text>👑</Text>,
-      }}
+      name="Admin Dashboard"
+      component={AdminDashboard}
+
     />
-    <Tab.Screen
-      name="AllReports"
-      component={AllReports}
-      options={{
-        tabBarLabel: "All Reports",
-        tabBarIcon: () => <Text>📊</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Analytics"
-      component={Analytics}
-      options={{
-        tabBarLabel: "Analytics",
-        tabBarIcon: () => <Text>📈</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Profile"
-      component={Profile}
-      options={{
-        tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Help"
-      component={Help}
-      options={{
-        tabBarLabel: "Help",
-        tabBarIcon: () => <Text>❓</Text>,
-      }}
-    />
+  
+
+   
   </Tab.Navigator>
 );
 
@@ -222,8 +190,6 @@ const RoleBasedNavigator = () => {
         return <StudentNavigator />;
       case "maintenance_staff":
         return <MaintenanceNavigator />;
-      case "staff":
-        return <StaffNavigator />;
       case "admin":
         return <AdminNavigator />;
       default:

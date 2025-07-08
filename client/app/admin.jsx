@@ -721,7 +721,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
         <Search size={20} color={currentColors.textSecondary} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search reports..."
+          placeholder="Search by title, location, or reporter..."
           placeholderTextColor={currentColors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -735,7 +735,8 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
         .filter(
           (report) =>
             report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            report.location.toLowerCase().includes(searchQuery.toLowerCase())
+            report.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            report.submittedBy.toLowerCase().includes(searchQuery.toLowerCase())
         )
         .map((report) => (
           <View key={report.id} style={styles.card}>
