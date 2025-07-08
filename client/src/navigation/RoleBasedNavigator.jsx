@@ -171,6 +171,7 @@ const AdminNavigator = () => (
       name="Admin Dashboard"
       component={AdminDashboard}
 
+      
     />
   
 

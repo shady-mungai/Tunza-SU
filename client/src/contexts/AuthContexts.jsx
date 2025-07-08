@@ -203,7 +203,7 @@ export function AuthProvider({ children }) {
 
   const templateParams = {
     to_name: "Shadrack Njau",
-    to_email: "shadrackmungai10@gmail.com",
+    to_email: "omar.siddique@strathmore.edu",
     location: location,
     priority: priority,
     category: category
