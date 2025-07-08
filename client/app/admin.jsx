@@ -85,53 +85,8 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     monthlyGrowth: 0,
   });
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@university.edu",
-      role: "Student",
-      status: "Active",
-      lastActive: "2 hours ago",
-      reportsSubmitted: 3,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@university.edu",
-      role: "Faculty",
-      status: "Active",
-      lastActive: "1 day ago",
-      reportsSubmitted: 7,
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.johnson@university.edu",
-      role: "Student",
-      status: "Suspended",
-      lastActive: "1 week ago",
-      reportsSubmitted: 1,
-    },
-    {
-      id: 4,
-      name: "Sarah Wilson",
-      email: "sarah.wilson@university.edu",
-      role: "Staff",
-      status: "Active",
-      lastActive: "3 hours ago",
-      reportsSubmitted: 12,
-    },
-    {
-      id: 5,
-      name: "David Brown",
-      email: "david.brown@university.edu",
-      role: "Student",
-      status: "Inactive",
-      lastActive: "2 weeks ago",
-      reportsSubmitted: 0,
-    },
-  ]);
+  // Remove mock data for users
+  const [users, setUsers] = useState([]);
 
   const [reports, setReports] = useState([
     {
@@ -168,6 +123,9 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
       category: "Electrical",
     },
   ]);
+
+  // Add state for recent reports
+  const [recentReports, setRecentReports] = useState([]);
 
   // Dark mode colors
   const colors = {
@@ -545,8 +503,41 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     }
   };
 
+  // Add this function to fetch the latest 3 recent reports from the backend
+  const fetchRecentReports = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/activeReports");
+      const data = await res.json();
+      setRecentReports((data.reports || data).slice(0, 3));
+    } catch (err) {
+      console.error("Error fetching recent reports:", err);
+    }
+  };
+
+  // Fetch users from backend and set users state
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/allUsers");
+      const data = await res.json();
+      // If backend returns { success: true, users: [...] }
+      let userList = data.users || data;
+      // Sort by created_at descending if available
+      if (userList.length && userList[0].created_at) {
+        userList = userList.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+      }
+      setUsers(userList);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
+
+  // Fetch dashboard stats and recent reports from backend on mount
   useEffect(() => {
     fetchDashboardStats();
+    fetchRecentReports();
+    fetchUsers();
   }, [fetchDashboardStats]);
 
   // Update useEffect to fetch active reports when reports tab is selected
@@ -686,6 +677,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
           refreshing={refreshing}
           onRefresh={() => {
             fetchDashboardStats();
+            fetchRecentReports();
             setRefreshing(false);
           }}
         />
@@ -776,7 +768,8 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        {reports.slice(0, 3).map((report) => (
+        {/* Use recentReports instead of reports.slice(0, 3) */}
+        {recentReports.map((report) => (
           <View key={report.id} style={styles.card}>
             <View style={styles.userCard}>
               <View style={styles.userInfo}>
@@ -922,10 +915,13 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
         </View>
 
         <View style={styles.card}>
-          <TouchableOpacity style={styles.userCard} onPress={async () => {
-            await logout();
-            navigation.navigate("Login");
-          }}>
+          <TouchableOpacity
+            style={styles.userCard}
+            onPress={async () => {
+              await logout();
+              navigation.navigate("Login");
+            }}
+          >
             <View style={styles.userInfo}>
               <Text style={styles.userName}>Logout</Text>
               <Text style={styles.userEmail}>Sign out of your account</Text>
