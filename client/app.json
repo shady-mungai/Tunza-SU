@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme":"tunzaSUapp",
+    "scheme": "tunzaSUapp",
     "name": "client",
     "slug": "client",
     "version": "1.0.0",
@@ -14,14 +14,16 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.client"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.client"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -29,6 +31,12 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "717c9799-3bce-425d-9922-78877c7a844f"
+      }
+    }
   }
 }

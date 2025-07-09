@@ -7,13 +7,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import { useState } from 'react'
 import { useAuth } from '../src/contexts/AuthContexts'
 import { useNavigation } from '@react-navigation/native'
 
 const Login = () => {
-    const { login, user, loading } = useAuth();
+    const { login, user, loading, logout, loginWithGoogle } = useAuth();
     const navigation = useNavigation();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -39,12 +40,11 @@ const Login = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={{ maxWidth: 400, alignSelf: 'center', width: '100%' }}>
-          {/* Header */}
           <View style={{ alignItems: 'center', marginBottom: 32 }}>
             <Text style={{ 
               fontSize: 36, 
               fontWeight: 'bold', 
-              color: '#2563eb', 
+              color: '#228C22', 
               marginBottom: 8 
             }}>
               TunzaSU
@@ -58,7 +58,32 @@ const Login = () => {
             </Text>
           </View>
 
-          {/* Login Form */}
+          {/* Continue with Google Button */}
+          {/* <TouchableOpacity
+            onPress={loginWithGoogle}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'white',
+              borderWidth: 1,
+              borderColor: '#d1d5db',
+              borderRadius: 8,
+              paddingVertical: 12,
+              marginBottom: 20,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>
+              Continue with Google
+            </Text>
+          </TouchableOpacity> */}
+
           <View style={{ 
             backgroundColor: 'white', 
             borderRadius: 16, 
@@ -83,7 +108,6 @@ const Login = () => {
               </Text>
             </View>
 
-            {/* Email/Admission Number Field */}
             <View style={{ marginBottom: 16 }}>
               <Text style={{ 
                 fontSize: 14, 
@@ -146,7 +170,6 @@ const Login = () => {
               />
             </View>
 
-            {/* Sign In Button */}
             <TouchableOpacity
               onPress={handleLogin}
               disabled={isLoading}
@@ -155,7 +178,7 @@ const Login = () => {
                 paddingVertical: 12,
                 paddingHorizontal: 16,
                 borderRadius: 8,
-                backgroundColor: isLoading ? '#9ca3af' : '#2563eb',
+                backgroundColor: isLoading ? '#9ca3af' : '#228C22',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -174,7 +197,6 @@ const Login = () => {
               </Text>
             </TouchableOpacity>
 
-            {/* Footer */}
             <View style={{ alignItems: 'center', marginTop: 24 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={{ fontSize: 14, color: '#6b7280' }}>
@@ -183,7 +205,7 @@ const Login = () => {
                 <TouchableOpacity onPress={()=>navigation.navigate("Signup")} activeOpacity={0.7}>
                   <Text style={{ 
                     fontSize: 14, 
-                    color: '#2563eb', 
+                    color: '#228C22', 
                     fontWeight: '500' 
                   }}>
                     Create account

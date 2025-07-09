@@ -1,0 +1,1256 @@
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  Dimensions,
+  Modal,
+  Alert,
+  RefreshControl,
+  Picker,
+} from "react-native";
+import {
+  useNavigation,
+  useNavigationContainerRef,
+} from "@react-navigation/native";
+import {
+  Bell,
+  User,
+  LayoutDashboard,
+  ListTodo,
+  MapPin,
+  UserCircle,
+  HelpCircle,
+  AlertTriangle,
+  Clock,
+  Settings,
+  CheckCircle,
+  Plus,
+  Eye,
+  ListChecks,
+  Users,
+  BarChart,
+  X,
+  Shield,
+  Database,
+  Activity,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Filter,
+  Search,
+  Edit,
+  Trash2,
+  MoreVertical,
+  LogOut,
+  Moon,
+  Sun,
+  BellRing,
+  UserCheck,
+  UserX,
+  FileText,
+  PieChart,
+  Target,
+  Award,
+  Zap,
+} from "lucide-react-native";
+import { useAuth } from "../src/contexts/AuthContexts";
+import { useCallback } from "react";
+
+const { width, height } = Dimensions.get("window");
+
+const AdminDashboard = ({ navigation: propNavigation, route }) => {
+  const navigation = useNavigation();
+  const { logout } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [selectedTab, setSelectedTab] = useState("dashboard");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+
+  // Mock data for admin dashboard
+  const [dashboardStats, setDashboardStats] = useState({
+    totalUsers: 0,
+    activeReports: 0,
+    resolvedReports: 0,
+    pendingReports: 0,
+    totalRevenue: 0,
+    monthlyGrowth: 0,
+  });
+
+  // Remove mock data for users
+  const [users, setUsers] = useState([]);
+
+  const [reports, setReports] = useState([
+    {
+      id: 1,
+      title: "Broken Window in Library",
+      location: "Main Library, 2nd Floor",
+      date: "Jan 16, 2024",
+      status: "In Progress",
+      priority: "High",
+      assignedTo: "Engineer A",
+      submittedBy: "John Doe",
+      category: "Infrastructure",
+    },
+    {
+      id: 2,
+      title: "Leaking Faucet in Dormitory",
+      location: "Dormitory Block A, Room 205",
+      date: "Jan 14, 2024",
+      status: "Pending Review",
+      priority: "Medium",
+      assignedTo: "Unassigned",
+      submittedBy: "Jane Smith",
+      category: "Plumbing",
+    },
+    {
+      id: 3,
+      title: "Lights Flickering in Lecture Hall",
+      location: "Science Building, Lecture Hall 3",
+      date: "Jan 12, 2024",
+      status: "Resolved",
+      priority: "Low",
+      assignedTo: "Electrician B",
+      submittedBy: "Mike Johnson",
+      category: "Electrical",
+    },
+  ]);
+
+  // Add state for recent reports
+  const [recentReports, setRecentReports] = useState([]);
+
+  // Dark mode colors
+  const colors = {
+    dark: {
+      background: "#0f0f23",
+      surface: "#1a1a2e",
+      primary: "#6366f1",
+      secondary: "#8b5cf6",
+      text: "#ffffff",
+      textSecondary: "#a1a1aa",
+      border: "#2d2d3a",
+      success: "#10b981",
+      warning: "#f59e0b",
+      error: "#ef4444",
+      card: "#1e1e2e",
+    },
+    light: {
+      background: "#ffffff",
+      surface: "#f8fafc",
+      primary: "#6366f1",
+      secondary: "#8b5cf6",
+      text: "#1e293b",
+      textSecondary: "#64748b",
+      border: "#e2e8f0",
+      success: "#10b981",
+      warning: "#f59e0b",
+      error: "#ef4444",
+      card: "#ffffff",
+    },
+  };
+
+  const currentColors = colors[isDarkMode ? "dark" : "light"];
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: currentColors.background,
+    },
+    header: {
+      backgroundColor: currentColors.surface,
+      paddingHorizontal: 20,
+      paddingTop: 60,
+      paddingBottom: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: currentColors.border,
+    },
+    headerContent: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: currentColors.text,
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      color: currentColors.textSecondary,
+      marginTop: 4,
+    },
+    headerActions: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    tabContainer: {
+      flexDirection: "row",
+      backgroundColor: currentColors.surface,
+      marginHorizontal: 20,
+      marginTop: 20,
+      borderRadius: 12,
+      padding: 4,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    activeTab: {
+      backgroundColor: currentColors.primary,
+    },
+    tabText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: currentColors.textSecondary,
+    },
+    activeTabText: {
+      color: currentColors.text,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 20,
+      paddingTop: 20,
+    },
+    statsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      marginBottom: 24,
+    },
+    statCard: {
+      flex: 1,
+      minWidth: width * 0.4,
+      backgroundColor: currentColors.card,
+      borderRadius: 12,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: currentColors.border,
+    },
+    statHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8,
+    },
+    statTitle: {
+      fontSize: 12,
+      color: currentColors.textSecondary,
+      fontWeight: "500",
+    },
+    statValue: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: currentColors.text,
+      marginBottom: 4,
+    },
+    statChange: {
+      fontSize: 12,
+      fontWeight: "500",
+    },
+    positiveChange: {
+      color: currentColors.success,
+    },
+    negativeChange: {
+      color: currentColors.error,
+    },
+    section: {
+      marginBottom: 24,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 16,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: currentColors.text,
+    },
+    viewAllButton: {
+      color: currentColors.primary,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    card: {
+      backgroundColor: currentColors.card,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: currentColors.border,
+    },
+    userCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    userInfo: {
+      flex: 1,
+    },
+    userName: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: currentColors.text,
+      marginBottom: 4,
+    },
+    userEmail: {
+      fontSize: 14,
+      color: currentColors.textSecondary,
+      marginBottom: 2,
+    },
+    userRole: {
+      fontSize: 12,
+      color: currentColors.primary,
+      fontWeight: "500",
+    },
+    userStatus: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+      alignSelf: "flex-start",
+    },
+    statusActive: {
+      backgroundColor: currentColors.success + "80",
+    },
+    statusInactive: {
+      backgroundColor: currentColors.error + "80",
+    },
+    statusSuspended: {
+      backgroundColor: currentColors.warning + "80",
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: "500",
+      color: "#fff",
+    },
+    statusActiveText: {},
+    statusInactiveText: {},
+    statusSuspendedText: {},
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: currentColors.surface,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: currentColors.border,
+    },
+    searchInput: {
+      flex: 1,
+      marginLeft: 12,
+      fontSize: 16,
+      color: currentColors.text,
+    },
+    actionButton: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 8,
+      backgroundColor: currentColors.primary,
+      marginLeft: 8,
+    },
+    actionButtonText: {
+      color: currentColors.text,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContent: {
+      backgroundColor: currentColors.card,
+      borderRadius: 16,
+      padding: 24,
+      width: width * 0.9,
+      maxHeight: height * 0.8,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: currentColors.text,
+    },
+    closeButton: {
+      padding: 8,
+    },
+    userDetailRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: currentColors.border,
+    },
+    userDetailLabel: {
+      fontSize: 14,
+      color: currentColors.textSecondary,
+      fontWeight: "500",
+    },
+    userDetailValue: {
+      fontSize: 14,
+      color: currentColors.text,
+      fontWeight: "600",
+    },
+    buttonGroup: {
+      flexDirection: "row",
+      gap: 12,
+      marginTop: 20,
+    },
+    button: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    primaryButton: {
+      backgroundColor: currentColors.primary,
+    },
+    secondaryButton: {
+      backgroundColor: currentColors.surface,
+      borderWidth: 1,
+      borderColor: currentColors.border,
+    },
+    buttonText: {
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    primaryButtonText: {
+      color: currentColors.text,
+    },
+    secondaryButtonText: {
+      color: currentColors.text,
+    },
+    dangerButton: {
+      backgroundColor: currentColors.error,
+    },
+    dangerButtonText: {
+      color: currentColors.text,
+    },
+  });
+
+  // Fetch dashboard stats from backend
+  const fetchDashboardStats = useCallback(async () => {
+    try {
+      const usersRes = await fetch("http://localhost:4000/allUsers");
+      const usersData = await usersRes.json();
+      const userCount = usersData.success ? usersData.users.length : 0;
+
+      const statsRes = await fetch("http://localhost:4000/reportStats");
+      const statsData = await statsRes.json();
+
+      setDashboardStats((prev) => ({
+        ...prev,
+        totalUsers: userCount,
+        activeReports: statsData.activeReports || 0,
+        resolvedReports: statsData.resolvedReports || 0,
+        pendingReports: statsData.pendingReports || 0,
+      }));
+    } catch (err) {
+      console.error("Error fetching dashboard stats:", err);
+    }
+  }, []);
+
+  // Add this function to fetch active reports from the backend
+  const fetchActiveReports = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/activeReports");
+      const data = await res.json();
+      if (data.success) {
+        setReports(data.reports);
+      }
+    } catch (err) {
+      console.error("Error fetching active reports:", err);
+    }
+  };
+
+  // Add this function to delete a user by ID
+  const deleteUser = async (id) => {
+    console.log("Attempting to delete user with id:", id);
+    try {
+      const res = await fetch(`http://localhost:4000/user/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      console.log("Delete response:", data);
+      if (data.success) {
+        setUsers((prev) => prev.filter((u) => u.id !== id));
+      } else {
+        Alert.alert("Error", data.message || "Failed to delete user");
+        console.error("Backend error:", data.message);
+      }
+    } catch (err) {
+      Alert.alert("Error", "Failed to delete user");
+      console.error("Error deleting user:", err);
+    }
+  };
+
+  // Add this function to fetch the latest 3 recent reports from the backend
+  const fetchRecentReports = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/activeReports");
+      const data = await res.json();
+      setRecentReports((data.reports || data).slice(0, 3));
+    } catch (err) {
+      console.error("Error fetching recent reports:", err);
+    }
+  };
+
+  // Fetch users from backend and set users state
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/allUsers");
+      const data = await res.json();
+      // If backend returns { success: true, users: [...] }
+      let userList = data.users || data;
+      // Sort by created_at descending if available
+      if (userList.length && userList[0].created_at) {
+        userList = userList.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+      }
+      setUsers(userList);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
+
+  // Fetch dashboard stats and recent reports from backend on mount
+  useEffect(() => {
+    fetchDashboardStats();
+    fetchRecentReports();
+    fetchUsers();
+  }, [fetchDashboardStats]);
+
+  // Update useEffect to fetch active reports when reports tab is selected
+  useEffect(() => {
+    if (selectedTab === "reports") {
+      fetchActiveReports();
+    }
+  }, [selectedTab]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    // Simulate API call
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+  const handleUserAction = (user, action) => {
+    if (action === "delete") {
+      if (
+        window.confirm(
+          `Are you sure you want to delete ${user.name}? This action cannot be undone!`
+        )
+      ) {
+        console.log("Web confirm Delete pressed for user id:", user.id);
+        deleteUser(user.id);
+        setModalVisible(false);
+      }
+    } else if (action === "suspend") {
+      setUsers(
+        users.map((u) => (u.id === user.id ? { ...u, status: "Suspended" } : u))
+      );
+      setModalVisible(false);
+    } else if (action === "activate") {
+      setUsers(
+        users.map((u) => (u.id === user.id ? { ...u, status: "Active" } : u))
+      );
+      setModalVisible(false);
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "Active":
+        return [styles.statusActive, styles.statusActiveText];
+      case "Inactive":
+        return [styles.statusInactive, styles.statusInactiveText];
+      case "Suspended":
+        return [styles.statusSuspended, styles.statusSuspendedText];
+      default:
+        return [styles.statusInactive, styles.statusInactiveText];
+    }
+  };
+
+  // Handler to update report status
+  const handleUpdateReportStatus = async (status) => {
+    if (selectedReport) {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/report/${selectedReport.id}/status`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setReports((prevReports) =>
+            prevReports.map((r) =>
+              r.id === selectedReport.id ? { ...r, status } : r
+            )
+          );
+          setSelectedReport((prev) => ({ ...prev, status }));
+        } else {
+          Alert.alert("Error", data.message || "Failed to update status");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to update status");
+        console.error("Error updating report status:", err);
+      }
+    }
+  };
+
+  // Handler to assign report
+  const handleAssignReport = (assignedTo) => {
+    if (selectedReport) {
+      setReports((prevReports) =>
+        prevReports.map((r) =>
+          r.id === selectedReport.id ? { ...r, assignedTo } : r
+        )
+      );
+      setSelectedReport((prev) => ({ ...prev, assignedTo }));
+    }
+  };
+
+  // Handler to delete report
+  const handleDeleteReport = async () => {
+    if (selectedReport) {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/report/${selectedReport.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setReports((prevReports) =>
+            prevReports.filter((r) => r.id !== selectedReport.id)
+          );
+          setReportModalVisible(false);
+          setSelectedReport(null);
+        } else {
+          Alert.alert("Error", data.message || "Failed to delete report");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to delete report");
+        console.error("Error deleting report:", err);
+      }
+    }
+  };
+
+  const renderDashboard = () => (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => {
+            fetchDashboardStats();
+            fetchRecentReports();
+            setRefreshing(false);
+          }}
+        />
+      }
+    >
+      <View style={styles.statsGrid}>
+        <View style={styles.statCard}>
+          <View style={styles.statHeader}>
+            <Text style={styles.statTitle}>Total Users</Text>
+            <Users size={20} color={currentColors.primary} />
+          </View>
+          <Text style={styles.statValue}>{dashboardStats.totalUsers}</Text>
+          <Text style={[styles.statChange, styles.positiveChange]}>
+            +{dashboardStats.monthlyGrowth}% this month
+          </Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <View style={styles.statHeader}>
+            <Text style={styles.statTitle}>Active Reports</Text>
+            <FileText size={20} color={currentColors.warning} />
+          </View>
+          <Text style={styles.statValue}>{dashboardStats.activeReports}</Text>
+          <Text style={[styles.statChange, styles.positiveChange]}>
+            +5 from yesterday
+          </Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <View style={styles.statHeader}>
+            <Text style={styles.statTitle}>Resolved</Text>
+            <CheckCircle size={20} color={currentColors.success} />
+          </View>
+          <Text style={styles.statValue}>{dashboardStats.resolvedReports}</Text>
+          <Text style={[styles.statChange, styles.positiveChange]}>
+            +12 this week
+          </Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <View style={styles.statHeader}>
+            <Text style={styles.statTitle}>Pending</Text>
+            <Clock size={20} color={currentColors.error} />
+          </View>
+          <Text style={styles.statValue}>{dashboardStats.pendingReports}</Text>
+          <Text style={[styles.statChange, styles.negativeChange]}>
+            +3 from yesterday
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Recent Users</Text>
+          <TouchableOpacity onPress={() => setSelectedTab("users")}>
+            <Text style={styles.viewAllButton}>View All</Text>
+          </TouchableOpacity>
+        </View>
+
+        {users.slice(0, 3).map((user) => (
+          <TouchableOpacity
+            key={user.id}
+            style={styles.card}
+            onPress={() => {
+              setSelectedUser(user);
+              setModalVisible(true);
+            }}
+          >
+            <View style={styles.userCard}>
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+                <Text style={styles.userRole}>{user.role}</Text>
+              </View>
+              <View style={getStatusStyle(user.status)}>
+                <Text style={styles.statusText}>{user.status}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Recent Reports</Text>
+          <TouchableOpacity onPress={() => setSelectedTab("reports")}>
+            <Text style={styles.viewAllButton}>View All</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Use recentReports instead of reports.slice(0, 3) */}
+        {recentReports.map((report) => (
+          <View key={report.id} style={styles.card}>
+            <View style={styles.userCard}>
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{report.title}</Text>
+                <Text style={styles.userEmail}>{report.location}</Text>
+                <Text style={styles.userRole}>
+                  {report.category} • {report.priority} Priority
+                </Text>
+              </View>
+              <View style={getStatusStyle(report.status)}>
+                <Text style={styles.statusText}>{report.status}</Text>
+              </View>
+            </View>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+
+  const renderUsers = () => (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.searchContainer}>
+        <Search size={20} color={currentColors.textSecondary} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search users..."
+          placeholderTextColor={currentColors.textSecondary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Filter</Text>
+        </TouchableOpacity>
+      </View>
+
+      {users
+        .filter(
+          (user) =>
+            user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .map((user) => (
+          <TouchableOpacity
+            key={user.id}
+            style={styles.card}
+            onPress={() => {
+              setSelectedUser(user);
+              setModalVisible(true);
+            }}
+          >
+            <View style={styles.userCard}>
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+                <Text style={styles.userRole}>{user.role}</Text>
+                <Text style={styles.userEmail}>
+                  Last active: {user.lastActive}
+                </Text>
+              </View>
+              <View style={getStatusStyle(user.status)}>
+                <Text style={styles.statusText}>{user.status}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+    </ScrollView>
+  );
+
+  const renderReports = () => (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.searchContainer}>
+        <Search size={20} color={currentColors.textSecondary} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by title, location, or reporter..."
+          placeholderTextColor={currentColors.textSecondary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Filter</Text>
+        </TouchableOpacity>
+      </View>
+
+      {reports
+        .filter(
+          (report) =>
+            report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            report.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            report.submittedBy.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .map((report) => (
+          <TouchableOpacity
+            key={report.id}
+            style={styles.card}
+            onPress={() => {
+              setSelectedReport(report);
+              setReportModalVisible(true);
+            }}
+          >
+            <View style={styles.userCard}>
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{report.title}</Text>
+                <Text style={styles.userEmail}>{report.location}</Text>
+                <Text style={styles.userRole}>
+                  {report.category} • {report.priority} Priority
+                </Text>
+                <Text style={styles.userEmail}>
+                  Submitted by: {report.submittedBy}
+                </Text>
+              </View>
+              <View style={getStatusStyle(report.status)}>
+                <Text style={styles.statusText}>{report.status}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+    </ScrollView>
+  );
+
+  const renderSettings = () => (
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Account</Text>
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.userCard}>
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>Profile Settings</Text>
+              <Text style={styles.userEmail}>Manage your account</Text>
+            </View>
+            <UserCircle size={20} color={currentColors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.userCard}
+            onPress={async () => {
+              await logout();
+              navigation.navigate("Login");
+            }}
+          >
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>Logout</Text>
+              <Text style={styles.userEmail}>Sign out of your account</Text>
+            </View>
+            <LogOut size={20} color={currentColors.error} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.headerTitle}>Admin Dashboard</Text>
+            <Text style={styles.headerSubtitle}>
+              Manage users, reports, and system settings
+            </Text>
+          </View>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              onPress={() => setIsDarkMode(!isDarkMode)}
+              style={styles.actionButton}
+            >
+              {isDarkMode ? (
+                <Sun size={20} color={currentColors.text} />
+              ) : (
+                <Moon size={20} color={currentColors.text} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton}>
+              <Bell size={20} color={currentColors.text} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, selectedTab === "dashboard" && styles.activeTab]}
+          onPress={() => setSelectedTab("dashboard")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "dashboard" && styles.activeTabText,
+            ]}
+          >
+            Dashboard
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, selectedTab === "users" && styles.activeTab]}
+          onPress={() => setSelectedTab("users")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "users" && styles.activeTabText,
+            ]}
+          >
+            Users
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, selectedTab === "reports" && styles.activeTab]}
+          onPress={() => setSelectedTab("reports")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "reports" && styles.activeTabText,
+            ]}
+          >
+            Reports
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, selectedTab === "settings" && styles.activeTab]}
+          onPress={() => setSelectedTab("settings")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === "settings" && styles.activeTabText,
+            ]}
+          >
+            Settings
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.content}>
+        {selectedTab === "dashboard" && renderDashboard()}
+        {selectedTab === "users" && renderUsers()}
+        {selectedTab === "reports" && renderReports()}
+        {selectedTab === "settings" && renderSettings()}
+      </View>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>User Details</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <X size={24} color={currentColors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {selectedUser && (
+              <>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Name</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedUser.name}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Email</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedUser.email}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Role</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedUser.role}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Status</Text>
+                  <View style={getStatusStyle(selectedUser.status)}>
+                    <Text style={styles.statusText}>{selectedUser.status}</Text>
+                  </View>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Last Active</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedUser.lastActive}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Reports Submitted</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedUser.reportsSubmitted}
+                  </Text>
+                </View>
+
+                <View style={styles.buttonGroup}>
+                  {selectedUser.status === "Active" ? (
+                    <TouchableOpacity
+                      style={[styles.button, styles.secondaryButton]}
+                      onPress={() => handleUserAction(selectedUser, "suspend")}
+                    >
+                      <Text style={styles.secondaryButtonText}>Suspend</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={[styles.button, styles.primaryButton]}
+                      onPress={() => handleUserAction(selectedUser, "activate")}
+                    >
+                      <Text style={styles.primaryButtonText}>Activate</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    style={[styles.button, styles.dangerButton]}
+                    onPress={() => {
+                      console.log(
+                        "Delete button pressed for user:",
+                        selectedUser
+                      );
+                      handleUserAction(selectedUser, "delete");
+                    }}
+                  >
+                    <Text style={styles.dangerButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={reportModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setReportModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Report Details</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setReportModalVisible(false)}
+              >
+                <X size={24} color={currentColors.text} />
+              </TouchableOpacity>
+            </View>
+            {selectedReport && (
+              <>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Title</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.title}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Location</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.location}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Category</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.category}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Priority</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.priority}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Submitted By</Text>
+                  <Text style={styles.userDetailValue}>
+                    {selectedReport.submittedBy}
+                  </Text>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Status</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {[
+                      "Pending Review",
+                      "In Progress",
+                      "Resolved",
+                      "Overdue",
+                    ].map((status) => (
+                      <TouchableOpacity
+                        key={status}
+                        style={{
+                          marginRight: 8,
+                          padding: 6,
+                          borderRadius: 8,
+                          backgroundColor:
+                            selectedReport.status === status
+                              ? currentColors.primary
+                              : currentColors.surface,
+                        }}
+                        onPress={() => handleUpdateReportStatus(status)}
+                      >
+                        <Text
+                          style={{
+                            color:
+                              selectedReport.status === status
+                                ? "#fff"
+                                : currentColors.text,
+                          }}
+                        >
+                          {status}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+                <View style={styles.userDetailRow}>
+                  <Text style={styles.userDetailLabel}>Assigned To</Text>
+                  <View
+                    style={{
+                      borderWidth: 1,
+                      borderColor: currentColors.border,
+                      borderRadius: 8,
+                      minWidth: 100,
+                      backgroundColor: currentColors.surface,
+                    }}
+                  >
+                    <Picker
+                      selectedValue={selectedReport.assignedTo}
+                      onValueChange={handleAssignReport}
+                      style={{
+                        color: currentColors.text,
+                        backgroundColor: currentColors.surface,
+                        fontSize: 16,
+                      }}
+                      itemStyle={{
+                        color: currentColors.text,
+                        fontSize: 16,
+                        backgroundColor: currentColors.surface,
+                      }}
+                    >
+                      <Picker.Item
+                        label="Omar Siddique"
+                        value="Omar Siddique"
+                      />
+                      <Picker.Item label="Peter Otieno" value="Peter Otieno" />
+                      <Picker.Item label="John Singh" value="John Singh" />
+                      <Picker.Item label="Paul Mwangi" value="Paul Mwangi" />
+                    </Picker>
+                  </View>
+                </View>
+                <View style={styles.buttonGroup}>
+                  <TouchableOpacity
+                    style={[styles.button, styles.dangerButton]}
+                    onPress={handleDeleteReport}
+                  >
+                    <Text style={styles.dangerButtonText}>Delete Report</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, styles.secondaryButton]}
+                    onPress={() => setReportModalVisible(false)}
+                  >
+                    <Text style={styles.secondaryButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+export default AdminDashboard;

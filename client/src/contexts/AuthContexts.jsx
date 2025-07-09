@@ -1,30 +1,84 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect } from "react"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WEB_CLIENT_ID, IOS_CLIENT_ID } from "@env";
+import * as AuthSession from "expo-auth-session";
+import emailjs from "@emailjs/react-native";
 
-const AuthContext = createContext(undefined)
+
+const AuthContext = createContext(undefined);
+WebBrowser.maybeCompleteAuthSession();
+
+console.log(
+  `RedirectURl is: ${AuthSession.makeRedirectUri({ useProxy: true })}`
+);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState("");
 
+  // Google Auth Request setup
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: IOS_CLIENT_ID,
+    webClientId: WEB_CLIENT_ID,
+    useProxy: true,
+  });
+
+  // Handle Google sign-in response
   useEffect(() => {
-    checkAuthState()
-  }, [])
+    console.log("Google response:", response);
+    const handleGoogleResponse = async () => {
+      if (response?.type === "success") {
+        const accessToken = response.authentication.accessToken;
+        try {
+          const res = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const googleUser = await res.json();
+          // Send Google user info to backend to get or create app user
+          const backendRes = await fetch("http://localhost:4000/auth/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(googleUser),
+          });
+          if (!backendRes.ok)
+            throw new Error("Failed to sync Google user with backend");
+          const appUser = await backendRes.json();
+          await AsyncStorage.setItem("user", JSON.stringify(appUser));
+          setUser(appUser);
+        } catch (error) {
+          console.error("Google sign-in error:", error);
+        }
+      }
+    };
+    handleGoogleResponse();
+  }, [response]);
+
+  // Check auth state on mount
+  useEffect(() => {
+    checkAuthState();
+  }, []);
 
   const checkAuthState = async () => {
     try {
-      const userData = await AsyncStorage.getItem("user")
+      const userData = await AsyncStorage.getItem("user");
       if (userData) {
-        setUser(JSON.parse(userData))
+        setUser(JSON.parse(userData));
       }
     } catch (error) {
-      console.error("Error checking auth state:", error)
+      console.error("Error checking auth state:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  const loginWithGoogle = async () => {
+    promptAsync();
+  };
 
   const login = async (email, password) => {
     try {
@@ -36,10 +90,10 @@ export function AuthProvider({ children }) {
           email: "admin@tunzasu.com",
           phoneNumber: "+1234567890",
           role: "admin",
-        }
-        setUser(adminUser)
-        await AsyncStorage.setItem("user", JSON.stringify(adminUser))
-        return true
+        };
+        setUser(adminUser);
+        await AsyncStorage.setItem("user", JSON.stringify(adminUser));
+        return true;
       }
       // API call for regular users
       const response = await fetch("http://localhost:4000/login", {
@@ -48,63 +102,125 @@ export function AuthProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      })
+      });
       if (response.ok) {
-        const userData = await response.json()
-        setUser(userData.user)
-        console.log(`The user logged in is: ${user}`);
-        await AsyncStorage.setItem("user", JSON.stringify(userData.user))
-        return true
+        const userData = await response.json();
+        setUser(userData.user);
+        console.log("[AuthContext] Setting user after login:", userData.user);
+        await AsyncStorage.setItem("user", JSON.stringify(userData.user));
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error("Login error:", error)
-      return false
+      console.error("Login error:", error);
+      return false;
     }
-  }
+  };
 
   const register = async (userData) => {
     try {
+      console.log("[AuthContext] Registering with data:", userData);
       const response = await fetch("http://localhost:4000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
-      })
+      });
+      console.log("[AuthContext] Register response status:", response.status);
       if (response.ok) {
-        const result = await response.json()
-        setUser(result.user)
-        await AsyncStorage.setItem("user", JSON.stringify(result.user))
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error("Registration error:", error)
-      return false
-    }
-  }
+        const result = await response.json();
+        console.log("[AuthContext] Register success:", result);
+        setUser(result.user);
+        await AsyncStorage.setItem("user", JSON.stringify(result.user));
+        return { success: true };
+      } else {
+        const errorData = await response.text();
+        console.log("[AuthContext] Register error response:", errorData);
 
-  const loginWithGoogle = async () => {
-    try {
-      // Implement Google Sign-In logic here
-      // This is a placeholder - you'll need to configure Google Sign-In
-      console.log("Google Sign-In not implemented yet")
-      return false
+        // Parse the error response to get the specific message
+        let errorMessage = "Registration failed. Please try again.";
+        try {
+          const errorJson = JSON.parse(errorData);
+          errorMessage = errorJson.message || errorMessage;
+        } catch (e) {
+          // If parsing fails, use the raw error data
+          errorMessage = errorData || errorMessage;
+        }
+
+        return { success: false, message: errorMessage };
+      }
     } catch (error) {
-      console.error("Google login error:", error)
-      return false
+      console.error("Registration error:", error);
+      return {
+        success: false,
+        message: "Network error. Please check your connection.",
+      };
     }
-  }
+  };
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem("user")
-      setUser(null)
+      console.log("[Logout] Called for user:", user);
+      // Clear user data from AsyncStorage
+      await AsyncStorage.removeItem("user");
+      const userAfterRemove = await AsyncStorage.getItem("user");
+      console.log("[Logout] user after remove:", userAfterRemove);
+
+      // Clear any other stored tokens or session data
+      await AsyncStorage.multiRemove(["user", "token", "refreshToken"]);
+      const userAfterMultiRemove = await AsyncStorage.getItem("user");
+      console.log("[Logout] user after multiRemove:", userAfterMultiRemove);
+
+      // Reset user state
+      setUser(null);
+      setToken("");
+      console.log("[Logout] State reset to null");
     } catch (error) {
-      console.error("Logout error:", error)
+      console.error("Logout error:", error);
+      // Even if there's an error, we should still clear the user state
+      setUser(null);
+      setToken("");
     }
-  }
+  };
+
+  // code to send an email to users
+  const sendMail = (object) => {
+
+    const { to_name, to_email, location, priority, category, status } = object;
+
+    console.log(object);
+    
+
+    console.log("From the email function");
+
+    console.log(`${to_email} and ${to_name}`);
+
+    console.log("---------------------------");
+    
+    
+    
+  const serviceId = 'service_yo68z0r';
+  const templateId = to_email ? 'template_bn7m1pt' : 'template_zj2tfar';
+  const publicKey = 'waI8hdlB5hAlhE6tP';
+
+  const templateParams = {
+    to_name: to_name ? to_name : "Shadrack Njau",
+    to_email: to_email ? to_email : "shadrackmungai10@gmail.com",
+    location: location,
+    priority: priority,
+    category: category,
+  };
+  emailjs
+    .send(serviceId, templateId, templateParams,{
+      publicKey: publicKey,
+    })
+    .then((res) => {
+      console.log("Email sent successfully", res);
+    })
+    .catch((err) => console.error("Error sending email", err));
+};
+
 
   return (
     <AuthContext.Provider
@@ -115,17 +231,18 @@ export function AuthProvider({ children }) {
         register,
         logout,
         loginWithGoogle,
+        sendMail
       }}
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
+  return context;
 }
