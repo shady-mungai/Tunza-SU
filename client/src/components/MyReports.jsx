@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContexts";
 import { useNavigation } from "@react-navigation/native";
 import SidebarNavigation from "./SidebarNavigation";
 import { useIsFocused } from "@react-navigation/native";
+import { apiUrl } from "../config/api";
 
 const statusBadge = (status) => {
   if (!status) return null;
@@ -62,7 +63,7 @@ const MyReports = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:4000/userReports?user_id=${user?.id}`
+          apiUrl(`/userReports?user_id=${encodeURIComponent(user?.id)}`)
         );
         const data = await res.json();
         setReports(data.reports || []);

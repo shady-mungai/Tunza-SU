@@ -4,17 +4,15 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { WEB_CLIENT_ID, IOS_CLIENT_ID } from "@env";
-import * as AuthSession from "expo-auth-session";
 import emailjs from "@emailjs/react-native";
+import { apiUrl } from "../config/api";
 
 
 const AuthContext = createContext(undefined);
 WebBrowser.maybeCompleteAuthSession();
 
-console.log(
-  `RedirectURl is: ${AuthSession.makeRedirectUri({ useProxy: true })}`
-);
+const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -30,7 +28,6 @@ export function AuthProvider({ children }) {
 
   // Handle Google sign-in response
   useEffect(() => {
-    console.log("Google response:", response);
     const handleGoogleResponse = async () => {
       if (response?.type === "success") {
         const accessToken = response.authentication.accessToken;
@@ -40,7 +37,7 @@ export function AuthProvider({ children }) {
           });
           const googleUser = await res.json();
           // Send Google user info to backend to get or create app user
-          const backendRes = await fetch("http://localhost:4000/auth/google", {
+          const backendRes = await fetch(apiUrl("/auth/google"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(googleUser),
@@ -82,21 +79,8 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      // Hardcoded admin check
-      if (email === "admin@tunzasu.com" && password === "admin123") {
-        const adminUser = {
-          id: "admin",
-          name: "System Administrator",
-          email: "admin@tunzasu.com",
-          phoneNumber: "+1234567890",
-          role: "admin",
-        };
-        setUser(adminUser);
-        await AsyncStorage.setItem("user", JSON.stringify(adminUser));
-        return true;
-      }
       // API call for regular users
-      const response = await fetch("http://localhost:4000/login", {
+      const response = await fetch(apiUrl("/login"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +90,6 @@ export function AuthProvider({ children }) {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData.user);
-        console.log("[AuthContext] Setting user after login:", userData.user);
         await AsyncStorage.setItem("user", JSON.stringify(userData.user));
         return true;
       }
@@ -119,24 +102,20 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      console.log("[AuthContext] Registering with data:", userData);
-      const response = await fetch("http://localhost:4000/register", {
+      const response = await fetch(apiUrl("/register"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
-      console.log("[AuthContext] Register response status:", response.status);
       if (response.ok) {
         const result = await response.json();
-        console.log("[AuthContext] Register success:", result);
         setUser(result.user);
         await AsyncStorage.setItem("user", JSON.stringify(result.user));
         return { success: true };
       } else {
         const errorData = await response.text();
-        console.log("[AuthContext] Register error response:", errorData);
 
         // Parse the error response to get the specific message
         let errorMessage = "Registration failed. Please try again.";
@@ -161,21 +140,15 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      console.log("[Logout] Called for user:", user);
       // Clear user data from AsyncStorage
       await AsyncStorage.removeItem("user");
-      const userAfterRemove = await AsyncStorage.getItem("user");
-      console.log("[Logout] user after remove:", userAfterRemove);
 
       // Clear any other stored tokens or session data
       await AsyncStorage.multiRemove(["user", "token", "refreshToken"]);
-      const userAfterMultiRemove = await AsyncStorage.getItem("user");
-      console.log("[Logout] user after multiRemove:", userAfterMultiRemove);
 
       // Reset user state
       setUser(null);
       setToken("");
-      console.log("[Logout] State reset to null");
     } catch (error) {
       console.error("Logout error:", error);
       // Even if there's an error, we should still clear the user state
@@ -186,40 +159,32 @@ export function AuthProvider({ children }) {
 
   // code to send an email to users
   const sendMail = (object) => {
-
     const { to_name, to_email, location, priority, category, status } = object;
 
-    console.log(object);
-    
+    const serviceId = process.env.EXPO_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = to_email
+      ? process.env.EXPO_PUBLIC_EMAILJS_RESOLVED_REPORT_TEMPLATE_ID
+      : process.env.EXPO_PUBLIC_EMAILJS_NEW_REPORT_TEMPLATE_ID;
+    const publicKey = process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-    console.log("From the email function");
+    if (!serviceId || !templateId || !publicKey) {
+      return Promise.resolve({ skipped: true });
+    }
 
-    console.log(`${to_email} and ${to_name}`);
-
-    console.log("---------------------------");
-    
-    
-    
-  const serviceId = 'service_yo68z0r';
-  const templateId = to_email ? 'template_bn7m1pt' : 'template_zj2tfar';
-  const publicKey = 'waI8hdlB5hAlhE6tP';
-
-  const templateParams = {
-    to_name: to_name ? to_name : "Shadrack Njau",
-    to_email: to_email ? to_email : "shadrackmungai10@gmail.com",
-    location: location,
-    priority: priority,
-    category: category,
+    return emailjs.send(
+      serviceId,
+      templateId,
+      {
+        to_name,
+        to_email,
+        location,
+        priority,
+        category,
+        status,
+      },
+      { publicKey }
+    );
   };
-  emailjs
-    .send(serviceId, templateId, templateParams,{
-      publicKey: publicKey,
-    })
-    .then((res) => {
-      console.log("Email sent successfully", res);
-    })
-    .catch((err) => console.error("Error sending email", err));
-};
 
 
   return (

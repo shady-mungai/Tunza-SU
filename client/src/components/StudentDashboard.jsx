@@ -7,6 +7,7 @@ import RecentReportsList from './RecentReportsList';
 import SidebarNavigation from './SidebarNavigation';
 import ReportForm from './ReportForm';
 import { useAuth } from '../contexts/AuthContexts';
+import { apiUrl } from '../config/api';
 
 const StudentDashboard = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(Dimensions.get('window').width >= 768);
@@ -26,7 +27,7 @@ const StudentDashboard = () => {
   const handleSubmitReport = async (reportData, isFormData = false) => {
     setSubmitting(true);
     try {
-      const response = await fetch('http://localhost:4000/addReport', {
+      const response = await fetch(apiUrl('/addReport'), {
         method: 'POST',
         ...(isFormData
           ? { body: reportData }
@@ -109,4 +110,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StudentDashboard; 
+export default StudentDashboard;

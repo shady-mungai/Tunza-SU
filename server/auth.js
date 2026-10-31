@@ -1,27 +1,38 @@
 import express from "express";
 import cors from "cors";
 import con from "./dbConnection.js";
-import bcrypt from "bcrypt";
-import axios from "axios";
+import bcrypt from "bcryptjs";
 import speakeasy from "speakeasy";
 import multer from "multer";
-import path from "path";
+import path from "node:path";
+import { mkdirSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 
 const app = express();
-const port = 4000;
+const port = Number(process.env.PORT || 4000);
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.CLIENT_ORIGIN
+        : true,
   })
 );
 
-let currentUser = {}; // empty object to store the current user, attempting to login using credentials
+function toPublicUser(user) {
+  if (!user) return null;
+  const { password, totp_secret, ...publicUser } = user;
+  return publicUser;
+}
+
+const uploadDirectory = path.resolve("uploads");
+mkdirSync(uploadDirectory, { recursive: true });
 
 // Set up multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDirectory);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -41,10 +52,8 @@ async function getCurrentUser(email, admission_number, res) {
         admission_number,
       ]);
     if (records.length > 0) {
-      currentUser = records[0]; //gets the retrieved user using admission_number or email
-      return currentUser;
+      return records[0];
     } else {
-      currentUser = {}; // Reset currentUser to empty object
       // Only return error response if res parameter is provided (for login)
       if (res) {
         return res
@@ -84,26 +93,16 @@ app.post("/register", async (req, res) => {
     req.body;
 
   // Check if user already exists
-  await getCurrentUser(email, admission_number);
+  const existingUser = await getCurrentUser(email, admission_number);
 
   // If user exists, return error
-  if (currentUser && Object.keys(currentUser).length > 0) {
+  if (existingUser) {
     return res.status(400).json({ message: "User already exists, Login" });
   }
 
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   const secret = generateSecret();
-
-  console.log([
-    name,
-    email,
-    admission_number,
-    hashedPassword,
-    secret.base32,
-    phone_number,
-    role,
-  ]);
 
   // Insert user into DB
   try {
@@ -121,10 +120,6 @@ app.post("/register", async (req, res) => {
           role,
         ]
       );
-    console.log("---------------------------------------");
-    console.log(records);
-    console.log("---------------------------------------");
-
     if (records.affectedRows > 0) {
       // Fetch the newly created user to get complete data including ID
       const [newUserRecords] = await con
@@ -139,7 +134,7 @@ app.post("/register", async (req, res) => {
         return res.status(200).json({
           success: true,
           message: "Registration successful",
-          user: newUser, // Return the complete user data
+          user: toPublicUser(newUser),
         });
       } else {
         return res.status(500).json({
@@ -178,20 +173,16 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, admission_number, password } = req.body;
 
-  console.log("--------------------------------");
-  console.log(req.body);
-  console.log("--------------------------------");
+  const user = await getCurrentUser(email, admission_number, res);
+  if (!user || res.headersSent) return;
 
-  await getCurrentUser(email, admission_number, res);
-
-  const hashedPassword = currentUser.password;
+  const hashedPassword = user.password;
   const isValid = await bcrypt.compare(password, hashedPassword);
   if (isValid) {
-    console.log("Password matches !"); // return errors to display to end user
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      user: currentUser, // This is what your frontend expects
+      user: toPublicUser(user),
     });
   } else {
     res.status(400).json({
@@ -219,7 +210,6 @@ app.post("/addReport", upload.single("image"), async (req, res) => {
 
   // The uploaded file info is in req.file
   const image_url = req.file ? req.file.path : null;
-  console.log("image_url being saved:", image_url);
 
   // Validation: check required fields
   if (
@@ -329,10 +319,6 @@ app.get("/assignedReports", async (req, res) => {
 // Google OAuth endpoint
 app.post("/auth/google", async (req, res) => {
   const { email, name } = req.body;
-  console.log(`Email address is ${email}`);
-  console.log("-----------------------------------------");
-  console.log(`Name from google ${name}`);
-
   if (!email) {
     return res
       .status(400)
@@ -350,7 +336,7 @@ app.post("/auth/google", async (req, res) => {
       // Create a new user with Google info
       const admission_number = "GGL-" + Math.floor(Math.random() * 1000000); // random fallback
       const role = "student";
-      const password = 123;
+      const password = await bcrypt.hash(randomUUID(), 10);
       const phone_number = "0712345678";
       const totp_secret = null;
       const [result] = await con
@@ -373,7 +359,7 @@ app.post("/auth/google", async (req, res) => {
         .query("SELECT * FROM users2 WHERE email = ?", [email]);
       user = newUserRecords[0];
     }
-    return res.status(200).json(user);
+    return res.status(200).json(toPublicUser(user));
   } catch (err) {
     console.error("Google auth error:", err);
     return res.status(500).json({ message: "Internal server error" });
@@ -384,7 +370,7 @@ app.post("/auth/google", async (req, res) => {
 app.get("/allUsers", async (req, res) => {
   try {
     const [users] = await con.promise().query("SELECT * FROM users2");
-    res.status(200).json({ success: true, users });
+    res.status(200).json({ success: true, users: users.map(toPublicUser) });
   } catch (err) {
     console.error("Error fetching users:", err);
     res.status(500).json({ success: false, message: "Internal server error" });

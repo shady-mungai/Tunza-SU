@@ -24,6 +24,7 @@ import {
 import { useAuth } from "../src/contexts/AuthContexts";
 import LayoutWrapper from "../src/components/LayoutWrapper";
 import { Picker } from '@react-native-picker/picker';
+import { apiUrl } from "../src/config/api";
 
 const { width } = Dimensions.get("window");
 
@@ -50,7 +51,7 @@ const AssignedReports = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:4000/assignedReports?maintenance_id=${user.id}`
+          apiUrl(`/assignedReports?maintenance_id=${encodeURIComponent(user.id)}`)
         );
 
         if (!response.ok) {
@@ -144,7 +145,7 @@ const AssignedReports = () => {
     console.log('---------------------------------------------')
 
     try {
-      const response = await fetch(`http://localhost:4000/reports/${selectedReport.id}`, {
+      const response = await fetch(apiUrl(`/reports/${selectedReport.id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: selectedStatus }),

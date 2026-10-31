@@ -11,7 +11,6 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import axios from "axios";
 import Toast from "react-native-toast-message";
 
 import { Picker } from "@react-native-picker/picker"; // Make sure to install this package
@@ -101,14 +100,12 @@ const Signup = () => {
 
   // Fixed: Proper React Native input change handler with real-time validation
   function handleInputChange(field, value) {
-    console.log(`Input changed - Field: ${field}, Value: ${value}`);
 
     setFormData((prevData) => {
       const newData = {
         ...prevData,
         [field]: value,
       };
-      console.log("Updated form data:", newData);
       return newData;
     });
 
@@ -123,7 +120,6 @@ const Signup = () => {
 
     if (field === "password") {
       const strength = validatePassword(value);
-      console.log("Password strength:", strength);
       setPasswordStrength(strength);
     }
   }
@@ -257,13 +253,10 @@ const Signup = () => {
   };
 
   const nextStep = () => {
-    console.log("Next button clicked, current step:", currentStep);
-    console.log("Current form data:", formData);
 
     if (validateCurrentStep()) {
       if (currentStep < steps.length - 1) {
         const newStep = currentStep + 1;
-        console.log("Moving to step:", newStep);
         setCurrentStep(newStep);
         // Remove animation for now to test if it's causing issues
         // animateSlide(newStep)

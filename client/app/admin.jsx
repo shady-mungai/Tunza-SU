@@ -11,8 +11,8 @@ import {
   Modal,
   Alert,
   RefreshControl,
-  Picker,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import {
   useNavigation,
   useNavigationContainerRef,
@@ -58,6 +58,7 @@ import {
   Award,
   Zap,
 } from "lucide-react-native";
+import { apiUrl } from "../src/config/api";
 import { useAuth } from "../src/contexts/AuthContexts";
 import { useCallback } from "react";
 
@@ -453,11 +454,11 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Fetch dashboard stats from backend
   const fetchDashboardStats = useCallback(async () => {
     try {
-      const usersRes = await fetch("http://localhost:4000/allUsers");
+      const usersRes = await fetch(apiUrl("/allUsers"));
       const usersData = await usersRes.json();
       const userCount = usersData.success ? usersData.users.length : 0;
 
-      const statsRes = await fetch("http://localhost:4000/reportStats");
+      const statsRes = await fetch(apiUrl("/reportStats"));
       const statsData = await statsRes.json();
 
       setDashboardStats((prev) => ({
@@ -475,7 +476,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Add this function to fetch active reports from the backend
   const fetchActiveReports = async () => {
     try {
-      const res = await fetch("http://localhost:4000/activeReports");
+      const res = await fetch(apiUrl("/activeReports"));
       const data = await res.json();
       if (data.success) {
         setReports(data.reports);
@@ -489,7 +490,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const deleteUser = async (id) => {
     console.log("Attempting to delete user with id:", id);
     try {
-      const res = await fetch(`http://localhost:4000/user/${id}`, {
+      const res = await fetch(apiUrl(`/user/${id}`), {
         method: "DELETE",
       });
       const data = await res.json();
@@ -509,7 +510,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Add this function to fetch the latest 3 recent reports from the backend
   const fetchRecentReports = async () => {
     try {
-      const res = await fetch("http://localhost:4000/activeReports");
+      const res = await fetch(apiUrl("/activeReports"));
       const data = await res.json();
       setRecentReports((data.reports || data).slice(0, 3));
     } catch (err) {
@@ -520,7 +521,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Fetch users from backend and set users state
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:4000/allUsers");
+      const res = await fetch(apiUrl("/allUsers"));
       const data = await res.json();
       // If backend returns { success: true, users: [...] }
       let userList = data.users || data;
@@ -600,9 +601,9 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     if (selectedReport) {
       try {
         const res = await fetch(
-          `http://localhost:4000/report/${selectedReport.id}/status`,
+          apiUrl(`/reports/${selectedReport.id}`),
           {
-            method: "PATCH",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status }),
           }
@@ -642,7 +643,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     if (selectedReport) {
       try {
         const res = await fetch(
-          `http://localhost:4000/report/${selectedReport.id}`,
+          apiUrl(`/report/${selectedReport.id}`),
           {
             method: "DELETE",
           }

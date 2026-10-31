@@ -35,6 +35,7 @@ import {
 } from "lucide-react-native";
 import { useAuth } from "../src/contexts/AuthContexts";
 import LayoutWrapper from "../src/components/LayoutWrapper";
+import { apiUrl } from "../src/config/api";
 
 const { width } = Dimensions.get("window");
 
@@ -59,7 +60,9 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:4000/assignedReports?maintenance_id=${user.id}`);
+        const response = await fetch(
+          apiUrl(`/assignedReports?maintenance_id=${encodeURIComponent(user.id)}`)
+        );
         if (!response.ok) throw new Error("Failed to fetch assigned reports");
         const data = await response.json();
         setMaintenanceReports(
