@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { apiUrl } from "../config/api";
+import { setObservabilityUser } from "../observability";
 
 
 const AuthContext = createContext(undefined);
@@ -40,6 +41,10 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState("");
+
+  useEffect(() => {
+    setObservabilityUser(user);
+  }, [user]);
 
   // Google Auth Request setup
   const [request, response, promptAsync] = Google.useAuthRequest({

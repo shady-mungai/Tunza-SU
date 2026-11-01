@@ -1,5 +1,10 @@
 import { registerRootComponent } from "expo";
 
 import App from "./app";
+import {
+  initializeObservability,
+  withObservability,
+} from "./src/observability";
 
-registerRootComponent(App);
+initializeObservability();
+registerRootComponent(withObservability(App));

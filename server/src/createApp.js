@@ -59,11 +59,18 @@ async function presentReports(reports, storage) {
   return Promise.all(reports.map((report) => presentReport(report, storage)));
 }
 
-function notifyInBackground(notification) {
+function notifyInBackground(notification, observability) {
   void notification.catch((error) => {
-    console.error("Background task failed", error);
+    observability.error("background_task_failed", error);
+    observability.captureException(error, { operation: "background_task" });
   });
 }
+
+const fallbackObservability = {
+  requestMiddleware: () => (req, res, next) => next(),
+  error: () => {},
+  captureException: () => {},
+};
 
 export function createApp({
   config,
@@ -72,6 +79,8 @@ export function createApp({
   verifyGoogleIdToken,
   storage,
   notifier,
+  observability = fallbackObservability,
+  readinessCheck = async () => true,
 }) {
   const app = express();
   const { authenticate, authorize } = createAuthMiddleware(
@@ -81,6 +90,7 @@ export function createApp({
   const rateLimitsEnabled = config.nodeEnv !== "test";
 
   app.disable("x-powered-by");
+  app.use(observability.requestMiddleware());
   if (config.trustProxy) app.set("trust proxy", 1);
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(
@@ -132,6 +142,21 @@ export function createApp({
   app.get("/health", (req, res) => {
     res.json({ status: "ok" });
   });
+
+  app.get(
+    "/ready",
+    asyncRoute(async (req, res) => {
+      try {
+        await readinessCheck();
+        return res.json({ status: "ready" });
+      } catch (error) {
+        observability.error("readiness_check_failed", error, {
+          requestId: req.requestId,
+        });
+        return res.status(503).json({ status: "unavailable" });
+      }
+    })
+  );
 
   app.post(
     "/register",
@@ -296,7 +321,10 @@ export function createApp({
         image_url: storedImage?.url || null,
       };
       const reporter = await repositories.users.findPublicById(req.user.id);
-      notifyInBackground(notifier.reportCreated({ report: responseReport, reporter }));
+      notifyInBackground(
+        notifier.reportCreated({ report: responseReport, reporter }),
+        observability
+      );
       return res.status(201).json({
         success: true,
         message: "Report added successfully",
@@ -348,7 +376,10 @@ export function createApp({
       await repositories.reports.updateStatus(id, status);
       if (status === "resolved" && previousStatus !== "resolved") {
         const resolvedReport = await repositories.reports.findDetailedById(id);
-        notifyInBackground(notifier.reportResolved({ report: resolvedReport }));
+        notifyInBackground(
+          notifier.reportResolved({ report: resolvedReport }),
+          observability
+        );
       }
       return res.json({ success: true, message: "Status updated successfully" });
     })
@@ -382,7 +413,7 @@ export function createApp({
       if (!report) return res.status(404).json({ message: "Report not found" });
       const deleted = await repositories.reports.delete(id);
       if (deleted && report.image_key) {
-        notifyInBackground(storage.remove(report.image_key));
+        notifyInBackground(storage.remove(report.image_key), observability);
       }
       return deleted
         ? res.json({ success: true, message: "Report deleted successfully" })
@@ -422,7 +453,20 @@ export function createApp({
     }
 
     const status = Number(error.status) || 500;
-    if (status >= 500) console.error(error);
+    if (status >= 500) {
+      observability.error("request_failed", error, {
+        requestId: req.requestId,
+        method: req.method,
+        path: req.path,
+        status,
+      });
+      observability.captureException(error, {
+        requestId: req.requestId,
+        method: req.method,
+        path: req.path,
+        status,
+      });
+    }
     return res.status(status).json({
       message: status >= 500 ? "Internal server error" : error.message,
       ...(error.details ? { details: error.details } : {}),

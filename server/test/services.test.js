@@ -46,6 +46,26 @@ test("explicit S3 credentials must be configured as a pair", () => {
   );
 });
 
+test("observability sampling must stay between zero and one", () => {
+  assert.throws(
+    () =>
+      loadConfig({
+        ...baseEnvironment,
+        SENTRY_TRACES_SAMPLE_RATE: "1.5",
+      }),
+    /between 0 and 1/
+  );
+
+  const config = loadConfig({
+    ...baseEnvironment,
+    NODE_ENV: "production",
+    SENTRY_DSN: "https://public@example.invalid/1",
+    SENTRY_TRACES_SAMPLE_RATE: "0.1",
+  });
+  assert.equal(config.observability.environment, "production");
+  assert.equal(config.observability.tracesSampleRate, 0.1);
+});
+
 test("local storage writes, resolves, and removes generated object keys", async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), "tunza-storage-"));
   const storage = createStorage({
