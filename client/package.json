@@ -9,7 +9,10 @@
     "web": "expo start --web",
     "check": "expo export --platform all --output-dir dist/check",
     "doctor": "expo-doctor",
-    "prebuild": "expo prebuild"
+    "prebuild": "expo prebuild",
+    "test:release-config": "node --test test/release-config.test.mjs",
+    "validate:release-env": "node scripts/validate-release-env.mjs",
+    "eas-build-pre-install": "node scripts/validate-release-env.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
