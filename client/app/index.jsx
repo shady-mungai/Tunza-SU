@@ -3,7 +3,7 @@ import Login from "./Login";
 import Signup from "./Signup";
 import { AuthProvider, useAuth } from "../src/contexts/AuthContexts";
 import RoleBasedNavigator from "../src/navigation/RoleBasedNavigator";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -11,6 +11,7 @@ import AllReports from "./allReports";
 import "../global.css";
 import Help from "./help";
 import AssignedReports from "./assignedReports";
+import { colors } from "../src/theme/tokens";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,8 +20,15 @@ function RootNavigator() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-xl font-bold text-blue-500">Loading...</Text>
+      <View
+        className="flex-1 items-center justify-center bg-white"
+        accessibilityRole="progressbar"
+        accessibilityLabel="Preparing Tunza SU"
+      >
+        <ActivityIndicator size="large" color={colors.brand} />
+        <Text className="mt-4 text-base font-semibold text-gray-700">
+          Preparing Tunza SU
+        </Text>
       </View>
     );
   }

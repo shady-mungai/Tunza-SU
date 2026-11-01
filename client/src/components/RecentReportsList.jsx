@@ -39,7 +39,12 @@ const RecentReportsList = () => {
   <View className="bg-white rounded-2xl p-6 border border-gray-200">
     <View className="flex-row justify-between items-center mb-4">
       <Text className="font-bold text-lg text-gray-900">Recent Reports</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('MyReports')}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('MyReports')}
+        accessibilityRole="button"
+        accessibilityLabel="View all reports"
+        className="min-h-[44px] justify-center"
+      >
         <Text className="px-3 py-1 border border-gray-300 rounded-lg text-gray-700 text-sm">View All</Text>
       </TouchableOpacity>
     </View>
@@ -54,7 +59,6 @@ const RecentReportsList = () => {
           <View className="flex-row items-center">
             {statusBadge(report.status)}
             {priorityBadge(report.priority)}
-            <Text className="ml-2 text-gray-400 text-lg">👁️</Text>
           </View>
         </View>
       ))}
@@ -62,4 +66,4 @@ const RecentReportsList = () => {
   </View>
 );
 }
-export default RecentReportsList; 
+export default RecentReportsList;
