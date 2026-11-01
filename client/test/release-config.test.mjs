@@ -12,6 +12,10 @@ const previewEnvironment = {
   EXPO_PUBLIC_API_URL: "https://staging-api.example.com",
   EAS_PROJECT_ID: "00000000-0000-4000-8000-000000000000",
   EXPO_OWNER: "tunza-su",
+  EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: "web-client.apps.exampleusercontent.com",
+  EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: "ios-client.apps.exampleusercontent.com",
+  EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID:
+    "android-client.apps.exampleusercontent.com",
 };
 
 test("development does not require cloud release settings", () => {
@@ -32,9 +36,11 @@ test("preview release settings accept a secure staging endpoint", () => {
   assert.deepEqual(validateReleaseEnvironment(previewEnvironment), []);
 });
 
-test("production builds require every Google OAuth client", () => {
+test("release builds require every Google OAuth client", () => {
   const errors = validateReleaseEnvironment({
-    ...previewEnvironment,
+    EAS_PROJECT_ID: previewEnvironment.EAS_PROJECT_ID,
+    EXPO_OWNER: previewEnvironment.EXPO_OWNER,
+    EXPO_PUBLIC_API_URL: previewEnvironment.EXPO_PUBLIC_API_URL,
     EAS_BUILD_PROFILE: "production",
   });
   assert.equal(errors.filter((error) => error.includes("GOOGLE")).length, 3);

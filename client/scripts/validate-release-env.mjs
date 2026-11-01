@@ -22,14 +22,12 @@ export function validateReleaseEnvironment(env = process.env) {
     errors.push("EXPO_PUBLIC_SENTRY_DSN must use HTTPS");
   }
 
-  if (currentProfile === "production") {
-    for (const key of [
-      "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID",
-      "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID",
-      "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID",
-    ]) {
-      if (!env[key]?.trim()) errors.push(`${key} is required`);
-    }
+  for (const key of [
+    "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID",
+    "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID",
+    "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID",
+  ]) {
+    if (!env[key]?.trim()) errors.push(`${key} is required`);
   }
 
   return errors;
