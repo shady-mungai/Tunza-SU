@@ -34,15 +34,17 @@ const statusBadge = (status) => {
 };
 
 const priorityBadge = (priority) => {
-  if (priority === "High") return <Text style={styles.priorityHigh}>High</Text>;
-  if (priority === "Medium")
+  const normalized = priority?.toLowerCase();
+  if (normalized === "high" || normalized === "urgent")
+    return <Text style={styles.priorityHigh}>{priority}</Text>;
+  if (normalized === "medium")
     return <Text style={styles.priorityMedium}>Medium</Text>;
-  if (priority === "Low") return <Text style={styles.priorityLow}>Low</Text>;
+  if (normalized === "low") return <Text style={styles.priorityLow}>Low</Text>;
   return null;
 };
 
 const MyReports = () => {
-  const { user } = useAuth();
+  const { user, authFetch } = useAuth();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLargeScreen, setIsLargeScreen] = useState(
@@ -61,9 +63,7 @@ const MyReports = () => {
     const fetchReports = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
-          `http://localhost:4000/userReports?user_id=${user?.id}`
-        );
+        const res = await authFetch("/userReports");
         const data = await res.json();
         setReports(data.reports || []);
       } catch (err) {
@@ -73,7 +73,7 @@ const MyReports = () => {
       }
     };
     if (user?.id && isFocused) fetchReports();
-  }, [user, isFocused]);
+  }, [authFetch, user, isFocused]);
 
   return (
     <View style={styles.container}>

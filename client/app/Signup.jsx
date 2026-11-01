@@ -11,10 +11,8 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import axios from "axios";
 import Toast from "react-native-toast-message";
 
-import { Picker } from "@react-native-picker/picker"; // Make sure to install this package
 import { useState, useRef } from "react";
 import {
   validatePassword,
@@ -36,7 +34,6 @@ const Signup = () => {
     email: "",
     admission_number: "", // Fixed: was admission_number
     phone_number: "", // Fixed: was phone_number_number
-    role: "",
     password: "",
     confirmPassword: "",
   });
@@ -59,7 +56,6 @@ const Signup = () => {
     email: "",
     admission_number: "",
     phone_number: "",
-    role: "",
     password: "",
     confirmPassword: "",
   });
@@ -69,7 +65,6 @@ const Signup = () => {
     email: false,
     admission_number: false,
     phone_number: false,
-    role: false,
     password: false,
     confirmPassword: false,
   });
@@ -85,7 +80,7 @@ const Signup = () => {
     {
       title: "Add your details",
       subtitle: "We need some additional information",
-      fields: ["admission_number", "phone_number", "role"],
+      fields: ["admission_number", "phone_number"],
     },
     {
       title: "Choose a password",
@@ -101,14 +96,12 @@ const Signup = () => {
 
   // Fixed: Proper React Native input change handler with real-time validation
   function handleInputChange(field, value) {
-    console.log(`Input changed - Field: ${field}, Value: ${value}`);
 
     setFormData((prevData) => {
       const newData = {
         ...prevData,
         [field]: value,
       };
-      console.log("Updated form data:", newData);
       return newData;
     });
 
@@ -123,7 +116,6 @@ const Signup = () => {
 
     if (field === "password") {
       const strength = validatePassword(value);
-      console.log("Password strength:", strength);
       setPasswordStrength(strength);
     }
   }
@@ -215,12 +207,6 @@ const Signup = () => {
             return false;
           }
           break;
-        case "role":
-          if (!value || value === "") {
-            Alert.alert("Error", "Please select your role");
-            return false;
-          }
-          break;
         case "password":
           if (passwordStrength.score < 5) {
             Alert.alert(
@@ -249,7 +235,6 @@ const Signup = () => {
       email: "email",
       admission_number: "admission number",
       phone_number: "phone_number",
-      role: "role",
       password: "password",
       confirmPassword: "confirm password",
     };
@@ -257,13 +242,10 @@ const Signup = () => {
   };
 
   const nextStep = () => {
-    console.log("Next button clicked, current step:", currentStep);
-    console.log("Current form data:", formData);
 
     if (validateCurrentStep()) {
       if (currentStep < steps.length - 1) {
         const newStep = currentStep + 1;
-        console.log("Moving to step:", newStep);
         setCurrentStep(newStep);
         // Remove animation for now to test if it's causing issues
         // animateSlide(newStep)
@@ -289,7 +271,6 @@ const Signup = () => {
       email: formData.email,
       admission_number: formData.admission_number,
       phone_number: formData.phone_number,
-      role: formData.role,
       password: formData.password,
     });
     setIsLoading(false);
@@ -562,52 +543,6 @@ const Signup = () => {
           )}
       </View>
 
-      <View style={{ marginBottom: 24 }}>
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "500",
-            color: "#374151",
-            marginBottom: 8,
-          }}
-        >
-          Role *
-        </Text>
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor:
-              fieldsTouched.role && !formData.role
-                ? "#f87171"
-                : fieldsTouched.role && formData.role
-                ? "#34d399"
-                : "#d1d5db",
-            borderRadius: 8,
-            backgroundColor: "white",
-          }}
-        >
-          <Picker
-            selectedValue={formData.role}
-            onValueChange={(value) => handleInputChange("role", value)}
-            style={{ height: 48, fontSize: 14 }}
-          >
-            <Picker.Item label="Select your role" value="" />
-            <Picker.Item label="Student" value="student" />
-            <Picker.Item label="Maintenance Staff" value="maintenance_staff" />
-            <Picker.Item label="Staff" value="staff" />
-          </Picker>
-        </View>
-        {fieldsTouched.role && !formData.role && (
-          <Text style={{ fontSize: 12, color: "#ef4444", marginTop: 4 }}>
-            Please select your role
-          </Text>
-        )}
-        {fieldsTouched.role && formData.role && (
-          <Text style={{ fontSize: 12, color: "#10b981", marginTop: 4 }}>
-            ✓ Role selected
-          </Text>
-        )}
-      </View>
     </View>
   );
 
@@ -849,21 +784,6 @@ const Signup = () => {
             </Text>
           </View>
 
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text style={{ color: "#6b7280", fontSize: 14 }}>Role:</Text>
-            <Text
-              style={{
-                fontWeight: "500",
-                color: "#111827",
-                fontSize: 14,
-                textTransform: "capitalize",
-              }}
-            >
-              {formData.role}
-            </Text>
-          </View>
         </View>
       </View>
 

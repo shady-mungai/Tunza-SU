@@ -10,7 +10,6 @@ import {
   Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useAuth, sendMail } from '../contexts/AuthContexts'
 
 const categories = ["Plumbing", "Electrical", "Furniture", "Cleaning", "Other"];
 const priorities = ["Low", "Medium", "High", "Urgent"];
@@ -24,8 +23,6 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
   const [imageUri, setImageUri] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { user, sendMail } = useAuth();
-
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -58,7 +55,6 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('user_id', user?.id);
       formData.append('title', title);
       formData.append('description', description);
       formData.append('location', location);
@@ -88,13 +84,11 @@ const ReportForm = ({ visible, onClose, onSubmit }) => {
           // Continue without image if there's an error
         }
       }
-      await onSubmit(formData, true);
-      sendMail({
-        location: location,
-        priority: priority,
-        category: category,
-
-      });
+      const submitted = await onSubmit(formData, true);
+      if (!submitted) {
+        setError("Failed to submit report.");
+        return;
+      }
       setTitle("");
       setDescription("");
       setLocation("");

@@ -12,7 +12,7 @@ const StudentDashboard = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(Dimensions.get('window').width >= 768);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const { user, sendMail } = useAuth();
+  const { user, authFetch } = useAuth();
 
   useEffect(() => {
     const onChange = ({ window }) => setIsLargeScreen(window.width >= 768);
@@ -26,7 +26,7 @@ const StudentDashboard = () => {
   const handleSubmitReport = async (reportData, isFormData = false) => {
     setSubmitting(true);
     try {
-      const response = await fetch('http://localhost:4000/addReport', {
+      const response = await authFetch('/addReport', {
         method: 'POST',
         ...(isFormData
           ? { body: reportData }
@@ -37,13 +37,14 @@ const StudentDashboard = () => {
       });
       if (response.ok) {
         Alert.alert('Success', 'Report submitted successfully!');
-
-
+        return true;
       } else {
         Alert.alert('Error', 'Failed to submit report.');
+        return false;
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to submit report.');
+      return false;
     } finally {
       setSubmitting(false);
     }
@@ -109,4 +110,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StudentDashboard; 
+export default StudentDashboard;

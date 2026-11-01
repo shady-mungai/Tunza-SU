@@ -176,7 +176,6 @@ const AdminNavigator = () => (
 const RoleBasedNavigator = () => {
   const { user } = useAuth();
 
-  console.log(`user role is ${user?.role}`);
   // Determine which navigator to show based on user role
   const getNavigatorByRole = () => {
     switch (user?.role) {

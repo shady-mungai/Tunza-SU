@@ -3,56 +3,16 @@ import Login from "./Login";
 import Signup from "./Signup";
 import { AuthProvider, useAuth } from "../src/contexts/AuthContexts";
 import RoleBasedNavigator from "../src/navigation/RoleBasedNavigator";
-import { StyleSheet, Text, View } from "react-native";
-import {
-  NavigationContainer,
-  NavigationIndependentTree,
-} from "@react-navigation/native";
+import { Text, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import StudentDashboard from "../src/components/StudentDashboard";
-import MyReports from "../src/components/MyReports";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import AllReports from "./allReports";
 import "../global.css";
 import Help from "./help";
 import AssignedReports from "./assignedReports";
-import GettingStarted from "./gettingStarted";
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-        tabBarLabelStyle: { fontSize: 12 },
-      }}
-    >
-      <Tab.Screen
-        name="Student Dash"
-        component={StudentDashboard}
-        options={{ tabBarIcon: () => <Text>⚙️</Text> }}
-      />
-      <Tab.Screen
-        name="My Reports"
-        component={MyReports}
-        options={{ tabBarIcon: () => <Text>⚠️</Text> }}
-      />
-      <Tab.Screen
-        name="Student Dash"
-        component={StudentDashboard}
-        options={{ tabBarIcon: () => <Text>⚙️</Text> }}
-      />
-      <Tab.Screen
-        name="My Reports"
-        component={MyReports}
-        options={{ tabBarIcon: () => <Text>⚠️</Text> }}
-      />
-    </Tab.Navigator>
-  );
-}
 
 function RootNavigator() {
   const { user, loading } = useAuth();
@@ -70,7 +30,6 @@ function RootNavigator() {
       {user ? (
         <>
           <Stack.Screen name="MainApp" component={RoleBasedNavigator} />
-          <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="AllReports" component={AllReports} />
           <Stack.Screen name="AssignedReports" component={AssignedReports} />
           <Stack.Screen name="Help" component={Help} />
@@ -88,16 +47,14 @@ function RootNavigator() {
 
 const Home = () => {
   return (
-    <AuthProvider>
-      <NavigationIndependentTree>
+    <SafeAreaProvider>
+      <AuthProvider>
         <NavigationContainer>
           <RootNavigator />
         </NavigationContainer>
-      </NavigationIndependentTree>
-    </AuthProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 };
 
 export default Home;
-
-const styles = StyleSheet.create({});

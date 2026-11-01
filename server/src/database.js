@@ -1,0 +1,15 @@
+import mysql from "mysql2/promise";
+
+export function createDatabase(config) {
+  return mysql.createPool({
+    host: config.host,
+    port: config.port,
+    database: config.database,
+    user: config.user,
+    password: config.password,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    decimalNumbers: true,
+  });
+}

@@ -29,7 +29,7 @@ const { width } = Dimensions.get("window");
 
 const AssignedReports = () => {
   const navigation = useNavigation();
-  const { user, sendMail } = useAuth();
+  const { user, authFetch } = useAuth();
   const [assignedReports, setAssignedReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,9 +49,7 @@ const AssignedReports = () => {
       setError(null);
 
       try {
-        const response = await fetch(
-          `http://localhost:4000/assignedReports?maintenance_id=${user.id}`
-        );
+        const response = await authFetch("/assignedReports");
 
         if (!response.ok) {
           throw new Error("Failed to fetch assigned reports");
@@ -69,39 +67,39 @@ const AssignedReports = () => {
     };
 
     fetchAssignedReports();
-  }, [user?.id]);
+  }, [authFetch, user?.id]);
 
   // Status badge component
   const StatusBadge = ({ status }) => {
     const getStatusStyle = () => {
-      switch (status) {
-        case "New":
+      switch (String(status).toLowerCase()) {
+        case "pending":
           return { backgroundColor: "#E0E7FF", color: "#4F46E5" };
-        case "In Progress":
+        case "in_progress":
           return { backgroundColor: "#DBEAFE", color: "#2563EB" };
-        case "Pending Review":
-          return { backgroundColor: "#FEF3C7", color: "#D97706" };
-        case "completed":
+        case "resolved":
           return { backgroundColor: "#D1FAE5", color: "#10B981" };
-        case "Overdue":
+        case "rejected":
           return { backgroundColor: "#FEE2E2", color: "#EF4444" };
         default:
           return { backgroundColor: "#E5E7EB", color: "#4B5563" };
       }
     };
 
-    return <Text style={[styles.badge, getStatusStyle()]}>{status}</Text>;
+    const label = String(status || "unknown").replaceAll("_", " ");
+    return <Text style={[styles.badge, getStatusStyle()]}>{label}</Text>;
   };
 
   // Priority badge component
   const PriorityBadge = ({ priority }) => {
     const getPriorityStyle = () => {
-      switch (priority) {
-        case "High":
+      switch (String(priority).toLowerCase()) {
+        case "high":
+        case "urgent":
           return { backgroundColor: "#FEE2E2", color: "#EF4444" };
-        case "Medium":
+        case "medium":
           return { backgroundColor: "#FFF7ED", color: "#F97316" };
-        case "Low":
+        case "low":
           return { backgroundColor: "#E5E7EB", color: "#4B5563" };
         default:
           return { backgroundColor: "#E5E7EB", color: "#4B5563" };
@@ -137,14 +135,8 @@ const AssignedReports = () => {
   const handleStatusUpdate = async () => {
     if (!selectedReport || !selectedStatus) return;
 
-    console.log('-----------------SELECTED REPORT----------------------------')
-
-    console.log(selectedReport);
-    
-    console.log('---------------------------------------------')
-
     try {
-      const response = await fetch(`http://localhost:4000/reports/${selectedReport.id}`, {
+      const response = await authFetch(`/reports/${selectedReport.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: selectedStatus }),
@@ -154,16 +146,6 @@ const AssignedReports = () => {
       setAssignedReports(prev => prev.map(r => r.id === selectedReport.id ? { ...r, status: selectedStatus } : r));
       setStatusModalVisible(false);
       setSelectedReport(null);
-      // Notify student if resolved
-      if (selectedStatus === 'completed' && selectedReport.reporter_email && selectedReport.reporter_name) {
-        sendMail({
-          to_email: selectedReport.reporter_email,
-          to_name: selectedReport.reporter_name,
-          status: selectedReport.status,
-          location: selectedReport.location,
-          category: selectedReport.category
-        });
-      }
     } catch (err) {
       Alert.alert('Error', 'Failed to update report status.');
     }
@@ -267,9 +249,9 @@ const AssignedReports = () => {
                 itemStyle={{ fontSize: 16, color: '#1F2937', fontWeight: '500' }}
                 dropdownIconColor="##228C22"
               >
-                <Picker.Item label="Pending Review" value="under_review" />
+                <Picker.Item label="Pending" value="pending" />
                 <Picker.Item label="In Progress" value="in_progress" />
-                <Picker.Item label="Resolved" value="completed" />
+                <Picker.Item label="Resolved" value="resolved" />
               </Picker>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 16 }}>

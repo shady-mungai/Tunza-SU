@@ -11,8 +11,8 @@ import {
   Modal,
   Alert,
   RefreshControl,
-  Picker,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import {
   useNavigation,
   useNavigationContainerRef,
@@ -65,7 +65,7 @@ const { width, height } = Dimensions.get("window");
 
 const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const navigation = useNavigation();
-  const { logout } = useAuth();
+  const { logout, authFetch } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedTab, setSelectedTab] = useState("dashboard");
   const [modalVisible, setModalVisible] = useState(false);
@@ -453,11 +453,11 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Fetch dashboard stats from backend
   const fetchDashboardStats = useCallback(async () => {
     try {
-      const usersRes = await fetch("http://localhost:4000/allUsers");
+      const usersRes = await authFetch("/allUsers");
       const usersData = await usersRes.json();
       const userCount = usersData.success ? usersData.users.length : 0;
 
-      const statsRes = await fetch("http://localhost:4000/reportStats");
+      const statsRes = await authFetch("/reportStats");
       const statsData = await statsRes.json();
 
       setDashboardStats((prev) => ({
@@ -470,12 +470,12 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
     } catch (err) {
       console.error("Error fetching dashboard stats:", err);
     }
-  }, []);
+  }, [authFetch]);
 
   // Add this function to fetch active reports from the backend
   const fetchActiveReports = async () => {
     try {
-      const res = await fetch("http://localhost:4000/activeReports");
+      const res = await authFetch("/activeReports");
       const data = await res.json();
       if (data.success) {
         setReports(data.reports);
@@ -489,7 +489,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const deleteUser = async (id) => {
     console.log("Attempting to delete user with id:", id);
     try {
-      const res = await fetch(`http://localhost:4000/user/${id}`, {
+      const res = await authFetch(`/user/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -509,7 +509,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Add this function to fetch the latest 3 recent reports from the backend
   const fetchRecentReports = async () => {
     try {
-      const res = await fetch("http://localhost:4000/activeReports");
+      const res = await authFetch("/activeReports");
       const data = await res.json();
       setRecentReports((data.reports || data).slice(0, 3));
     } catch (err) {
@@ -520,7 +520,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   // Fetch users from backend and set users state
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:4000/allUsers");
+      const res = await authFetch("/allUsers");
       const data = await res.json();
       // If backend returns { success: true, users: [...] }
       let userList = data.users || data;
@@ -599,10 +599,10 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const handleUpdateReportStatus = async (status) => {
     if (selectedReport) {
       try {
-        const res = await fetch(
-          `http://localhost:4000/report/${selectedReport.id}/status`,
+        const res = await authFetch(
+          `/reports/${selectedReport.id}`,
           {
-            method: "PATCH",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status }),
           }
@@ -626,14 +626,30 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   };
 
   // Handler to assign report
-  const handleAssignReport = (assignedTo) => {
+  const handleAssignReport = async (maintenanceId) => {
     if (selectedReport) {
-      setReports((prevReports) =>
-        prevReports.map((r) =>
-          r.id === selectedReport.id ? { ...r, assignedTo } : r
-        )
-      );
-      setSelectedReport((prev) => ({ ...prev, assignedTo }));
+      try {
+        const response = await authFetch(`/reports/${selectedReport.id}/assignment`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ maintenance_id: maintenanceId }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Assignment failed");
+        const assignee = users.find((user) => user.id === maintenanceId);
+        const update = {
+          assigned_to: maintenanceId,
+          assignedTo: assignee?.name || "Assigned",
+        };
+        setReports((current) =>
+          current.map((report) =>
+            report.id === selectedReport.id ? { ...report, ...update } : report
+          )
+        );
+        setSelectedReport((current) => ({ ...current, ...update }));
+      } catch (error) {
+        Alert.alert("Error", error.message || "Failed to assign report");
+      }
     }
   };
 
@@ -641,8 +657,8 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
   const handleDeleteReport = async () => {
     if (selectedReport) {
       try {
-        const res = await fetch(
-          `http://localhost:4000/report/${selectedReport.id}`,
+        const res = await authFetch(
+          `/report/${selectedReport.id}`,
           {
             method: "DELETE",
           }
@@ -1163,33 +1179,33 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
                   <Text style={styles.userDetailLabel}>Status</Text>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     {[
-                      "Pending Review",
-                      "In Progress",
-                      "Resolved",
-                      "Overdue",
+                      { label: "Pending", value: "pending" },
+                      { label: "In Progress", value: "in_progress" },
+                      { label: "Resolved", value: "resolved" },
+                      { label: "Rejected", value: "rejected" },
                     ].map((status) => (
                       <TouchableOpacity
-                        key={status}
+                        key={status.value}
                         style={{
                           marginRight: 8,
                           padding: 6,
                           borderRadius: 8,
                           backgroundColor:
-                            selectedReport.status === status
+                            selectedReport.status === status.value
                               ? currentColors.primary
                               : currentColors.surface,
                         }}
-                        onPress={() => handleUpdateReportStatus(status)}
+                        onPress={() => handleUpdateReportStatus(status.value)}
                       >
                         <Text
                           style={{
                             color:
-                              selectedReport.status === status
+                              selectedReport.status === status.value
                                 ? "#fff"
                                 : currentColors.text,
                           }}
                         >
-                          {status}
+                          {status.label}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -1207,7 +1223,7 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
                     }}
                   >
                     <Picker
-                      selectedValue={selectedReport.assignedTo}
+                      selectedValue={selectedReport.assigned_to}
                       onValueChange={handleAssignReport}
                       style={{
                         color: currentColors.text,
@@ -1220,13 +1236,15 @@ const AdminDashboard = ({ navigation: propNavigation, route }) => {
                         backgroundColor: currentColors.surface,
                       }}
                     >
-                      <Picker.Item
-                        label="Omar Siddique"
-                        value="Omar Siddique"
-                      />
-                      <Picker.Item label="Peter Otieno" value="Peter Otieno" />
-                      <Picker.Item label="John Singh" value="John Singh" />
-                      <Picker.Item label="Paul Mwangi" value="Paul Mwangi" />
+                      {users
+                        .filter((user) => user.role === "maintenance_staff")
+                        .map((user) => (
+                          <Picker.Item
+                            key={user.id}
+                            label={user.name}
+                            value={user.id}
+                          />
+                        ))}
                     </Picker>
                   </View>
                 </View>
