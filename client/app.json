@@ -23,7 +23,8 @@
           "photosPermission": "Allow Tunza SU to attach photos to maintenance reports.",
           "cameraPermission": "Allow Tunza SU to take photos for maintenance reports."
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }

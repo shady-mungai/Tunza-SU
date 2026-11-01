@@ -83,12 +83,34 @@ npx eas-cli@latest init
 npx eas-cli@latest build --profile preview --platform android
 ```
 
-Use the `production` profile only after the backend is deployed over HTTPS and
-the authentication/authorization work in Phase 2 is complete.
+Use the `production` profile only after Phase 2 is complete and the backend is
+deployed over HTTPS.
 
-## Known Phase 2 work
+## Secure API setup
 
-The current API is retained for recovery purposes. It still needs authenticated
-sessions, role-based authorization, verified Google identity tokens, database
-migrations, upload restrictions, rate limiting, and integration tests before it
-can be exposed to the public internet.
+Phase 2 adds signed bearer sessions, server-verified Google ID tokens, role-based
+authorization, validation, rate limits, security headers, upload restrictions,
+database migrations, and integration tests.
+
+After configuring `server/.env`, initialize or upgrade the database and create
+the first administrator:
+
+```bash
+cd server
+npm run migrate
+npm run create-admin
+npm test
+```
+
+Public registration always creates a student. Maintenance and additional admin
+accounts must be provisioned by an administrator through the authenticated
+`POST /users` API. The client stores native access tokens in Expo SecureStore
+and validates a restored session against `GET /auth/me`.
+
+Google login requires the mobile OAuth client identifiers in `client/.env` and
+the corresponding comma-separated audiences in `server/.env` under
+`GOOGLE_CLIENT_IDS`. Set `GOOGLE_HOSTED_DOMAIN` if only university-managed
+Google accounts should be accepted.
+
+The API must be deployed behind HTTPS. If it is behind a trusted reverse proxy,
+set `TRUST_PROXY=true` so rate limiting receives the correct client address.

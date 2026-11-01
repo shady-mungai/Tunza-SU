@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Dimensions,
   Modal,
+  Alert,
 } from "react-native";
 import {
   useNavigation,
@@ -35,14 +36,13 @@ import {
 } from "lucide-react-native";
 import { useAuth } from "../src/contexts/AuthContexts";
 import LayoutWrapper from "../src/components/LayoutWrapper";
-import { apiUrl } from "../src/config/api";
 
 const { width } = Dimensions.get("window");
 
 const Dashboard = ({ navigation: propNavigation, route }) => {
   const navigation = useNavigation();
   const navigationRef = useNavigationContainerRef();
-  const { user } = useAuth();
+  const { user, authFetch } = useAuth();
   const [selectedReport, setSelectedReport] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
@@ -60,9 +60,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(
-          apiUrl(`/assignedReports?maintenance_id=${encodeURIComponent(user.id)}`)
-        );
+        const response = await authFetch("/assignedReports");
         if (!response.ok) throw new Error("Failed to fetch assigned reports");
         const data = await response.json();
         setMaintenanceReports(
@@ -76,7 +74,7 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
       }
     };
     fetchAssignedReports();
-  }, [user?.id]);
+  }, [authFetch, user?.id]);
 
   // Debug navigation context
   console.log("Dashboard navigation context:", {
@@ -112,22 +110,26 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
   };
 
   // Function to update report status
-  const handleStatusChange = (newStatus) => {
+  const handleStatusChange = async (newStatus) => {
     if (selectedReport) {
-      const updatedReports = maintenanceReports.map((report) =>
-        report.id === selectedReport.id
-          ? { ...report, status: newStatus }
-          : report
-      );
-      setMaintenanceReports(updatedReports);
-
-      // Update the selected report in the modal
-      const updatedSelectedReport = updatedReports.find(
-        (report) => report.id === selectedReport.id
-      );
-      setSelectedReport(updatedSelectedReport);
-
-      setStatusModalVisible(false);
+      try {
+        const response = await authFetch(`/reports/${selectedReport.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        if (!response.ok) throw new Error("Status update failed");
+        const updatedReports = maintenanceReports.map((report) =>
+          report.id === selectedReport.id ? { ...report, status: newStatus } : report
+        );
+        setMaintenanceReports(updatedReports);
+        setSelectedReport(
+          updatedReports.find((report) => report.id === selectedReport.id)
+        );
+        setStatusModalVisible(false);
+      } catch {
+        Alert.alert("Error", "Failed to update the report status.");
+      }
     }
   };
 
@@ -186,7 +188,10 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
     (report) => report.status?.toLowerCase() === "new"
   ).length;
   const pendingReports = maintenanceReports.filter(
-    (report) => ["pending review", "under_review"].includes(report.status?.toLowerCase())
+    (report) =>
+      ["pending", "pending review", "under_review"].includes(
+        report.status?.toLowerCase()
+      )
   ).length;
   const inProgressReports = maintenanceReports.filter(
     (report) => ["in progress", "in_progress"].includes(report.status?.toLowerCase())
@@ -518,21 +523,21 @@ const Dashboard = ({ navigation: propNavigation, route }) => {
               <View style={styles.statusOptions}>
                 <TouchableOpacity
                   style={styles.statusOption}
-                  onPress={() => handleStatusChange("In Progress")}
+                  onPress={() => handleStatusChange("in_progress")}
                 >
                   <Text style={styles.statusOptionText}>In Progress</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.statusOption}
-                  onPress={() => handleStatusChange("Pending Review")}
+                  onPress={() => handleStatusChange("pending")}
                 >
                   <Text style={styles.statusOptionText}>Pending Review</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.statusOption}
-                  onPress={() => handleStatusChange("Resolved")}
+                  onPress={() => handleStatusChange("resolved")}
                 >
                   <Text style={styles.statusOptionText}>Resolved</Text>
                 </TouchableOpacity>

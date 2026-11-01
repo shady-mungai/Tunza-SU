@@ -2,12 +2,15 @@
   "name": "tunza-su",
   "version": "1.0.0",
   "description": "A mobile based solution to streamline the reporting of faulty infrastructure in Strathmore University",
-  "main": "index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node auth.js",
-    "dev": "node --watch auth.js",
-    "check": "node --check auth.js && node --check dbConnection.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/createApp.js && node --check scripts/migrate.js && node --check scripts/createAdmin.js && node --test",
+    "test": "node --test",
+    "migrate": "node scripts/migrate.js",
+    "create-admin": "node scripts/createAdmin.js"
   },
   "repository": {
     "type": "git",
@@ -24,11 +27,19 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.7.2",
+    "file-type": "^22.3.0",
+    "google-auth-library": "^11.3.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.1",
     "mysql2": "^3.14.0",
-    "speakeasy": "^2.0.0"
+    "zod": "^4.6.7"
   },
   "engines": {
     "node": ">=22.13 <25"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.1"
   }
 }

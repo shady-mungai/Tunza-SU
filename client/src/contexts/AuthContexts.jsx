@@ -2,8 +2,10 @@
 
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 import emailjs from "@emailjs/react-native";
 import { apiUrl } from "../config/api";
 
@@ -13,6 +15,29 @@ WebBrowser.maybeCompleteAuthSession();
 
 const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+const EMAIL_SERVICE_ID = process.env.EXPO_PUBLIC_EMAILJS_SERVICE_ID;
+const EMAIL_PUBLIC_KEY = process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY;
+const TOKEN_KEY = "tunza_access_token";
+const USER_KEY = "tunza_user";
+
+async function readToken() {
+  return Platform.OS === "web"
+    ? AsyncStorage.getItem(TOKEN_KEY)
+    : SecureStore.getItemAsync(TOKEN_KEY);
+}
+
+async function writeToken(value) {
+  return Platform.OS === "web"
+    ? AsyncStorage.setItem(TOKEN_KEY, value)
+    : SecureStore.setItemAsync(TOKEN_KEY, value);
+}
+
+async function removeToken() {
+  return Platform.OS === "web"
+    ? AsyncStorage.removeItem(TOKEN_KEY)
+    : SecureStore.deleteItemAsync(TOKEN_KEY);
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -22,38 +47,52 @@ export function AuthProvider({ children }) {
   // Google Auth Request setup
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: IOS_CLIENT_ID,
+    androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
-    useProxy: true,
+    scopes: ["openid", "profile", "email"],
   });
+
+  const persistSession = useCallback(async (session) => {
+    await Promise.all([
+      writeToken(session.accessToken),
+      AsyncStorage.setItem(USER_KEY, JSON.stringify(session.user)),
+    ]);
+    setToken(session.accessToken);
+    setUser(session.user);
+  }, []);
+
+  const clearSession = useCallback(async () => {
+    await Promise.all([
+      removeToken(),
+      AsyncStorage.multiRemove([USER_KEY, "user", "token", "refreshToken"]),
+    ]);
+    setUser(null);
+    setToken("");
+  }, []);
 
   // Handle Google sign-in response
   useEffect(() => {
     const handleGoogleResponse = async () => {
       if (response?.type === "success") {
-        const accessToken = response.authentication.accessToken;
         try {
-          const res = await fetch("https://www.googleapis.com/userinfo/v2/me", {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
-          const googleUser = await res.json();
-          // Send Google user info to backend to get or create app user
+          const idToken =
+            response.authentication?.idToken || response.params?.id_token;
+          if (!idToken) throw new Error("Google did not return an identity token");
           const backendRes = await fetch(apiUrl("/auth/google"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(googleUser),
+            body: JSON.stringify({ idToken }),
           });
           if (!backendRes.ok)
-            throw new Error("Failed to sync Google user with backend");
-          const appUser = await backendRes.json();
-          await AsyncStorage.setItem("user", JSON.stringify(appUser));
-          setUser(appUser);
+            throw new Error("Google sign-in was rejected by the server");
+          await persistSession(await backendRes.json());
         } catch (error) {
           console.error("Google sign-in error:", error);
         }
       }
     };
     handleGoogleResponse();
-  }, [response]);
+  }, [persistSession, response]);
 
   // Check auth state on mount
   useEffect(() => {
@@ -62,19 +101,27 @@ export function AuthProvider({ children }) {
 
   const checkAuthState = async () => {
     try {
-      const userData = await AsyncStorage.getItem("user");
-      if (userData) {
-        setUser(JSON.parse(userData));
-      }
+      const storedToken = await readToken();
+      if (!storedToken) return;
+      const response = await fetch(apiUrl("/auth/me"), {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+      if (!response.ok) return clearSession();
+      const { user: currentUser } = await response.json();
+      setToken(storedToken);
+      setUser(currentUser);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(currentUser));
     } catch (error) {
       console.error("Error checking auth state:", error);
+      await clearSession();
     } finally {
       setLoading(false);
     }
   };
 
   const loginWithGoogle = async () => {
-    promptAsync();
+    if (!request) return false;
+    return promptAsync();
   };
 
   const login = async (email, password) => {
@@ -88,9 +135,7 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, password }),
       });
       if (response.ok) {
-        const userData = await response.json();
-        setUser(userData.user);
-        await AsyncStorage.setItem("user", JSON.stringify(userData.user));
+        await persistSession(await response.json());
         return true;
       }
       return false;
@@ -110,9 +155,7 @@ export function AuthProvider({ children }) {
         body: JSON.stringify(userData),
       });
       if (response.ok) {
-        const result = await response.json();
-        setUser(result.user);
-        await AsyncStorage.setItem("user", JSON.stringify(result.user));
+        await persistSession(await response.json());
         return { success: true };
       } else {
         const errorData = await response.text();
@@ -140,52 +183,39 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      // Clear user data from AsyncStorage
-      await AsyncStorage.removeItem("user");
-
-      // Clear any other stored tokens or session data
-      await AsyncStorage.multiRemove(["user", "token", "refreshToken"]);
-
-      // Reset user state
-      setUser(null);
-      setToken("");
+      await clearSession();
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if there's an error, we should still clear the user state
       setUser(null);
       setToken("");
     }
   };
 
-  // code to send an email to users
-  const sendMail = (object) => {
-    const { to_name, to_email, location, priority, category, status } = object;
+  const authFetch = useCallback(
+    async (path, options = {}) => {
+      const headers = {
+        ...(options.headers || {}),
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await fetch(apiUrl(path), { ...options, headers });
+      if (response.status === 401) await clearSession();
+      return response;
+    },
+    [clearSession, token]
+  );
 
-    const serviceId = process.env.EXPO_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateId = to_email
-      ? process.env.EXPO_PUBLIC_EMAILJS_RESOLVED_REPORT_TEMPLATE_ID
-      : process.env.EXPO_PUBLIC_EMAILJS_NEW_REPORT_TEMPLATE_ID;
-    const publicKey = process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY;
-
-    if (!serviceId || !templateId || !publicKey) {
-      return Promise.resolve({ skipped: true });
+  const sendMail = useCallback(async (templateId, templateParams) => {
+    if (!EMAIL_SERVICE_ID || !templateId || !EMAIL_PUBLIC_KEY) return false;
+    try {
+      await emailjs.send(EMAIL_SERVICE_ID, templateId, templateParams, {
+        publicKey: EMAIL_PUBLIC_KEY,
+      });
+      return true;
+    } catch (error) {
+      console.error("Email notification failed:", error);
+      return false;
     }
-
-    return emailjs.send(
-      serviceId,
-      templateId,
-      {
-        to_name,
-        to_email,
-        location,
-        priority,
-        category,
-        status,
-      },
-      { publicKey }
-    );
-  };
-
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -196,7 +226,8 @@ export function AuthProvider({ children }) {
         register,
         logout,
         loginWithGoogle,
-        sendMail
+        authFetch,
+        sendMail,
       }}
     >
       {children}
