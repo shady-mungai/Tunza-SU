@@ -22,6 +22,17 @@ export function validateReleaseEnvironment(env = process.env) {
     errors.push("EXPO_PUBLIC_SENTRY_DSN must use HTTPS");
   }
 
+  for (const key of ["EXPO_PUBLIC_SUPPORT_URL", "EXPO_PUBLIC_PRIVACY_URL"]) {
+    const value = env[key]?.trim();
+    if (!value) errors.push(`${key} is required`);
+    else if (!value.startsWith("https://")) errors.push(`${key} must use HTTPS`);
+  }
+
+  const supportEmail = env.EXPO_PUBLIC_SUPPORT_EMAIL?.trim();
+  if (supportEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportEmail)) {
+    errors.push("EXPO_PUBLIC_SUPPORT_EMAIL must be a valid email address");
+  }
+
   for (const key of [
     "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID",
     "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID",

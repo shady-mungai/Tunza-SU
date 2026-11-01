@@ -16,6 +16,9 @@ const previewEnvironment = {
   EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: "ios-client.apps.exampleusercontent.com",
   EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID:
     "android-client.apps.exampleusercontent.com",
+  EXPO_PUBLIC_SUPPORT_EMAIL: "support@example.com",
+  EXPO_PUBLIC_SUPPORT_URL: "https://support.example.com/tunza-su",
+  EXPO_PUBLIC_PRIVACY_URL: "https://support.example.com/tunza-su/privacy",
 };
 
 test("development does not require cloud release settings", () => {
@@ -41,9 +44,32 @@ test("release builds require every Google OAuth client", () => {
     EAS_PROJECT_ID: previewEnvironment.EAS_PROJECT_ID,
     EXPO_OWNER: previewEnvironment.EXPO_OWNER,
     EXPO_PUBLIC_API_URL: previewEnvironment.EXPO_PUBLIC_API_URL,
+    EXPO_PUBLIC_SUPPORT_EMAIL: previewEnvironment.EXPO_PUBLIC_SUPPORT_EMAIL,
+    EXPO_PUBLIC_SUPPORT_URL: previewEnvironment.EXPO_PUBLIC_SUPPORT_URL,
+    EXPO_PUBLIC_PRIVACY_URL: previewEnvironment.EXPO_PUBLIC_PRIVACY_URL,
     EAS_BUILD_PROFILE: "production",
   });
   assert.equal(errors.filter((error) => error.includes("GOOGLE")).length, 3);
+});
+
+test("release builds require public support and privacy links", () => {
+  const errors = validateReleaseEnvironment({
+    ...previewEnvironment,
+    EXPO_PUBLIC_SUPPORT_EMAIL: "not-an-email",
+    EXPO_PUBLIC_PRIVACY_URL: "http://example.com/privacy",
+  });
+  assert.ok(errors.includes("EXPO_PUBLIC_SUPPORT_EMAIL must be a valid email address"));
+  assert.ok(errors.includes("EXPO_PUBLIC_PRIVACY_URL must use HTTPS"));
+});
+
+test("a support email is optional when the support URL is configured", () => {
+  assert.deepEqual(
+    validateReleaseEnvironment({
+      ...previewEnvironment,
+      EXPO_PUBLIC_SUPPORT_EMAIL: "",
+    }),
+    [],
+  );
 });
 
 test("preview and production builds use distinct application identities", () => {
