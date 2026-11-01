@@ -1,7 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import os from "node:os";
-import path from "node:path";
 import request from "supertest";
 
 import { createApp } from "../src/createApp.js";
@@ -10,6 +8,9 @@ import { createTokenService } from "../src/security/tokens.js";
 function createFixture() {
   const users = [];
   const reports = [];
+  const storedFiles = [];
+  const removedFiles = [];
+  const notifications = [];
   let nextUserId = 1;
   let nextReportId = 1;
 
@@ -99,6 +100,18 @@ function createFixture() {
     async findById(id) {
       return reports.find((report) => report.id === Number(id)) || null;
     },
+    async findDetailedById(id) {
+      const report = reports.find((item) => item.id === Number(id));
+      if (!report) return null;
+      const reporter = users.find(
+        (user) => user.id === Number(report.userId ?? report.user_id)
+      );
+      return {
+        ...report,
+        reporter_name: reporter?.name || null,
+        reporter_email: reporter?.email || null,
+      };
+    },
     async updateStatus(id, status) {
       const report = reports.find((item) => item.id === Number(id));
       if (!report) return false;
@@ -136,8 +149,30 @@ function createFixture() {
     trustProxy: false,
     allowedOrigins: ["http://localhost:8081"],
     uploads: {
-      directory: path.join(os.tmpdir(), "tunza-su-tests"),
       maxBytes: 1024,
+    },
+  };
+  const storage = {
+    driver: "test",
+    async save(file) {
+      const stored = { key: `stored-${storedFiles.length + 1}${file.extension}` };
+      stored.url = `/test-uploads/${stored.key}`;
+      storedFiles.push({ ...stored, ...file });
+      return stored;
+    },
+    async remove(key) {
+      removedFiles.push(key);
+    },
+    async urlFor(key, fallback = null) {
+      return key ? `/test-uploads/${key}` : fallback;
+    },
+  };
+  const notifier = {
+    async reportCreated(event) {
+      notifications.push({ type: "created", ...event });
+    },
+    async reportResolved(event) {
+      notifications.push({ type: "resolved", ...event });
     },
   };
   const verifyGoogleIdToken = async () => ({
@@ -151,6 +186,8 @@ function createFixture() {
     repositories: { users: userRepository, reports: reportRepository },
     tokenService,
     verifyGoogleIdToken,
+    storage,
+    notifier,
   });
 
   function addUser(role, overrides = {}) {
@@ -171,6 +208,9 @@ function createFixture() {
     users,
     reports,
     reportRepository,
+    storedFiles,
+    removedFiles,
+    notifications,
     addUser,
   };
 }
@@ -262,6 +302,63 @@ test("report ownership comes from the authenticated session", async () => {
 
   assert.equal(reportRepository.lastCreated.userId, user.id);
   assert.equal(reportRepository.lastCreated.priority, "high");
+});
+
+test("valid report images are stored by the backend storage service", async () => {
+  const { app, addUser, reportRepository, storedFiles } = createFixture();
+  const { token } = addUser("student");
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+    "base64"
+  );
+
+  const response = await request(app)
+    .post("/addReport")
+    .set("Authorization", `Bearer ${token}`)
+    .field("title", "Broken light")
+    .field("description", "The corridor light is no longer working.")
+    .field("location", "Science block")
+    .field("category", "Electrical")
+    .field("priority", "high")
+    .attach("image", png, { filename: "light.png", contentType: "image/png" })
+    .expect(201);
+
+  assert.equal(storedFiles.length, 1);
+  assert.equal(reportRepository.lastCreated.imageKey, "stored-1.png");
+  assert.equal(response.body.report.image_url, "/test-uploads/stored-1.png");
+});
+
+test("new reports and first resolution emit backend notification events", async () => {
+  const { app, addUser, reports, notifications } = createFixture();
+  const { user: student, token: studentToken } = addUser("student");
+  const { user: maintenance, token: maintenanceToken } = addUser("maintenance_staff");
+
+  await request(app)
+    .post("/addReport")
+    .set("Authorization", `Bearer ${studentToken}`)
+    .send({
+      title: "Broken door",
+      description: "The main entrance door will not close securely.",
+      location: "Library",
+      category: "Infrastructure",
+      priority: "urgent",
+    })
+    .expect(201);
+
+  reports[0].assigned_to = maintenance.id;
+  reports[0].userId = student.id;
+  await request(app)
+    .put("/reports/1")
+    .set("Authorization", `Bearer ${maintenanceToken}`)
+    .send({ status: "resolved" })
+    .expect(200);
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.deepEqual(
+    notifications.map((event) => event.type),
+    ["created", "resolved"]
+  );
+  assert.equal(notifications[1].report.reporter_email, student.email);
 });
 
 test("maintenance staff can update only reports assigned to them", async () => {

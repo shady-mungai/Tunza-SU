@@ -6,12 +6,16 @@ import { createRepositories } from "./repositories/index.js";
 import { createTokenService } from "./security/tokens.js";
 import { createGoogleVerifier } from "./security/google.js";
 import { createApp } from "./createApp.js";
+import { createStorage } from "./services/storage.js";
+import { createNotifier } from "./services/notifier.js";
 
 const config = loadConfig();
 const database = createDatabase(config.database);
 const repositories = createRepositories(database);
 const tokenService = createTokenService(config.jwt);
 const verifyGoogleIdToken = createGoogleVerifier(config.google);
+const storage = createStorage(config.storage);
+const notifier = createNotifier(config.notifications);
 
 await database.query("SELECT 1");
 
@@ -20,6 +24,8 @@ const app = createApp({
   repositories,
   tokenService,
   verifyGoogleIdToken,
+  storage,
+  notifier,
 });
 
 const server = app.listen(config.port, () => {

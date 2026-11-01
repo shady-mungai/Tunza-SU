@@ -4,8 +4,8 @@ export function createReportRepository(db) {
       const [result] = await db.execute(
         `INSERT INTO reports2
           (user_id, title, description, location, category, priority, status,
-           image_url, assigned_to, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, NULL, NOW(), NOW())`,
+           image_url, image_key, assigned_to, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?, NULL, NOW(), NOW())`,
         [
           report.userId,
           report.title,
@@ -14,6 +14,7 @@ export function createReportRepository(db) {
           report.category,
           report.priority,
           report.imageUrl,
+          report.imageKey,
         ]
       );
       return { id: result.insertId };
@@ -42,6 +43,18 @@ export function createReportRepository(db) {
     async findById(id) {
       const [rows] = await db.execute(
         "SELECT * FROM reports2 WHERE id = ? LIMIT 1",
+        [id]
+      );
+      return rows[0] || null;
+    },
+
+    async findDetailedById(id) {
+      const [rows] = await db.execute(
+        `SELECT r.*, u.name AS reporter_name, u.email AS reporter_email
+         FROM reports2 r
+         LEFT JOIN users2 u ON r.user_id = u.id
+         WHERE r.id = ?
+         LIMIT 1`,
         [id]
       );
       return rows[0] || null;

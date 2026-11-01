@@ -29,7 +29,7 @@ const { width } = Dimensions.get("window");
 
 const AssignedReports = () => {
   const navigation = useNavigation();
-  const { user, authFetch, sendMail } = useAuth();
+  const { user, authFetch } = useAuth();
   const [assignedReports, setAssignedReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -142,14 +142,6 @@ const AssignedReports = () => {
         body: JSON.stringify({ status: selectedStatus }),
       });
       if (!response.ok) throw new Error('Failed to update status');
-      if (selectedStatus === "resolved" && selectedReport.reporter_email) {
-        await sendMail(process.env.EXPO_PUBLIC_EMAILJS_RESOLVED_REPORT_TEMPLATE_ID, {
-          reporter_name: selectedReport.reporter_name || "Student",
-          reporter_email: selectedReport.reporter_email,
-          report_title: selectedReport.title,
-          report_status: "resolved",
-        });
-      }
       // Update local state
       setAssignedReports(prev => prev.map(r => r.id === selectedReport.id ? { ...r, status: selectedStatus } : r));
       setStatusModalVisible(false);

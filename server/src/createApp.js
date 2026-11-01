@@ -5,9 +5,6 @@ import { rateLimit } from "express-rate-limit";
 import multer from "multer";
 import bcrypt from "bcryptjs";
 import { fileTypeFromBuffer } from "file-type";
-import path from "node:path";
-import { mkdir, writeFile } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
 
 import { createAuthMiddleware } from "./security/middleware.js";
 import {
@@ -49,11 +46,32 @@ function sessionResponse(user, tokenService) {
   };
 }
 
+async function presentReport(report, storage) {
+  if (!report) return report;
+  const { image_key: imageKey, ...publicReport } = report;
+  return {
+    ...publicReport,
+    image_url: await storage.urlFor(imageKey, report.image_url),
+  };
+}
+
+async function presentReports(reports, storage) {
+  return Promise.all(reports.map((report) => presentReport(report, storage)));
+}
+
+function notifyInBackground(notification) {
+  void notification.catch((error) => {
+    console.error("Background task failed", error);
+  });
+}
+
 export function createApp({
   config,
   repositories,
   tokenService,
   verifyGoogleIdToken,
+  storage,
+  notifier,
 }) {
   const app = express();
   const { authenticate, authorize } = createAuthMiddleware(
@@ -74,10 +92,12 @@ export function createApp({
     })
   );
   app.use(express.json({ limit: "100kb" }));
-  app.use(
-    "/uploads",
-    express.static(config.uploads.directory, { dotfiles: "deny" })
-  );
+  if (storage.driver === "local") {
+    app.use(
+      "/uploads",
+      express.static(storage.localDirectory, { dotfiles: "deny" })
+    );
+  }
 
   const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -243,7 +263,7 @@ export function createApp({
     upload.single("image"),
     asyncRoute(async (req, res) => {
       const input = parse(reportSchema, req.body);
-      let imageUrl = null;
+      let storedImage = null;
       if (req.file) {
         const detectedType = await fileTypeFromBuffer(req.file.buffer);
         if (!detectedType || !allowedImageTypes.has(detectedType.mime)) {
@@ -251,26 +271,32 @@ export function createApp({
             status: 415,
           });
         }
-        await mkdir(config.uploads.directory, { recursive: true });
-        const filename = `${randomUUID()}${allowedImageTypes.get(detectedType.mime)}`;
-        await writeFile(
-          path.join(config.uploads.directory, filename),
-          req.file.buffer,
-          { flag: "wx" }
-        );
-        imageUrl = `/uploads/${filename}`;
+        storedImage = await storage.save({
+          buffer: req.file.buffer,
+          mime: detectedType.mime,
+          extension: allowedImageTypes.get(detectedType.mime),
+        });
       }
-      const report = await repositories.reports.create({
-        ...input,
-        userId: req.user.id,
-        imageUrl,
-      });
+      let report;
+      try {
+        report = await repositories.reports.create({
+          ...input,
+          userId: req.user.id,
+          imageUrl: storage.driver === "local" ? storedImage?.url || null : null,
+          imageKey: storedImage?.key || null,
+        });
+      } catch (error) {
+        if (storedImage?.key) await storage.remove(storedImage.key).catch(() => {});
+        throw error;
+      }
       const responseReport = {
         ...report,
         ...input,
         status: "pending",
-        image_url: imageUrl,
+        image_url: storedImage?.url || null,
       };
+      const reporter = await repositories.users.findPublicById(req.user.id);
+      notifyInBackground(notifier.reportCreated({ report: responseReport, reporter }));
       return res.status(201).json({
         success: true,
         message: "Report added successfully",
@@ -288,7 +314,7 @@ export function createApp({
         return res.status(403).json({ message: "You cannot view another user's reports" });
       }
       const reports = await repositories.reports.listByUser(requestedId);
-      return res.json({ success: true, reports });
+      return res.json({ success: true, reports: await presentReports(reports, storage) });
     })
   );
 
@@ -302,7 +328,7 @@ export function createApp({
           ? parse(idSchema, req.query.maintenance_id)
           : req.user.id;
       const reports = await repositories.reports.listAssigned(maintenanceId);
-      return res.json({ success: true, reports });
+      return res.json({ success: true, reports: await presentReports(reports, storage) });
     })
   );
 
@@ -318,7 +344,12 @@ export function createApp({
       if (req.user.role !== "admin" && Number(report.assigned_to) !== req.user.id) {
         return res.status(403).json({ message: "This report is not assigned to you" });
       }
+      const previousStatus = report.status;
       await repositories.reports.updateStatus(id, status);
+      if (status === "resolved" && previousStatus !== "resolved") {
+        const resolvedReport = await repositories.reports.findDetailedById(id);
+        notifyInBackground(notifier.reportResolved({ report: resolvedReport }));
+      }
       return res.json({ success: true, message: "Status updated successfully" });
     })
   );
@@ -350,6 +381,9 @@ export function createApp({
       const report = await repositories.reports.findById(id);
       if (!report) return res.status(404).json({ message: "Report not found" });
       const deleted = await repositories.reports.delete(id);
+      if (deleted && report.image_key) {
+        notifyInBackground(storage.remove(report.image_key));
+      }
       return deleted
         ? res.json({ success: true, message: "Report deleted successfully" })
         : res.status(404).json({ message: "Report not found" });
@@ -369,7 +403,7 @@ export function createApp({
     authorize("admin"),
     asyncRoute(async (req, res) => {
       const reports = await repositories.reports.listActive();
-      return res.json({ success: true, reports });
+      return res.json({ success: true, reports: await presentReports(reports, storage) });
     })
   );
 

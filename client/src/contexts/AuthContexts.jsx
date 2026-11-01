@@ -6,7 +6,6 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import emailjs from "@emailjs/react-native";
 import { apiUrl } from "../config/api";
 
 
@@ -16,8 +15,6 @@ WebBrowser.maybeCompleteAuthSession();
 const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
 const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
-const EMAIL_SERVICE_ID = process.env.EXPO_PUBLIC_EMAILJS_SERVICE_ID;
-const EMAIL_PUBLIC_KEY = process.env.EXPO_PUBLIC_EMAILJS_PUBLIC_KEY;
 const TOKEN_KEY = "tunza_access_token";
 const USER_KEY = "tunza_user";
 
@@ -204,19 +201,6 @@ export function AuthProvider({ children }) {
     [clearSession, token]
   );
 
-  const sendMail = useCallback(async (templateId, templateParams) => {
-    if (!EMAIL_SERVICE_ID || !templateId || !EMAIL_PUBLIC_KEY) return false;
-    try {
-      await emailjs.send(EMAIL_SERVICE_ID, templateId, templateParams, {
-        publicKey: EMAIL_PUBLIC_KEY,
-      });
-      return true;
-    } catch (error) {
-      console.error("Email notification failed:", error);
-      return false;
-    }
-  }, []);
-
   return (
     <AuthContext.Provider
       value={{
@@ -227,7 +211,6 @@ export function AuthProvider({ children }) {
         logout,
         loginWithGoogle,
         authFetch,
-        sendMail,
       }}
     >
       {children}

@@ -24,7 +24,8 @@
           "cameraPermission": "Allow Tunza SU to take photos for maintenance reports."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-web-browser"
     ]
   }
 }

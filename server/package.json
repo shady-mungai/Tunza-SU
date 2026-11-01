@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "check": "node --check src/server.js && node --check src/createApp.js && node --check scripts/migrate.js && node --check scripts/createAdmin.js && node --test",
+    "check": "node --check src/server.js && node --check src/createApp.js && node --check src/services/storage.js && node --check src/services/notifier.js && node --check scripts/migrate.js && node --check scripts/createAdmin.js && node --test",
     "test": "node --test",
     "migrate": "node scripts/migrate.js",
     "create-admin": "node scripts/createAdmin.js"
@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/shady-mungai/Tunza-SU#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1161.0",
+    "@aws-sdk/s3-request-presigner": "^3.1161.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -34,6 +36,7 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.1",
     "mysql2": "^3.14.0",
+    "nodemailer": "^10.3.1",
     "zod": "^4.6.7"
   },
   "engines": {
