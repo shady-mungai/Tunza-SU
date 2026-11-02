@@ -1,38 +1,59 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
+import {
+  BadgeCheck,
+  CircleHelp,
+  ClipboardList,
+  Home,
+  UserRound,
+  Wrench,
+} from "lucide-react-native";
 import { useAuth } from "../contexts/AuthContexts";
+import { colors, touchTarget } from "../theme/tokens";
 
 // Import screens
 import StudentDashboard from "../components/StudentDashboard";
 import MyReports from "../components/MyReports";
 import Maintenance from "../../app/maintenanceView";
-import AllReports from "../../app/allReports";
 import AssignedReports from "../../app/assignedReports";
-import Analytics from "../../app/analytics";
 import Profile from "../../app/profile";
 import Help from "../../app/help";
-import GettingStarted from "../../app/gettingStarted";
-import Dashboard from "../../app/dashboard";
 import AdminDashboard from "../../app/admin";
 
 const Tab = createBottomTabNavigator();
 
+const screenOptions = {
+  headerShown: false,
+  tabBarActiveTintColor: colors.brand,
+  tabBarInactiveTintColor: colors.textMuted,
+  tabBarStyle: {
+    minHeight: 64,
+    paddingBottom: 8,
+    paddingTop: 6,
+    borderTopColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  tabBarItemStyle: { minHeight: touchTarget },
+  tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
+};
+
+const tabIcon = (Icon) =>
+  function TabIcon({ color, size }) {
+    return <Icon color={color} size={size || 22} strokeWidth={2} />;
+  };
+
 // Student Navigation
 const StudentNavigator = () => (
   <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-      tabBarLabelStyle: { fontSize: 12 },
-    }}
+    screenOptions={screenOptions}
   >
     <Tab.Screen
       name="StudentDashboard"
       component={StudentDashboard}
       options={{
         tabBarLabel: "Dashboard",
-        tabBarIcon: () => <Text>🏠</Text>,
+        tabBarAccessibilityLabel: "Student dashboard",
+        tabBarIcon: tabIcon(Home),
       }}
     />
     <Tab.Screen
@@ -40,7 +61,8 @@ const StudentNavigator = () => (
       component={MyReports}
       options={{
         tabBarLabel: "My Reports",
-        tabBarIcon: () => <Text>📋</Text>,
+        tabBarAccessibilityLabel: "My reports",
+        tabBarIcon: tabIcon(ClipboardList),
       }}
     />
     <Tab.Screen
@@ -48,7 +70,8 @@ const StudentNavigator = () => (
       component={Profile}
       options={{
         tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text>,
+        tabBarAccessibilityLabel: "Profile",
+        tabBarIcon: tabIcon(UserRound),
       }}
     />
     <Tab.Screen
@@ -56,7 +79,8 @@ const StudentNavigator = () => (
       component={Help}
       options={{
         tabBarLabel: "Help",
-        tabBarIcon: () => <Text>❓</Text>,
+        tabBarAccessibilityLabel: "Help and support",
+        tabBarIcon: tabIcon(CircleHelp),
       }}
     />
   </Tab.Navigator>
@@ -65,18 +89,15 @@ const StudentNavigator = () => (
 // Maintenance Staff Navigation
 const MaintenanceNavigator = () => (
   <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-      tabBarLabelStyle: { fontSize: 12 },
-    }}
+    screenOptions={screenOptions}
   >
     <Tab.Screen
       name="Maintenance Dashboard"
       component={Maintenance}
       options={{
-        tabBarLabel: "Maintenance Dashboard",
-        tabBarIcon: () => <Text>⚙️</Text>,
+        tabBarLabel: "Work",
+        tabBarAccessibilityLabel: "Maintenance dashboard",
+        tabBarIcon: tabIcon(Wrench),
       }}
     />
   
@@ -85,7 +106,8 @@ const MaintenanceNavigator = () => (
       component={AssignedReports}
       options={{
         tabBarLabel: "Assigned",
-        tabBarIcon: () => <Text>✅</Text>,
+        tabBarAccessibilityLabel: "Assigned reports",
+        tabBarIcon: tabIcon(BadgeCheck),
       }}
     />
     <Tab.Screen
@@ -93,7 +115,8 @@ const MaintenanceNavigator = () => (
       component={Profile}
       options={{
         tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text>,
+        tabBarAccessibilityLabel: "Profile",
+        tabBarIcon: tabIcon(UserRound),
       }}
     />
     <Tab.Screen
@@ -101,76 +124,15 @@ const MaintenanceNavigator = () => (
       component={Help}
       options={{
         tabBarLabel: "Help",
-        tabBarIcon: () => <Text>❓</Text>,
-      }}
-    />
-  </Tab.Navigator>
-);
-
-// Staff Navigation
-const StaffNavigator = () => (
-  <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-      tabBarLabelStyle: { fontSize: 12 },
-    }}
-  >
-    <Tab.Screen
-      name="Dashboard"
-      component={Dashboard}
-      options={{
-        tabBarLabel: "Dashboard",
-        tabBarIcon: () => <Text>🏢</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="AllReports"
-      component={AllReports}
-      options={{
-        tabBarLabel: "All Reports",
-        tabBarIcon: () => <Text>📊</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Profile"
-      component={Profile}
-      options={{
-        tabBarLabel: "Profile",
-        tabBarIcon: () => <Text>👤</Text>,
-      }}
-    />
-    <Tab.Screen
-      name="Help"
-      component={Help}
-      options={{
-        tabBarLabel: "Help",
-        tabBarIcon: () => <Text>❓</Text>,
+        tabBarAccessibilityLabel: "Help and support",
+        tabBarIcon: tabIcon(CircleHelp),
       }}
     />
   </Tab.Navigator>
 );
 
 // Admin Navigation
-const AdminNavigator = () => (
-  <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarStyle: { height: 60, paddingBottom: 8, paddingTop: 8 },
-      tabBarLabelStyle: { fontSize: 12 },
-    }}
-  >
-    <Tab.Screen
-      name="Admin Dashboard"
-      component={AdminDashboard}
-
-     
-    />
-  
-
-   
-  </Tab.Navigator>
-);
+const AdminNavigator = () => <AdminDashboard />;
 
 // Main Role-Based Navigator
 const RoleBasedNavigator = () => {

@@ -3,7 +3,7 @@ name: Continuous integration
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, "release/**"]
 
 permissions:
   contents: read
@@ -46,6 +46,29 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run migrate
       - run: npm run check
+      - name: Run database-backed release smoke test
+        env:
+          ADMIN_NAME: CI Release Administrator
+          ADMIN_EMAIL: release-admin@example.invalid
+          ADMIN_ADMISSION_NUMBER: CI-RELEASE-ADMIN
+          ADMIN_PASSWORD: CI-Release-Admin-A9-Password
+          SMOKE_API_URL: http://127.0.0.1:4000
+          SMOKE_ALLOW_HTTP: "true"
+          SMOKE_ADMIN_EMAIL: release-admin@example.invalid
+          SMOKE_ADMIN_PASSWORD: CI-Release-Admin-A9-Password
+        run: |
+          npm run create-admin
+          npm start > "$RUNNER_TEMP/tunza-api.log" 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true; cat "$RUNNER_TEMP/tunza-api.log"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4000/ready > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4000/ready
+          npm run smoke:release
 
   mobile:
     runs-on: ubuntu-latest
@@ -62,4 +85,13 @@ jobs:
       - run: npm ci
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run doctor -- --verbose
+      - run: npm run test:release-config
       - run: npm run check
+
+  container:
+    needs: api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production API image
+        run: docker build --tag tunza-su-api:ci ./server

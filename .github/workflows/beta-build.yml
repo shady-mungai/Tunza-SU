@@ -1,0 +1,92 @@
+name: Beta mobile build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - android
+          - ios
+      confirm_beta_build:
+        description: I confirm this should use EAS build capacity
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beta-mobile-build
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: ${{ inputs.confirm_beta_build == true }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    env:
+      APP_VARIANT: preview
+      EAS_BUILD_PROFILE: preview
+      EAS_PROJECT_ID: ${{ vars.EAS_PROJECT_ID }}
+      EXPO_OWNER: ${{ vars.EXPO_OWNER }}
+      EXPO_PUBLIC_API_URL: ${{ vars.PREVIEW_API_URL }}
+      EXPO_PUBLIC_SENTRY_DSN: ${{ vars.PREVIEW_SENTRY_DSN }}
+      EXPO_PUBLIC_SUPPORT_EMAIL: ${{ vars.PREVIEW_SUPPORT_EMAIL }}
+      EXPO_PUBLIC_SUPPORT_URL: ${{ vars.PREVIEW_SUPPORT_URL }}
+      EXPO_PUBLIC_PRIVACY_URL: ${{ vars.PREVIEW_PRIVACY_URL }}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ vars.PREVIEW_GOOGLE_WEB_CLIENT_ID }}
+      EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${{ vars.PREVIEW_GOOGLE_IOS_CLIENT_ID }}
+      EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: ${{ vars.PREVIEW_GOOGLE_ANDROID_CLIENT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run validate:release-env
+      - run: npm run test:release-config
+      - run: npm run doctor -- --verbose
+      - run: npm run check
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: beta
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Require Expo automation token
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: test -n "$EXPO_TOKEN"
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
+      - run: npm ci
+      - name: Queue preview build
+        run: >-
+          eas build
+          --platform ${{ inputs.platform }}
+          --profile preview
+          --non-interactive
+          --no-wait

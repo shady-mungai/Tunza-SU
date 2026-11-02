@@ -4,22 +4,19 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Dimensions,
+  Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   LayoutDashboard,
   ListTodo,
   ListChecks,
-  Users,
   BarChart,
   UserCircle,
   HelpCircle,
-  BookOpen,
 } from "lucide-react-native";
 import { useAuth } from "../contexts/AuthContexts";
-
-const { width } = Dimensions.get("window");
+import { colors, touchTarget } from "../theme/tokens";
 
 const SidebarNavigation = () => {
   const navigation = useNavigation();
@@ -35,28 +32,6 @@ const SidebarNavigation = () => {
     console.log("Auth context not available, using default navigation");
     user = { role: "student" }; // Default to student role
   }
-
-  // Get role display name
-  const getRoleDisplayName = (role) => {
-    const roleNames = {
-      student: "Student",
-      maintenance_staff: "Maintenance Staff",
-      staff: "Staff",
-      admin: "Administrator",
-    };
-    return roleNames[role] || "User";
-  };
-
-  // Get department based on role
-  const getDepartment = (role) => {
-    const departments = {
-      student: "Student Affairs",
-      maintenance_staff: "Facilities & Maintenance",
-      staff: "Administration",
-      admin: "IT Administration",
-    };
-    return departments[role] || "General";
-  };
 
   // Get role-specific dashboard subtitle
   const getDashboardSubtitle = () => {
@@ -79,21 +54,21 @@ const SidebarNavigation = () => {
     const baseItems = [
       {
         icon: (
-          <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
+          <LayoutDashboard size={20} color={colors.brand} style={styles.navIcon} />
         ),
         text: "Dashboard",
         route: "StudentDashboard",
         showFor: ["student"],
       },
       {
-        icon: <ListChecks size={20} color="#97D60E" style={styles.navIcon} />,
+        icon: <ListChecks size={20} color={colors.brand} style={styles.navIcon} />,
         text: "My Reports",
         route: "MyReports",
         showFor: ["student"],
       },
       {
         icon: (
-          <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
+          <LayoutDashboard size={20} color={colors.brand} style={styles.navIcon} />
         ),
         text: "Dashboard",
         route: "Maintenance Dashboard",
@@ -101,38 +76,38 @@ const SidebarNavigation = () => {
       },
       {
         icon: (
-          <LayoutDashboard size={20} color="#97D60E" style={styles.navIcon} />
+          <LayoutDashboard size={20} color={colors.brand} style={styles.navIcon} />
         ),
         text: "Dashboard",
         route: "Dashboard",
         showFor: ["staff", "admin"],
       },
       {
-        icon: <ListTodo size={20} color="#97D60E" style={styles.navIcon} />,
+        icon: <ListTodo size={20} color={colors.brand} style={styles.navIcon} />,
         text: "All Reports",
         route: "AllReports",
         showFor: ["staff", "admin"],
       },
       {
-        icon: <ListChecks size={20} color="#97D60E" style={styles.navIcon} />,
+        icon: <ListChecks size={20} color={colors.brand} style={styles.navIcon} />,
         text: "Assigned Reports",
         route: "AssignedReports",
         showFor: ["maintenance_staff"],
       },
       {
-        icon: <BarChart size={20} color="#97D60E" style={styles.navIcon} />,
+        icon: <BarChart size={20} color={colors.brand} style={styles.navIcon} />,
         text: "Analytics",
         route: "Analytics",
         showFor: ["admin"],
       },
       {
-        icon: <UserCircle size={20} color="#97D60E" style={styles.navIcon} />,
+        icon: <UserCircle size={20} color={colors.brand} style={styles.navIcon} />,
         text: "Profile",
         route: "Profile",
         showFor: ["student", "maintenance_staff", "admin"],
       },
       {
-        icon: <HelpCircle size={20} color="#97D60E" style={styles.navIcon} />,
+        icon: <HelpCircle size={20} color={colors.brand} style={styles.navIcon} />,
         text: "Help",
         route: "Help",
         showFor: ["student", "maintenance_staff", "admin"],
@@ -151,10 +126,12 @@ const SidebarNavigation = () => {
   return (
     <View style={styles.sidebar}>
       <View style={styles.logoContainer}>
-        <View style={styles.logoCircle}>
-          <Text style={styles.logoText}>T</Text>
-        </View>
-        <Text style={styles.appTitle}>TunzaSU</Text>
+        <Image
+          source={require("../../assets/icon.png")}
+          style={styles.logoImage}
+          accessibilityLabel="Tunza SU"
+        />
+        <Text style={styles.appTitle}>Tunza SU</Text>
       </View>
       <Text style={styles.dashboardSubtitle}>{getDashboardSubtitle()}</Text>
       <View style={styles.navContainer}>
@@ -165,9 +142,12 @@ const SidebarNavigation = () => {
               key={index}
               style={[styles.navItem, isActive && styles.activeNavItem]}
               onPress={() => !isActive && navigation.navigate(item.route)}
+              accessibilityRole="button"
+              accessibilityLabel={item.text}
+              accessibilityState={{ selected: isActive }}
             >
               {React.cloneElement(item.icon, {
-                color: isActive ? "#97D60E" : "#4B5563",
+                color: isActive ? colors.brand : colors.textMuted,
               })}
               <Text style={[styles.navText, isActive && styles.activeNavText]}>
                 {item.text}
@@ -183,7 +163,7 @@ const SidebarNavigation = () => {
 const styles = StyleSheet.create({
   sidebar: {
     width: 256,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     padding: 24,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -198,27 +178,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 40,
   },
-  logoCircle: {
+  logoImage: {
     width: 40,
     height: 40,
-    backgroundColor: "#228C22",
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
+    borderRadius: 10,
   },
   appTitle: {
     marginLeft: 12,
     fontSize: 20,
     fontWeight: "600",
-    color: "#1F2937",
+    color: colors.text,
   },
   dashboardSubtitle: {
-    color: "#6B7280",
+    color: colors.textMuted,
     fontSize: 14,
     marginBottom: 24,
   },
@@ -231,20 +203,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 12,
+    minHeight: touchTarget,
   },
   activeNavItem: {
-    backgroundColor: "#97D60E33",
+    backgroundColor: colors.brandSurface,
   },
   navIcon: {
     marginRight: 12,
   },
   navText: {
-    color: "#4B5563",
+    color: colors.textMuted,
     fontWeight: "500",
     marginLeft: 12,
   },
   activeNavText: {
-    color: "#97D60E",
+    color: colors.brand,
   },
 });
 

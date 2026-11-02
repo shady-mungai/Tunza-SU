@@ -71,7 +71,8 @@ npm start
 ```
 
 For native development builds, use `npm run android` or `npm run ios`. Expo
-generates the ignored `android/` and `ios/` directories from `app.json`.
+generates the ignored `android/` and `ios/` directories from the dynamic
+`app.config.js` configuration.
 
 ## EAS builds
 
@@ -140,5 +141,10 @@ The continuous-integration workflow validates migrations against MySQL 8,
 executes API tests, audits high-severity dependencies, runs Expo Doctor, and
 exports all mobile platforms on Node 22.
 
-See [the Phase 3 release checklist](docs/phase-3-release-checklist.md) before
-creating preview or store builds.
+Phase 4 adds observability, environment-gated EAS profiles, guarded beta build
+automation, release branding, support/privacy settings, and pilot operations.
+Start with [the Phase 4 beta checklist](docs/phase-4-beta-checklist.md), then use
+the [beta pilot](docs/beta-pilot-runbook.md) and
+[operations](docs/operations-runbook.md) runbooks for recorded release proof.
+The current verified results and external release gates are in
+[the Phase 4 evidence record](docs/release-evidence.md).

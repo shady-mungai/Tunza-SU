@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContexts";
 import { useNavigation } from "@react-navigation/native";
 import SidebarNavigation from "./SidebarNavigation";
 import { useIsFocused } from "@react-navigation/native";
+import { colors } from "../theme/tokens";
 
 const statusBadge = (status) => {
   if (!status) return null;
@@ -84,7 +85,7 @@ const MyReports = () => {
           {loading ? (
             <ActivityIndicator
               size="large"
-              color="#97D60E"
+              color={colors.brand}
               style={{ marginTop: 32 }}
             />
           ) : reports.length === 0 ? (
@@ -105,7 +106,6 @@ const MyReports = () => {
                   <View style={styles.badgeRow}>
                     {statusBadge(report.status)}
                     {priorityBadge(report.priority)}
-                    <Text style={styles.eyeIcon}>👁️</Text>
                   </View>
                 </View>
               ))}
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   statusInProgress: {
     backgroundColor: "#DBEAFE",
-    color: "#97D60E",
+    color: "#1D4ED8",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -231,11 +231,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     marginRight: 6,
-  },
-  eyeIcon: {
-    marginLeft: 8,
-    fontSize: 18,
-    color: "#9CA3AF",
   },
   emptyText: {
     textAlign: "center",

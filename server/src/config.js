@@ -8,6 +8,14 @@ function positiveInteger(value, fallback) {
   return parsed;
 }
 
+function ratio(value, fallback = 0) {
+  const parsed = Number(value ?? fallback);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) {
+    throw new Error(`Expected a number between 0 and 1, received: ${value}`);
+  }
+  return parsed;
+}
+
 function csv(value) {
   return String(value || "")
     .split(",")
@@ -27,6 +35,7 @@ function required(value, name) {
 }
 
 export function loadConfig(env = process.env) {
+  const nodeEnv = env.NODE_ENV || "development";
   const jwtSecret = env.JWT_SECRET?.trim();
   if (!jwtSecret || jwtSecret.length < 32) {
     throw new Error("JWT_SECRET must be configured with at least 32 characters");
@@ -50,7 +59,7 @@ export function loadConfig(env = process.env) {
   }
 
   return {
-    nodeEnv: env.NODE_ENV || "development",
+    nodeEnv,
     port: positiveInteger(env.PORT, 4000),
     trustProxy: env.TRUST_PROXY === "true" || env.TRUST_PROXY === "1",
     allowedOrigins: csv(env.ALLOWED_ORIGINS || env.CLIENT_ORIGIN),
@@ -97,6 +106,12 @@ export function loadConfig(env = process.env) {
       password: env.SMTP_PASSWORD || null,
       from: smtpEnabled ? required(env.MAIL_FROM, "MAIL_FROM") : null,
       adminRecipients: csv(env.NOTIFICATION_ADMIN_EMAILS),
+    },
+    observability: {
+      dsn: env.SENTRY_DSN?.trim() || null,
+      environment: env.SENTRY_ENVIRONMENT?.trim() || nodeEnv,
+      release: env.RELEASE_VERSION?.trim() || null,
+      tracesSampleRate: ratio(env.SENTRY_TRACES_SAMPLE_RATE, 0),
     },
     database: {
       host: env.MYSQL_HOST || "localhost",

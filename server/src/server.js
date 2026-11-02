@@ -8,6 +8,7 @@ import { createGoogleVerifier } from "./security/google.js";
 import { createApp } from "./createApp.js";
 import { createStorage } from "./services/storage.js";
 import { createNotifier } from "./services/notifier.js";
+import { createObservability } from "./services/observability.js";
 
 const config = loadConfig();
 const database = createDatabase(config.database);
@@ -16,6 +17,7 @@ const tokenService = createTokenService(config.jwt);
 const verifyGoogleIdToken = createGoogleVerifier(config.google);
 const storage = createStorage(config.storage);
 const notifier = createNotifier(config.notifications);
+const observability = createObservability(config.observability);
 
 await database.query("SELECT 1");
 
@@ -26,16 +28,19 @@ const app = createApp({
   verifyGoogleIdToken,
   storage,
   notifier,
+  observability,
+  readinessCheck: async () => database.query("SELECT 1"),
 });
 
 const server = app.listen(config.port, () => {
-  console.log(`Tunza SU API listening on port ${config.port}`);
+  observability.info("server_started", { port: config.port });
 });
 
 async function shutdown(signal) {
-  console.log(`${signal} received; shutting down`);
+  observability.info("server_shutdown_started", { signal });
   server.close(async () => {
     await database.end();
+    await observability.flush();
     process.exit(0);
   });
 }

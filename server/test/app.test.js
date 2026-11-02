@@ -5,12 +5,13 @@ import request from "supertest";
 import { createApp } from "../src/createApp.js";
 import { createTokenService } from "../src/security/tokens.js";
 
-function createFixture() {
+function createFixture({ readinessCheck = async () => true } = {}) {
   const users = [];
   const reports = [];
   const storedFiles = [];
   const removedFiles = [];
   const notifications = [];
+  const observedErrors = [];
   let nextUserId = 1;
   let nextReportId = 1;
 
@@ -175,6 +176,19 @@ function createFixture() {
       notifications.push({ type: "resolved", ...event });
     },
   };
+  const observability = {
+    requestMiddleware() {
+      return (req, res, next) => {
+        req.requestId = "test-request-id";
+        res.setHeader("X-Request-ID", req.requestId);
+        next();
+      };
+    },
+    error(event, error, fields) {
+      observedErrors.push({ event, error, fields });
+    },
+    captureException() {},
+  };
   const verifyGoogleIdToken = async () => ({
     subject: "google-123",
     name: "Google Student",
@@ -188,6 +202,8 @@ function createFixture() {
     verifyGoogleIdToken,
     storage,
     notifier,
+    observability,
+    readinessCheck,
   });
 
   function addUser(role, overrides = {}) {
@@ -211,6 +227,7 @@ function createFixture() {
     storedFiles,
     removedFiles,
     notifications,
+    observedErrors,
     addUser,
   };
 }
@@ -221,6 +238,22 @@ test("health endpoint responds with security headers", async () => {
   assert.equal(response.body.status, "ok");
   assert.equal(response.headers["x-content-type-options"], "nosniff");
   assert.equal(response.headers["x-powered-by"], undefined);
+  assert.equal(response.headers["x-request-id"], "test-request-id");
+});
+
+test("readiness endpoint reports dependency availability", async () => {
+  const ready = createFixture();
+  await request(ready.app).get("/ready").expect(200, { status: "ready" });
+
+  const unavailable = createFixture({
+    readinessCheck: async () => {
+      throw new Error("database unavailable");
+    },
+  });
+  await request(unavailable.app)
+    .get("/ready")
+    .expect(503, { status: "unavailable" });
+  assert.equal(unavailable.observedErrors[0].event, "readiness_check_failed");
 });
 
 test("admin endpoints require authentication", async () => {

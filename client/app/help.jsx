@@ -6,13 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Linking,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {
   ChevronDown,
   ChevronRight,
   Mail,
-  Phone,
   MessageCircle,
   BookOpen,
   AlertCircle,
@@ -22,13 +22,31 @@ import {
   ListTodo,
   Users,
   BarChart,
+  ShieldCheck,
 } from "lucide-react-native";
 import LayoutWrapper from "../src/components/LayoutWrapper";
+import { colors } from "../src/theme/tokens";
 
 const { width } = Dimensions.get("window");
 
 const Help = () => {
   const navigation = useNavigation();
+  const supportEmail = process.env.EXPO_PUBLIC_SUPPORT_EMAIL?.trim();
+  const supportUrl = process.env.EXPO_PUBLIC_SUPPORT_URL?.trim();
+  const privacyUrl = process.env.EXPO_PUBLIC_PRIVACY_URL?.trim();
+  const supportDestination = supportEmail
+    ? `mailto:${supportEmail}`
+    : supportUrl;
+
+  const openExternal = async (destination) => {
+    try {
+      if (destination && (await Linking.canOpenURL(destination))) {
+        await Linking.openURL(destination);
+      }
+    } catch (error) {
+      console.warn("Unable to open support link", error);
+    }
+  };
   const faqData = [
     {
       question: "How do I view all reports?",
@@ -60,22 +78,22 @@ const Help = () => {
   const quickGuides = [
     {
       title: "Getting Started",
-      icon: <BookOpen size={24} color="#97D60E" />,
+      icon: <BookOpen size={24} color={colors.brand} />,
       description: "Learn the basics of using the maintenance dashboard",
     },
     {
       title: "Report Management",
-      icon: <ListTodo size={24} color="#97D60E" />,
+      icon: <ListTodo size={24} color={colors.brand} />,
       description: "How to create, edit, and track maintenance reports",
     },
     {
       title: "User Management",
-      icon: <Users size={24} color="#97D60E" />,
+      icon: <Users size={24} color={colors.brand} />,
       description: "Managing maintenance personnel and assignments",
     },
     {
       title: "Analytics & Reports",
-      icon: <BarChart size={24} color="#97D60E" />,
+      icon: <BarChart size={24} color={colors.brand} />,
       description: "Understanding performance metrics and generating reports",
     },
   ];
@@ -200,15 +218,38 @@ const Help = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Contact Support</Text>
           <View style={styles.contactGrid}>
-            <TouchableOpacity style={styles.contactCard}>
-              <Mail size={24} color="#97D60E" />
+            <TouchableOpacity
+              style={[
+                styles.contactCard,
+                !supportDestination && styles.contactCardDisabled,
+              ]}
+              onPress={() => openExternal(supportDestination)}
+              disabled={!supportDestination}
+              accessibilityRole="link"
+              accessibilityLabel="Contact Tunza SU support"
+            >
+              <Mail size={24} color={colors.brand} />
               <Text style={styles.contactTitle}>Email Support</Text>
-              <Text style={styles.contactInfo}>support@tunzasu.com</Text>
+              <Text style={styles.contactInfo}>
+                {supportEmail ||
+                  (supportUrl ? "Open support centre" : "Support contact is not configured")}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.contactCard}>
-              <Phone size={24} color="#97D60E" />
-              <Text style={styles.contactTitle}>Phone Support</Text>
-              <Text style={styles.contactInfo}>+254 700 000 000</Text>
+            <TouchableOpacity
+              style={[
+                styles.contactCard,
+                !privacyUrl && styles.contactCardDisabled,
+              ]}
+              onPress={() => openExternal(privacyUrl)}
+              disabled={!privacyUrl}
+              accessibilityRole="link"
+              accessibilityLabel="Read the Tunza SU privacy notice"
+            >
+              <ShieldCheck size={24} color={colors.brand} />
+              <Text style={styles.contactTitle}>Privacy & Data</Text>
+              <Text style={styles.contactInfo}>
+                {privacyUrl ? "Read privacy notice" : "Privacy link is not configured"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -422,6 +463,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: (width - 64 - 32) / 3 - 16,
     marginBottom: 16,
+  },
+  contactCardDisabled: {
+    opacity: 0.5,
   },
   contactTitle: {
     fontSize: 16,
