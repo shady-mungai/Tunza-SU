@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   api:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       mysql:
         image: mysql:8
@@ -36,8 +36,8 @@ jobs:
       MYSQL_USER: root
       MYSQL_PASSWORD: test-password
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22.13.1
           cache: npm
@@ -71,13 +71,13 @@ jobs:
           npm run smoke:release
 
   mobile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: client
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22.13.1
           cache: npm
@@ -90,8 +90,8 @@ jobs:
 
   container:
     needs: api
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build production API image
         run: docker build --tag tunza-su-api:ci ./server

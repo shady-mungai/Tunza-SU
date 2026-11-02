@@ -28,7 +28,7 @@ concurrency:
 jobs:
   validate:
     if: ${{ inputs.confirm_beta_build == true }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: client
@@ -46,8 +46,8 @@ jobs:
       EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${{ vars.PREVIEW_GOOGLE_IOS_CLIENT_ID }}
       EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: ${{ vars.PREVIEW_GOOGLE_ANDROID_CLIENT_ID }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22.13.1
           cache: npm
@@ -60,14 +60,14 @@ jobs:
 
   build:
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: beta
     defaults:
       run:
         working-directory: client
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22.13.1
           cache: npm
