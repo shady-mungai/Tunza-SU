@@ -11,7 +11,9 @@
    email, and optional Sentry settings.
 6. Confirm `/health` shows that the process is running and `/ready` proves the
    database is reachable before directing traffic to the candidate.
-7. Run the beta scenarios and review structured logs by request identifier.
+7. Run `npm run smoke:release` with staging-only credentials, then complete the
+   device/provider beta scenarios and review structured logs by request
+   identifier.
 
 Never print or commit secrets. Keep the database, object-storage, SMTP, Expo,
 and monitoring credentials in the provider's secret store, separated by

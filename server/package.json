@@ -7,10 +7,11 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "check": "node --check src/server.js && node --check src/createApp.js && node --check src/services/storage.js && node --check src/services/notifier.js && node --check src/services/observability.js && node --check scripts/migrate.js && node --check scripts/createAdmin.js && node --test",
+    "check": "node --check src/server.js && node --check src/createApp.js && node --check src/services/storage.js && node --check src/services/notifier.js && node --check src/services/observability.js && node --check scripts/migrate.js && node --check scripts/createAdmin.js && node --check scripts/smokeRelease.mjs && node --test",
     "test": "node --test",
     "migrate": "node scripts/migrate.js",
-    "create-admin": "node scripts/createAdmin.js"
+    "create-admin": "node scripts/createAdmin.js",
+    "smoke:release": "node scripts/smokeRelease.mjs"
   },
   "repository": {
     "type": "git",

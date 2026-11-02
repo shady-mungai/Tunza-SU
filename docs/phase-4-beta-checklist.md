@@ -17,6 +17,9 @@ deployed services, devices, and store accounts.
 - [x] Privacy, support, data-safety, store-listing, beta, and operations drafts.
 - [x] Node 22 clean-install checks cover API tests, release configuration, Expo
   Doctor, native prebuild, and Android/iOS/web exports.
+- [x] The production API image, all three migrations, readiness endpoint, and
+  an 11-check report lifecycle passed against disposable MySQL 8; CI repeats
+  this database-backed path.
 
 ## Deployment evidence required
 
@@ -40,3 +43,6 @@ deployed services, devices, and store accounts.
 An unchecked external item is not a source-code failure, but it is a release
 gate. Do not describe the app as deployed, beta-tested, approved, or shipped
 until the corresponding evidence exists.
+
+See [the recorded Phase 4 evidence](release-evidence.md) for exact proof and
+boundaries.

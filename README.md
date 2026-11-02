@@ -146,3 +146,5 @@ automation, release branding, support/privacy settings, and pilot operations.
 Start with [the Phase 4 beta checklist](docs/phase-4-beta-checklist.md), then use
 the [beta pilot](docs/beta-pilot-runbook.md) and
 [operations](docs/operations-runbook.md) runbooks for recorded release proof.
+The current verified results and external release gates are in
+[the Phase 4 evidence record](docs/release-evidence.md).

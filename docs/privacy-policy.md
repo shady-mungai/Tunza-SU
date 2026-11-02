@@ -13,8 +13,8 @@ notice describes the data handled by the current application and API.
 
 ## Data the service handles
 
-- Account data: name, email address, admission or staff number, role, optional
-  phone number, password hash, and account timestamps.
+- Account data: name, email address, admission or staff number, role, phone
+  number for password registration, password hash, and account timestamps.
 - Google sign-in data: the verified Google account identifier, email, name, and
   hosted-domain claim needed to authenticate the account. The service does not
   receive the user's Google password.
@@ -66,9 +66,10 @@ retained for legitimate operational, safety, audit, or legal reasons. The
 operator must verify the requester's identity, explain any limitation, and
 provide the rights required by applicable law.
 
-Users can choose not to attach an image or phone number. If Google sign-in is
-offered, users may instead use the supported email or admission-number login
-flow when an account password is available.
+Users can choose not to attach an image. A Google-created account does not need
+a phone number. If Google sign-in is offered, users may instead use the
+supported email or admission-number login flow when an account password is
+available.
 
 ## Children and sensitive information
 

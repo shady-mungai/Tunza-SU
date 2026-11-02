@@ -21,6 +21,21 @@ passes. Keep TestFlight and Play Console groups private.
 
 ## Required scenarios
 
+Run the automated API path first against the HTTPS staging endpoint:
+
+```bash
+cd server
+SMOKE_API_URL=https://api.example.edu \
+SMOKE_ADMIN_EMAIL=release-admin@example.edu \
+SMOKE_ADMIN_PASSWORD='from-the-secret-store' \
+npm run smoke:release
+```
+
+The script creates disposable student and maintenance accounts, verifies role
+boundaries and the report lifecycle, and removes its records. Continue with the
+device-only and provider checks below; the script does not prove Google, email,
+image storage, push delivery, or physical-device behavior.
+
 1. Install, launch, sign in, restore a session after restart, and sign out.
 2. Register a student and confirm that public registration cannot choose a
    privileged role.
